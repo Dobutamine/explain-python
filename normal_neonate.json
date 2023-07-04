@@ -14,14 +14,14 @@
     "AA": {
       "name": "AA",
       "description": "ascending aorta",
-      "model_type": "Capacitance",
+      "model_type": "BloodCapacitance",
       "is_enabled": true,
       "dependencies": [],
       "u_vol": 0.003,
       "vol": 0.005,
       "el_base": 23000,
       "el_k": 0,
-      "pres": 46.0,
+      "pres": 0.0,
       "pres_ext": 0.0
     }
   },
