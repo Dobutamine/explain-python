@@ -648,6 +648,17 @@
       "r_back": 35000,
       "r_k": 0
     },
+    "PC": {
+      "name": "PC",
+      "description": "pericardium",
+      "model_type": "Container",
+      "is_enabled": true,
+      "contained_components": ["RA", "RV", "LA", "LV"],
+      "vol": 0.0,
+      "u_vol": 0.0,
+      "el_base": 10,
+      "el_k": 0
+    },
     "Heart": {
       "name": "Heart",
       "description": "heart model",
