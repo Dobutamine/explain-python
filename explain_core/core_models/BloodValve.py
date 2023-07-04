@@ -12,7 +12,10 @@ class BloodValve(Valve):
         super().init_model(model)
 
         # get a reference to the model components which are connected by this resistor
-        self.model_comp_from = self._model.Models[self.comp_from]
-        self.model_comp_to = self._model.Models[self.comp_to]
+        self.model_comp_from = self._model.models[self.comp_from]
+        self.model_comp_to = self._model.models[self.comp_to]
 
+        # flag that the valve is initialized
         self._is_initialized = True
+
+        return self._is_initialized

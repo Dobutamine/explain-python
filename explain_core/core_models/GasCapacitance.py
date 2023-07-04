@@ -8,8 +8,6 @@ class GasCapacitance(Capacitance):
         # do the cap actions
         super().calc_model()
 
-    # override the volume_in method as all the gas fractions have to be changed to
-    def volume_in(self, dvol: float, model_from: object) -> None:
+    # override the volume_in method as all the blood solutes have to be changed to
+    def volume_in(self, dvol: float, model_from: Capacitance) -> None:
         super().volume_in(dvol)
-
-        # change the gasfractions

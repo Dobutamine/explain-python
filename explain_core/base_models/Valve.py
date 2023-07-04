@@ -4,7 +4,7 @@ from explain_core.base_models.BaseModel import BaseModel
 from explain_core.base_models.Capacitance import Capacitance
 
 
-class Resistor(BaseModel):
+class Valve(BaseModel):
     # independent variables
     r_for: float = 1.0
     r_for_factor: float = 1.0

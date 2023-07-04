@@ -120,13 +120,14 @@ class ModelEngine:
             init_errors = 0
             # initialize all components
             for _, model in self.models.items():
-                try:
-                    model.init_model(self)
-                except:
-                    # a module holding the desired model class is producing an error while initiallizing
-                    print(
-                        f"Initialization error: {model_type} model failed to initialize.")
-                    init_errors += 1
+                model.init_model(self)
+                # try:
+                #     model.init_model(self)
+                # except:
+                #     # a module holding the desired model class is producing an error while initiallizing
+                #     print(
+                #         f"Initialization error: {model_type} model failed to initialize.")
+                #     init_errors += 1
 
             if init_errors > 0:
                 self._initialized = False
