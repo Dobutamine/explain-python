@@ -1,6 +1,7 @@
 import math
 
 from explain_core.base_models.BaseModel import BaseModel
+from explain_core.base_models.Capacitance import Capacitance
 
 
 class Resistor(BaseModel):
@@ -17,19 +18,24 @@ class Resistor(BaseModel):
     # dependent variables
     flow: float = 0.0
 
-    # local variable holding the pressures
-    _p1: float = 0.0
-    _p2: float = 0.0
+    # define object which hold references to a BloodCapacitance or TimeVaryingElastance
+    _model_comp_from: Capacitance = {}
+    _model_comp_to: Capacitance = {}
 
     def calc_model(self) -> None:
+        # get the pressures
+        _p1: float = self._model_comp_from.pres
+        _p2: float = self._model_comp_to.pres
+
         if self.no_flow:
             self.flow = 0.0
             return
 
         # forward flow
-        if (self._p1 > self._p2):
-            self.flow = (self._p1 - self._p2) / (self.r_for * self.r_for_factor) - \
+        if (_p1 > _p2):
+            self.flow = (_p1 - _p2) / (self.r_for * self.r_for_factor) - \
                 self.r_k * self.r_k_factor * math.pow(self.no_flow, 2)
+            self.update_volumes()
             return
 
         # so there is no forward flow, if no_back_flow is true then set flow to zero and return
@@ -38,6 +44,26 @@ class Resistor(BaseModel):
             return
 
         # back flow
-        if (self._p1 < self._p2):
-            self.flow = (self._p1 - self._p2) / (self.r_for * self.r_for_factor) + \
+        if (_p1 < _p2):
+            self.flow = (_p1 - _p2) / (self.r_for * self.r_for_factor) + \
                 self.r_k * self.r_k_factor * math.pow(self.no_flow, 2)
+            self.update_volumes()
+            return
+
+    def update_volumes(self) -> None:
+        # now update the volumes of the model components which are connected by this resistor
+        if self.flow > 0:
+            # flow is from comp_from to comp_to
+            vol_not_removed: float = self._model_comp_from.volume_out(
+                self.flow * self._t)
+            self._model_comp_to.volume_in(
+                (self.flow * self._t) - vol_not_removed, self._model_comp_from)
+            return
+
+        if self.flow < 0:
+            # flow is from comp_to to comp_from
+            vol_not_removed: float = self._model_comp_to.volume_out(
+                -self.flow * self._t)
+            self._model_comp_from.volume_in(
+                (-self.flow * self._t) - vol_not_removed, self._model_comp_to)
+            return

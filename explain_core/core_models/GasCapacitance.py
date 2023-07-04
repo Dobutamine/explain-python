@@ -7,3 +7,9 @@ class GasCapacitance(Capacitance):
     def calc_model(self) -> None:
         # do the cap actions
         super().calc_model()
+
+    # override the volume_in method as all the gas fractions have to be changed to
+    def volume_in(self, dvol: float, model_from: object) -> None:
+        super().volume_in(dvol)
+
+        # change the gasfractions

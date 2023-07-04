@@ -3,6 +3,7 @@ from explain_core.base_models.BaseModel import BaseModel
 
 
 class Capacitance(BaseModel):
+
     # independent variables
     u_vol: float = 0.0
     u_vol_factor: float = 1.0
@@ -32,18 +33,18 @@ class Capacitance(BaseModel):
 
     def volume_out(self, dvol: float) -> float:
         # assume all dvol can be removed
-        vol_out: float = dvol
+        vol_not_removed: float = 0.0
 
         # decrease the volume
-        self.vol -= self.dvol
+        self.vol -= dvol
 
         # guard against negative volumes
         if self.vol < 0:
             # so we need to remove more volume then we have which is not possible. Calculate how much volume can be removed
-            vol_out = self.vol + dvol
+            vol_not_removed = -self.vol
 
             # reset the volume to zero
             self.vol = 0.0
 
         # return the amount of volume out
-        return vol_out
+        return vol_not_removed

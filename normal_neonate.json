@@ -20,9 +20,30 @@
       "u_vol": 0.003,
       "vol": 0.005,
       "el_base": 23000,
-      "el_k": 0,
-      "pres": 0.0,
-      "pres_ext": 0.0
+      "el_k": 0
+    },
+    "AAR": {
+      "name": "AAR",
+      "description": "aortic arch",
+      "model_type": "BloodCapacitance",
+      "is_enabled": true,
+      "u_vol": 0.0032,
+      "vol": 0.0048,
+      "el_base": 28000,
+      "el_k": 0
+    },
+    "AA_AAR": {
+      "name": "AA_AAR",
+      "description": "ascending aorta to aortic arch",
+      "model_type": "BloodResistor",
+      "is_enabled": true,
+      "no_flow": false,
+      "no_back_flow": false,
+      "comp_from": "AA",
+      "comp_to": "AAR",
+      "r_for": 50,
+      "r_back": 50,
+      "r_k": 0
     }
   },
   "dateCreated": {

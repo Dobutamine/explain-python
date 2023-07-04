@@ -11,6 +11,7 @@ class BaseModel:
 
     # reference to all models
     _model: object = {}
+    _t: float = 0.0005
 
     def __init__(self, **args: dict[str, any]):
         # set the values of the independent properties as arguments of the model
@@ -20,6 +21,9 @@ class BaseModel:
     def init_model(self, model: object) -> bool:
         # get a reference to the model
         self._model = model
+
+        # get the modeling step size
+        self._t = model.modeling_stepsize
 
         # flag that the model is initialized
         self._is_initialized = True
