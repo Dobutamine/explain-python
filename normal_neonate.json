@@ -693,7 +693,6 @@
       "model_type": "Blood",
       "is_enabled": true,
       "solutes": {
-        "na": 140.0,
         "to2": 9.7,
         "tco2": 24.7
       },
@@ -706,18 +705,6 @@
         "po2": 0.0,
         "so2": 0.0
       }
-    },
-    "AcidBase": {
-      "name": "AcidBase",
-      "description": "acid base model",
-      "model_type": "AcidBase",
-      "is_enabled": true
-    },
-    "Oxygenation": {
-      "name": "Oxygenation",
-      "description": "xygenation model",
-      "model_type": "Oxygenation",
-      "is_enabled": true
     }
   },
   "dateCreated": {
