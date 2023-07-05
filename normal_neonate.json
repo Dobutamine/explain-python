@@ -672,6 +672,20 @@
       "pq_time": 0.1,
       "qrs_time": 0.075,
       "qt_time": 0.4
+    },
+    "Ans": {
+      "name": "Ans",
+      "description": "autonomic nervous system model",
+      "model_type": "Ans",
+      "is_enabled": true,
+      "baroreceptor_location": "AA",
+      "chemoreceptor_location": "BR",
+      "heart_rate_ref": 140,
+      "set_baro": 53.0,
+      "max_baro": 76.0,
+      "min_baro": 30.0,
+      "g_map_hp": 10.0,
+      "tc_map_hp": 2.0
     }
   },
   "dateCreated": {

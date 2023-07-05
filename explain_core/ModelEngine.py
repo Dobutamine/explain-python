@@ -191,10 +191,10 @@ class ModelEngine:
             # execute the model step method of all models
             # iterate over all models
             for model in self.models.values():
-                model.calc_model()
+                model.step_model()
 
             # call the user interface
-            self.interface.model_step(self.model_time_total)
+            self.interface.step_model(self.model_time_total)
 
             # increase the model clock
             self.model_time_total += self.modeling_stepsize

@@ -44,7 +44,7 @@ class Interface:
         print(
             f'Ready in {run_duration} sec. Average model step in {step_duration} ms.')
 
-    def model_step(self, model_clock):
+    def step_model(self, model_clock):
         self.dc.collect_data(model_clock)
         # process the propchanges
         if (self.prop_update_counter >= self.prop_update_interval):
