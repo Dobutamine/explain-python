@@ -2,6 +2,7 @@ import math
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.base_models.Capacitance import Capacitance
 from explain_core.core_models.Heart import Heart
+from explain_core.helpers.ActivationFunction import activation_function
 
 
 class Ans(BaseModel):
@@ -23,12 +24,11 @@ class Ans(BaseModel):
         return self._is_initialized
 
     def calc_model(self) -> None:
-
         # get the baroreflex input
         _baro_pres: float = self._baroreceptor.mean
 
         # calculate the activation function
-        self._a_map = self.activation_function(
+        self._a_map = activation_function(
             _baro_pres, self.max_baro, self.set_baro, self.min_baro)
 
         # calculate the effectors
@@ -36,18 +36,4 @@ class Ans(BaseModel):
             ((1 / self.tc_map_hp) * (-self._d_map_hp + self._a_map)) + self._d_map_hp
 
         # apply the effects
-        self._heart.heart_rate = 60000.0 / \
-            (60000.0 / self.heart_rate_ref + self.g_map_hp * self._d_map_hp)
-
-    def activation_function(self, value: float, max: float, setpoint: float, min: float):
-        activation: float = 0.0
-
-        if value >= max:
-            activation = max - setpoint
-        else:
-            if value <= min:
-                activation = min - setpoint
-            else:
-                activation = value - setpoint
-
-        return activation
+        self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hp

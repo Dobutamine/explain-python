@@ -686,6 +686,17 @@
       "min_baro": 30.0,
       "g_map_hp": 10.0,
       "tc_map_hp": 2.0
+    },
+    "Blood": {
+      "name": "Blood",
+      "description": "blood model",
+      "model_type": "Blood",
+      "is_enabled": true,
+      "solutes": {
+        "na": 140.0,
+        "to2": 9.7,
+        "tco2": 24.7
+      }
     }
   },
   "dateCreated": {
