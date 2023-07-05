@@ -668,6 +668,7 @@
       "right_atrium": "RA",
       "left_ventricle": "LV",
       "right_ventricle": "RV",
+      "heart_rate": 120.0,
       "pq_time": 0.1,
       "qrs_time": 0.075,
       "qt_time": 0.4

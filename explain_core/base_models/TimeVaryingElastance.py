@@ -12,6 +12,7 @@ class TimeVaryingElastance(BaseModel):
     el_max_factor: float = 1.0
     el_k: float = 0.0
     el_k_factor: float = 1.0
+    act_factor: float = 0.0
 
     # dependent variables
     vol: float = 0.0
@@ -29,7 +30,7 @@ class TimeVaryingElastance(BaseModel):
                 (self.vol - (self.u_vol * self.u_vol_factor)) + self.pres_ext
             self.pres_ms = self.el_max * self.el_max_factor * \
                 (self.vol - (self.u_vol * self.u_vol_factor))
-            self.pres = self.a * (self.pres_ms - self.pres_ed) + \
+            self.pres = self.act_factor * (self.pres_ms - self.pres_ed) + \
                 self.pres_ed + self.pres_ext
         else:
             self.pres = self.pres_ext
