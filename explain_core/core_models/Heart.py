@@ -14,8 +14,6 @@ class Heart(BaseModel):
     cqt_time: float = 0.0
     ncc_atrial: int = 0
     ncc_ventricular: int = 0
-    ncca = 0.0
-    nccv = 0.0
     aaf: float = 0.0
     vaf: float = 0.0
 
@@ -106,9 +104,6 @@ class Heart(BaseModel):
         # increase the heart activation function counters
         self.ncc_atrial += 1
         self.ncc_ventricular += 1
-
-        self.ncca = self.ncc_atrial
-        self.nccv = self.ncc_ventricular
 
         # calculate the varying elastance factor
         self.calc_varying_elastance()
