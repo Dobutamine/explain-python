@@ -12,3 +12,7 @@ class Blood(BaseModel):
             if model.model_type == "BloodCapacitance" or model.model_type == "BloodTimeVaryingElastance":
                 # fill the solutes
                 model.solutes = {**self.solutes}
+                model.acidbase = {**self.acidbase}
+                model.oxy = {**self.oxy}
+
+        return self._is_initialized

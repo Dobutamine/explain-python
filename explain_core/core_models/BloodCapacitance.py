@@ -11,6 +11,8 @@ class BloodCapacitance(Capacitance):
     vol_min: float = 0.0
     stroke_volume: float = 0.0
     solutes: dict[str, float] = {}
+    acidbase: dict[str, float] = {}
+    oxy: dict[str, float] = {}
 
     # local variables
     _temp_max_pres: float = -1000.0
