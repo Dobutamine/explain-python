@@ -2,47 +2,58 @@ import json
 import importlib
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
+from explain_core.helpers.Interface import Interface
+
+# import the perfomance counter module to measure the model performance
+from time import perf_counter
 
 
 class ModelEngine:
     # define an object holding the entire model and submodels
-    models = {}
+    models: dict = {}
 
     # define an object holding the model engine properties
-    model_engine = {}
+    model_engine: dict = {}
 
     # define an object holding the model properties of the current model
-    model_definition = {}
+    model_definition: dict = {}
 
     # define an object holding the high resolution model data
-    model_data = {}
+    model_data: dict = {}
 
     # define an object holding the low resolution model data
-    model_data_slow = {}
+    model_data_slow: dict = {}
 
     # define an attribute holding the name of the model
-    name = ""
+    name: str = ""
 
     # define an attribute holding the description of the model
-    description = ""
+    description: str = ""
 
     # define an attribute holding the weight
-    weight = 0.0
+    weight: float = 0.0
 
     # define an attribute holding the modeling stepsize
-    modeling_stepsize = 0.0005
+    modeling_stepsize: float = 0.0005
 
     # define an attribute holding the model time
-    model_time_total = 0.0
+    model_time_total: float = 0.0
 
     # define an obvject holding the  datacollector
-    datacollector = {}
+    datacollector: dict = {}
+
+    # define an obvject holding the  datacollector
+    interface: dict = {}
 
     # define an object holding the task scheduler
-    task_scheduler = {}
+    task_scheduler: dict = {}
+
+    # performance
+    run_duration: float = 0.0
+    step_duration: float = 0.0
 
     # define local attributes
-    _initialized = False
+    _initialized: bool = False
 
     # define the constructor
     def __init__(self, model_definition_filename: str):
@@ -110,7 +121,7 @@ class ModelEngine:
                     error_counter += 1
 
         # initialize a datacollector
-        self.datacollector = DataCollector(self)
+        self.interface = Interface(self)
 
         # check the dependencies
         self.check_dependencies()
@@ -168,14 +179,29 @@ class ModelEngine:
         # stop the realtime model
         pass
 
-    def calculate(self, time_to_calculate=10.0):
-        pass
+    def calculate(self, time_to_calculate: float = 10.0):
+        # calculate a number of seconds of the model
+        _no_of_steps: float = int(time_to_calculate / self.modeling_stepsize)
 
-    def model_step(self):
-        pass
+        # start the performance counter
+        perf_start = perf_counter()
 
-    def rt_model_step(self):
-        pass
+        # do all model steps
+        for _ in range(_no_of_steps):
+            # execute the model step method of all models
+            # iterate over all models
+            for model in self.models.values():
+                model.calc_model()
 
-    def print_performance(self, perf):
-        pass
+            # call the user interface
+            self.interface.model_step(self.model_time_total)
+
+            # increase the model clock
+            self.model_time_total += self.modeling_stepsize
+
+        # stop the performance counter
+        perf_stop = perf_counter()
+
+        # store the performance metrics
+        self.run_duration = perf_stop - perf_start
+        self.step_duration = (self.run_duration / _no_of_steps) * 1000

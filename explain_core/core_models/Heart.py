@@ -14,6 +14,8 @@ class Heart(BaseModel):
     cqt_time: float = 0.0
     ncc_atrial: int = 0
     ncc_ventricular: int = 0
+    ncca = 0.0
+    nccv = 0.0
     aaf: float = 0.0
     vaf: float = 0.0
 
@@ -64,7 +66,7 @@ class Heart(BaseModel):
             # reset the pq timer
             self._pq_timer = 0.0
             # signal that the pq timer has stopped
-            self._pq_running = True
+            self._pq_running = False
             # check whether the ventricles are in a refractory state
             if not self._ventricle_is_refractory:
                 # signal that the qrs time starts running
@@ -104,6 +106,9 @@ class Heart(BaseModel):
         # increase the heart activation function counters
         self.ncc_atrial += 1
         self.ncc_ventricular += 1
+
+        self.ncca = self.ncc_atrial
+        self.nccv = self.ncc_ventricular
 
         # calculate the varying elastance factor
         self.calc_varying_elastance()

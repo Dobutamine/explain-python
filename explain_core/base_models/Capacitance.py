@@ -47,4 +47,5 @@ class Capacitance(BaseModel):
             self.vol = 0.0
 
         # return the amount of volume out
+        vol_not_removed = 0
         return vol_not_removed
