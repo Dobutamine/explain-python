@@ -17,6 +17,8 @@ class Capacitance(BaseModel):
     pres: float = 0.0
     pres_ext: float = 0.0
     pres_cc: float = 0.0
+    pres_atm: float = 0.0
+    pres_mus: float = 0.0
 
     # implement the calc_model method
     def calc_model(self) -> None:
@@ -25,9 +27,14 @@ class Capacitance(BaseModel):
             self.pres = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + \
                 self.el_base * self.el_base_factor * \
                 (self.vol - (self.u_vol * self.u_vol_factor)) + \
-                self.pres_ext + self.pres_cc
+                self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
         else:
-            self.pres = self.pres_ext + self.pres_cc
+            self.pres = self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
+
+        # reset the pressure which are recalculated every model iterattion
+        self.pres_ext = 0.0
+        self.pres_cc = 0.0
+        self.pres_mus = 0.0
 
     def volume_in(self, dvol: float) -> None:
         # increase the volume

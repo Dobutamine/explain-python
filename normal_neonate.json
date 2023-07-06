@@ -814,6 +814,12 @@
         "hemoglobin": 10.0,
         "temp": 37.0
       }
+    },
+    "Gas": {
+      "name": "Gas",
+      "description": "gas model",
+      "model_type": "Gas",
+      "is_enabled": true
     }
   },
   "dateCreated": {

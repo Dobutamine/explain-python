@@ -54,9 +54,6 @@ class GasCapacitance(Capacitance):
         # do the cap actions
         super().calc_model()
 
-        # reset the external pressure
-        self.pres_ext = 0
-
         # calculate the current gas composition
         self.calc_gas_composition()
 
