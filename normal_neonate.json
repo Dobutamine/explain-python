@@ -723,7 +723,7 @@
     },
     "MOUTH_DS": {
       "name": "MOUTH_DS",
-      "description": "MOUTHside air to dead space",
+      "description": "MOUTH air to dead space",
       "model_type": "GasResistor",
       "is_enabled": true,
       "no_flow": false,
@@ -819,7 +819,26 @@
       "name": "Gas",
       "description": "gas model",
       "model_type": "Gas",
-      "is_enabled": true
+      "is_enabled": true,
+      "pres_atm": 760,
+      "dry_air": {
+        "f_o2": 0.205,
+        "f_co2": 0.000392,
+        "f_n2": 0.794608,
+        "f_other": 0
+      },
+      "temp_settings": {
+        "MOUTH": 0.5,
+        "DS": 1.0,
+        "ALL": 1.0,
+        "ALR": 1.0
+      },
+      "humidity_settings": {
+        "MOUTH": 20.0,
+        "DS": 37.0,
+        "ALL": 37.0,
+        "ALR": 37.0
+      }
     }
   },
   "dateCreated": {
