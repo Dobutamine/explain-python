@@ -55,7 +55,7 @@ def brent_root_finding(f, x0, x1, max_iter, tolerance):
         steps_taken += 1
 
     if (steps_taken >= max_iter):
-        return (-1, steps, True)
+        return -1
     else:
         steps = steps_taken
-        return (x1, steps, False)
+        return x1

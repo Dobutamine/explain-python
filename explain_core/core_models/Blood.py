@@ -1,6 +1,5 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
-from explain_core.helpers.BrentRootFinding import brent_root_finding
 
 
 class Blood(BaseModel):
@@ -34,6 +33,10 @@ class Blood(BaseModel):
     hemoglobin = 10
     temp = 37
 
+    # local parameters
+    _update_interval = 0.015
+    _update_counter = 0.0
+
     def init_model(self, model: object) -> bool:
         super().init_model(model)
 
@@ -49,26 +52,26 @@ class Blood(BaseModel):
 
     def calc_acidbase_from_tco2(self, comp):
         # calculate the apparent strong ion difference (SID) in mEq/l
-        comp.sid = comp.sodium + comp.potassium + 2 * comp.calcium + 2 * \
-            comp.magnesium - comp.chloride - comp.lactate - comp.urate
-
-        # store the apparent SID
-        self.sid = comp.sid
-
-        # get the albumin concentration in g/l
-        self.albumin = comp.albumin
-
-        # get the inorganic phosphates concentration in mEq/l
-        self.phosphates = comp.phosphates
-
-        # get the unmeasured anions in mEq/l
-        self.uma = comp.uma
+        # comp.sid = comp.sodium + comp.potassium + 2 * comp.calcium + 2 * \
+        #     comp.magnesium - comp.chloride - comp.lactate - comp.urate
 
         # get the total co2 concentration in mmol/l
-        self.tco2 = comp.tco2
+        self.tco2 = comp.solutes['tco2']
 
-        # get the hemoglobin concentration in mmol/l
-        self.hemoglobin = comp.hemoglobin
+        # store the apparent SID
+        self.sid = comp.acidbase['sid']
+
+        # get the albumin concentration in g/l
+        self.albumin = comp.acidbase['albumin']
+
+        # get the inorganic phosphates concentration in mEq/l
+        self.phosphates = comp.acidbase['phosphates']
+
+        # get the unmeasured anions in mEq/l
+        self.uma = comp.acidbase['uma']
+
+        # # get the hemoglobin concentration in mmol/l
+        self.hemoglobin = comp.oxy['hemoglobin']
 
         # now try to find the hydrogen concentration at the point where the net charge of the plasma is zero within limits of the brent accuracy
         hp = self.brent_root_finding(
@@ -77,13 +80,10 @@ class Blood(BaseModel):
         # if this hydrogen concentration is found then store it inside the compartment
         if (hp > 0):
             # calculate the pH and store it inside the compartment
-            comp.ph = (-math.log10(hp / 1000))
-            # get the rest of the calculated blood gas
-            comp.pco2 = self.pco2
-            comp.hco3 = self.hco3
-            comp.cco2 = self.cco2
-            comp.cco3 = self.cco3
-            comp.be = self.be
+            comp.acidbase['ph'] = (-math.log10(hp / 1000))
+            comp.acidbase['pco2'] = self.pco2
+            comp.acidbase['hco3'] = self.hco3
+            comp.acidbase['be'] = self.be
 
     def net_charge_plasma(self, hp_estimate):
         # calculate the ph based on the current hp estimate
@@ -140,11 +140,12 @@ class Blood(BaseModel):
 
     def calc_oxygenation_from_to2(self, comp):
         # get the for the oxygenation independent parameters from the component
-        self.to2 = comp.to2
-        self.dpg = comp.dpg
-        self.hemoglobin = comp.hemoglobin
-        self.be = comp.be
-        self.temp = comp.temp
+        self.to2 = comp.solutes['to2']
+        self.ph = comp.acidbase['ph']
+        self.be = comp.acidbase['be']
+        self.dpg = comp.oxy['dpg']
+        self.hemoglobin = comp.oxy['hemoglobin']
+        self.temp = comp.oxy['temp']
 
         # calculate the po2 from the to2 using a brent root finding function and oxygen dissociation curve
         self.po2 = self.brent_root_finding(
@@ -153,8 +154,8 @@ class Blood(BaseModel):
         # if a po2 is found then store the po2 and so2 into the component
         if (self.po2 > 0):
             # convert the po2 to mmHg
-            comp.po2 = self.po2 / 0.1333
-            comp.so2 = self.so2 * 100
+            comp.oxy['po2'] = self.po2 / 0.1333
+            comp.oxy['so2'] = self.so2 * 100
 
     def oxygen_content(self, po2_estimate):
         # calculate the saturation from the current po2 from the current po2 estimate
@@ -188,3 +189,65 @@ class Blood(BaseModel):
 
         # return the o2 saturation
         return 1.0 / (math.pow(math.e, -y) + 1.0)
+
+    def brent_root_finding(self, f, x0, x1, max_iter, tolerance):
+        steps = 0
+
+        fx0 = f(x0)
+        fx1 = f(x1)
+
+        if (fx0 * fx1) > 0:
+            return (-1, steps, True)
+
+        if abs(fx0) < abs(fx1):
+            x0, x1 = x1, x0
+            fx0, fx1 = fx1, fx0
+
+        x2, fx2 = x0, fx0
+
+        mflag = True
+        steps_taken = 0
+
+        while steps_taken < max_iter and abs(x1 - x0) > tolerance:
+            fx0 = f(x0)
+            fx1 = f(x1)
+            fx2 = f(x2)
+
+            if fx0 != fx2 and fx1 != fx2:
+                L0 = (x0 * fx1 * fx2) / ((fx0 - fx1) * (fx0 - fx2))
+                L1 = (x1 * fx0 * fx2) / ((fx1 - fx0) * (fx1 - fx2))
+                L2 = (x2 * fx1 * fx0) / ((fx2 - fx0) * (fx2 - fx1))
+                new = L0 + L1 + L2
+
+            else:
+                new = x1 - ((fx1 * (x1 - x0)) / (fx1 - fx0))
+
+            if ((new < ((3 * x0 + x1) / 4) or new > x1) or
+                    (mflag == True and (abs(new - x1)) >= (abs(x1 - x2) / 2)) or
+                    (mflag == False and (abs(new - x1)) >= (abs(x2 - d) / 2)) or
+                    (mflag == True and (abs(x1 - x2)) < tolerance) or
+                    (mflag == False and (abs(x2 - d)) < tolerance)):
+                new = (x0 + x1) / 2
+                mflag = True
+
+            else:
+                mflag = False
+
+            fnew = f(new)
+            d, x2 = x2, x1
+
+            if (fx0 * fnew) < 0:
+                x1 = new
+            else:
+                x0 = new
+
+            if abs(fx0) < abs(fx1):
+                x0, x1 = x1, x0
+
+            steps_taken += 1
+
+        if (steps_taken >= max_iter):
+            return -1
+        else:
+            steps = steps_taken
+            return x1

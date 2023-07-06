@@ -659,6 +659,107 @@
       "el_base": 10,
       "el_k": 0
     },
+    "CHEST_L": {
+      "name": "CHEST_L",
+      "description": "pleural space left",
+      "model_type": "Container",
+      "is_enabled": true,
+      "contained_components": ["ALL"],
+      "vol": 0.05,
+      "u_vol": 0.065,
+      "el_base": 200.0,
+      "el_k": 0
+    },
+    "CHEST_R": {
+      "name": "CHEST_R",
+      "description": "pleural space right",
+      "model_type": "Container",
+      "is_enabled": true,
+      "contained_components": ["ALR"],
+      "vol": 0.05,
+      "u_vol": 0.065,
+      "el_base": 200.0,
+      "el_k": 0
+    },
+    "MOUTH": {
+      "name": "MOUTH",
+      "description": "MOUTHside air",
+      "model_type": "GasCapacitance",
+      "is_enabled": true,
+      "vol": 1000000,
+      "u_vol": 1000000,
+      "el_base": 0.00076,
+      "el_k": 0
+    },
+    "DS": {
+      "name": "DS",
+      "description": "dead space",
+      "model_type": "GasCapacitance",
+      "is_enabled": true,
+      "vol": 0.005,
+      "u_vol": 0.005,
+      "el_base": 40000,
+      "el_k": 0
+    },
+    "ALL": {
+      "name": "ALL",
+      "description": "alveolar left lung",
+      "model_type": "GasCapacitance",
+      "is_enabled": true,
+      "vol": 0.05,
+      "u_vol": 0.0425,
+      "el_base": 400.0,
+      "el_k": 0
+    },
+    "ALR": {
+      "name": "ALR",
+      "description": "alveolar right lung",
+      "model_type": "GasCapacitance",
+      "is_enabled": true,
+      "vol": 0.05,
+      "u_vol": 0.0425,
+      "el_base": 400.0,
+      "el_k": 0
+    },
+    "MOUTH_DS": {
+      "name": "MOUTH_DS",
+      "description": "MOUTHside air to dead space",
+      "model_type": "GasResistor",
+      "is_enabled": true,
+      "no_flow": false,
+      "no_back_flow": false,
+      "comp_from": "MOUTH",
+      "comp_to": "DS",
+      "r_for": 25,
+      "r_back": 25,
+      "r_k": 0
+    },
+    "DS_ALL": {
+      "name": "DS_ALL",
+      "description": "non-collapsible airways to alveolar left lung",
+      "model_type": "GasResistor",
+      "is_enabled": true,
+      "no_flow": false,
+      "no_back_flow": false,
+      "comp_from": "DS",
+      "comp_to": "ALL",
+      "r_for": 75,
+      "r_back": 75,
+      "r_k": 0
+    },
+    "DS_ALR": {
+      "name": "DS_ALR",
+      "description": "non-collapsible airways to alveolar right lung",
+      "model_type": "GasResistor",
+      "is_enabled": true,
+      "no_flow": false,
+      "no_back_flow": false,
+      "comp_from": "DS",
+      "comp_to": "ALR",
+      "r_for": 75,
+      "r_back": 75,
+      "r_k": 0
+    },
     "Heart": {
       "name": "Heart",
       "description": "heart model",
@@ -697,13 +798,21 @@
         "tco2": 24.7
       },
       "acidbase": {
-        "ph": 0.0,
-        "pco2": 0.0,
-        "hco3": 0.0
+        "ph": 7.4,
+        "pco2": 35.0,
+        "hco3": 25.0,
+        "be": 0.0,
+        "sid": 41.6,
+        "albumin": 30.0,
+        "phosphates": 1.5,
+        "uma": 7.2
       },
       "oxy": {
         "po2": 0.0,
-        "so2": 0.0
+        "so2": 0.0,
+        "dpg": 5.0,
+        "hemoglobin": 10.0,
+        "temp": 37.0
       }
     }
   },

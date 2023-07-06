@@ -16,6 +16,7 @@ class Capacitance(BaseModel):
     vol: float = 0.0
     pres: float = 0.0
     pres_ext: float = 0.0
+    pres_cc: float = 0.0
 
     # implement the calc_model method
     def calc_model(self) -> None:
@@ -23,9 +24,10 @@ class Capacitance(BaseModel):
         if self.vol > self.u_vol * self.u_vol_factor:
             self.pres = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + \
                 self.el_base * self.el_base_factor * \
-                (self.vol - (self.u_vol * self.u_vol_factor)) + self.pres_ext
+                (self.vol - (self.u_vol * self.u_vol_factor)) + \
+                self.pres_ext + self.pres_cc
         else:
-            self.pres = self.pres_ext
+            self.pres = self.pres_ext + self.pres_cc
 
     def volume_in(self, dvol: float) -> None:
         # increase the volume
