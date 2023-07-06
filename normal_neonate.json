@@ -827,13 +827,13 @@
         "f_n2": 0.794608,
         "f_other": 0
       },
-      "temp_settings": {
+      "humidity_settings": {
         "MOUTH": 0.5,
         "DS": 1.0,
         "ALL": 1.0,
         "ALR": 1.0
       },
-      "humidity_settings": {
+      "temp_settings": {
         "MOUTH": 20.0,
         "DS": 37.0,
         "ALL": 37.0,

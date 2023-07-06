@@ -123,7 +123,7 @@ class GasCapacitance(Capacitance):
             self.temp = (self.temp * self.vol + dtemp) / self.vol
 
     def calc_gas_composition(self) -> None:
-        # calculate Ctotal sum of all concentrations
+        # calculate the concentration in mmol/l using the sum of all concentrations
         self.c_total = self.c_h2o + self.c_o2 + self.c_co2 + self.c_n2 + self.c_other
 
         # protect against division by zero

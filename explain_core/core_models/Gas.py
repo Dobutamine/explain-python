@@ -4,6 +4,7 @@ from explain_core.base_models.BaseModel import BaseModel
 
 class Gas(BaseModel):
 
+    # local constant
     _gas_constant: float = 62.36367
 
     def init_model(self, model: object) -> bool:
@@ -15,6 +16,14 @@ class Gas(BaseModel):
         self.set_humidity()
 
         # we need a pressure to calculate the composition of the air in the gas capacitances
+        for model in self._model.models.values():
+            if model.model_type == "GasCapacitance":
+                # calculate the pressure
+                model.calc_model()
+
+                # calculate the gas composition
+                self.set_air_composition(
+                    model, self.dry_air['f_o2'], self.dry_air['f_co2'], self.dry_air['f_n2'], self.dry_air['f_other'])
 
         return self._is_initialized
 
