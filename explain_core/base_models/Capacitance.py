@@ -23,13 +23,11 @@ class Capacitance(BaseModel):
     # implement the calc_model method
     def calc_model(self) -> None:
         # calculate the pressure depending on the volume, unstressed volume, elastance and external pressure
-        if self.vol > self.u_vol * self.u_vol_factor:
-            self.pres = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + \
-                self.el_base * self.el_base_factor * \
-                (self.vol - (self.u_vol * self.u_vol_factor)) + \
-                self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
-        else:
-            self.pres = self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
+
+        self.pres = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + \
+            self.el_base * self.el_base_factor * \
+            (self.vol - (self.u_vol * self.u_vol_factor)) + \
+            self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
 
         # reset the pressure which are recalculated every model iterattion
         self.pres_ext = 0.0
