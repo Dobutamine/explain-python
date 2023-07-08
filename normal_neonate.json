@@ -760,6 +760,28 @@
       "r_back": 75,
       "r_k": 0
     },
+    "GASEX_LL": {
+      "name": "GASEX_LL",
+      "description": "Gas exchanger blood-gas left lung",
+      "model_type": "GasExchanger",
+      "is_enabled": true,
+      "dependencies": [],
+      "comp_blood": "LL",
+      "comp_gas": "ALL",
+      "dif_co2": 0.01,
+      "dif_o2": 0.01
+    },
+    "GASEX_LR": {
+      "name": "GASEX_LR",
+      "description": "Gas exchanger blood-gas right lung",
+      "model_type": "GasExchanger",
+      "is_enabled": true,
+      "dependencies": [],
+      "comp_blood": "RL",
+      "comp_gas": "ALR",
+      "dif_co2": 0.01,
+      "dif_o2": 0.01
+    },
     "Heart": {
       "name": "Heart",
       "description": "heart model",

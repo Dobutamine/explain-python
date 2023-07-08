@@ -197,7 +197,7 @@ class Blood(BaseModel):
         fx1 = f(x1)
 
         if (fx0 * fx1) > 0:
-            return (-1, steps, True)
+            return -1
 
         if abs(fx0) < abs(fx1):
             x0, x1 = x1, x0
