@@ -56,13 +56,13 @@ class BloodTimeVaryingElastance(TimeVaryingElastance):
         super().volume_in(dvol)
 
         # process the to2 and tco2
-        d_to2: float = (model_from.oxy['to2'] - self.oxy['to2']) * dvol
-        self.oxy['to2'] = (self.oxy['to2'] * self.vol + d_to2) / self.vol
+        d_to2: float = (model_from.aboxy['to2'] - self.aboxy['to2']) * dvol
+        self.aboxy['to2'] = (self.aboxy['to2'] * self.vol + d_to2) / self.vol
 
         d_tco2: float = (
-            model_from.acidbase['tco2'] - self.acidbase['tco2']) * dvol
-        self.acidbase['tco2'] = (
-            self.acidbase['tco2'] * self.vol + d_tco2) / self.vol
+            model_from.aboxy['tco2'] - self.aboxy['tco2']) * dvol
+        self.aboxy['tco2'] = (
+            self.aboxy['tco2'] * self.vol + d_tco2) / self.vol
 
         # process the solutes
         if self.vol > 0:

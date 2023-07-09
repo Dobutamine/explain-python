@@ -36,7 +36,6 @@ class Blood(BaseModel):
     # local parameters
     _update_interval = 0.015
     _update_counter = 0.0
-    _aa = {}
 
     def init_model(self, model: object) -> bool:
         super().init_model(model)
@@ -46,16 +45,16 @@ class Blood(BaseModel):
             if model.model_type == "BloodCapacitance" or model.model_type == "BloodTimeVaryingElastance":
                 # fill the solutes
                 model.solutes = {**self.solutes}
-                model.acidbase = {**self.acidbase}
-                model.oxy = {**self.oxy}
+                model.aboxy = {**self.aboxy}
 
-        self._aa = self._model.models['AA']
+        # add a reference to all the models needing acidbase calcs
 
         return self._is_initialized
 
     def calc_model(self) -> None:
-        self.calc_acidbase_from_tco2(self._aa)
-        self.calc_oxygenation_from_to2(self._aa)
+        for c in self.aboxy['comps']:
+            self.calc_acidbase_from_tco2(self._model.models[c])
+            self.calc_oxygenation_from_to2(self._model.models[c])
 
     def calc_acidbase_from_tco2(self, comp):
         # calculate the apparent strong ion difference (SID) in mEq/l
@@ -63,22 +62,22 @@ class Blood(BaseModel):
         #     comp.magnesium - comp.chloride - comp.lactate - comp.urate
 
         # get the total co2 concentration in mmol/l
-        self.tco2 = comp.acidbase['tco2']
+        self.tco2 = comp.aboxy['tco2']
 
         # store the apparent SID
-        self.sid = comp.acidbase['sid']
+        self.sid = comp.aboxy['sid']
 
         # get the albumin concentration in g/l
-        self.albumin = comp.acidbase['albumin']
+        self.albumin = comp.aboxy['albumin']
 
         # get the inorganic phosphates concentration in mEq/l
-        self.phosphates = comp.acidbase['phosphates']
+        self.phosphates = comp.aboxy['phosphates']
 
         # get the unmeasured anions in mEq/l
-        self.uma = comp.acidbase['uma']
+        self.uma = comp.aboxy['uma']
 
         # # get the hemoglobin concentration in mmol/l
-        self.hemoglobin = comp.oxy['hemoglobin']
+        self.hemoglobin = comp.aboxy['hemoglobin']
 
         # now try to find the hydrogen concentration at the point where the net charge of the plasma is zero within limits of the brent accuracy
         hp = self.brent_root_finding(
@@ -87,10 +86,10 @@ class Blood(BaseModel):
         # if this hydrogen concentration is found then store it inside the compartment
         if (hp > 0):
             # calculate the pH and store it inside the compartment
-            comp.acidbase['ph'] = (-math.log10(hp / 1000))
-            comp.acidbase['pco2'] = self.pco2
-            comp.acidbase['hco3'] = self.hco3
-            comp.acidbase['be'] = self.be
+            comp.aboxy['ph'] = (-math.log10(hp / 1000))
+            comp.aboxy['pco2'] = self.pco2
+            comp.aboxy['hco3'] = self.hco3
+            comp.aboxy['be'] = self.be
 
     def net_charge_plasma(self, hp_estimate):
         # calculate the ph based on the current hp estimate
@@ -147,12 +146,12 @@ class Blood(BaseModel):
 
     def calc_oxygenation_from_to2(self, comp):
         # get the for the oxygenation independent parameters from the component
-        self.to2 = comp.oxy['to2']
-        self.ph = comp.acidbase['ph']
-        self.be = comp.acidbase['be']
-        self.dpg = comp.oxy['dpg']
-        self.hemoglobin = comp.oxy['hemoglobin']
-        self.temp = comp.oxy['temp']
+        self.to2 = comp.aboxy['to2']
+        self.ph = comp.aboxy['ph']
+        self.be = comp.aboxy['be']
+        self.dpg = comp.aboxy['dpg']
+        self.hemoglobin = comp.aboxy['hemoglobin']
+        self.temp = comp.aboxy['temp']
 
         # calculate the po2 from the to2 using a brent root finding function and oxygen dissociation curve
         self.po2 = self.brent_root_finding(
@@ -161,8 +160,8 @@ class Blood(BaseModel):
         # if a po2 is found then store the po2 and so2 into the component
         if (self.po2 > 0):
             # convert the po2 to mmHg
-            comp.oxy['po2'] = self.po2 / 0.1333
-            comp.oxy['so2'] = self.so2 * 100
+            comp.aboxy['po2'] = self.po2 / 0.1333
+            comp.aboxy['so2'] = self.so2 * 100
 
     def oxygen_content(self, po2_estimate):
         # calculate the saturation from the current po2 from the current po2 estimate

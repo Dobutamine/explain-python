@@ -10,22 +10,22 @@ class GasCapacitance(Capacitance):
     pres_atm: float = 760
 
     # dependent variables
-    c_total: float = 0.0
-    c_o2: float = 0.0
-    c_co2: float = 0.0
-    c_n2: float = 0.0
-    c_h2o: float = 0.0
-    c_other: float = 0.0
-    p_o2: float = 0.0
-    p_co2: float = 0.0
-    p_n2: float = 0.0
-    p_h2o: float = 0.0
-    p_other: float = 0.0
-    f_o2: float = 0.0
-    f_co2: float = 0.0
-    f_n2: float = 0.0
-    f_h2o: float = 0.0
-    f_other: float = 0.0
+    ctotal: float = 0.0
+    co2: float = 0.0
+    cco2: float = 0.0
+    cn2: float = 0.0
+    ch2o: float = 0.0
+    cother: float = 0.0
+    po2: float = 0.0
+    pco2: float = 0.0
+    pn2: float = 0.0
+    ph2o: float = 0.0
+    pother: float = 0.0
+    fo2: float = 0.0
+    fco2: float = 0.0
+    fn2: float = 0.0
+    fh2o: float = 0.0
+    fother: float = 0.0
     temp: float = 0.0
     pres_max: float = -1000.0
     pres_min: float = 1000.0
@@ -95,28 +95,28 @@ class GasCapacitance(Capacitance):
         # change the gas composition
         if self.vol <= 0:
             self.vol = 0.0
-            self.c_o2 = 0.0
-            self.c_co2 = 0.0
-            self.c_n2 = 0.0
-            self.c_h2o = 0.0
-            self.c_other = 0.0
-            self.c_total = 0.0
+            self.co2 = 0.0
+            self.cco2 = 0.0
+            self.cn2 = 0.0
+            self.ch2o = 0.0
+            self.cother = 0.0
+            self.ctotal = 0.0
         else:
             # change the gas concentrations
-            dc_o2: float = (model_from.c_o2 - self.c_o2) * dvol
-            self.c_o2 = (self.c_o2 * self.vol + dc_o2) / self.vol
+            dco2: float = (model_from.co2 - self.co2) * dvol
+            self.co2 = (self.co2 * self.vol + dco2) / self.vol
 
-            dc_co2: float = (model_from.c_co2 - self.c_co2) * dvol
-            self.c_co2: float = (self.c_co2 * self.vol + dc_co2) / self.vol
+            dcco2: float = (model_from.cco2 - self.cco2) * dvol
+            self.cco2: float = (self.cco2 * self.vol + dcco2) / self.vol
 
-            dc_n2 = (model_from.c_n2 - self.c_n2) * dvol
-            self.c_n2 = (self.c_n2 * self.vol + dc_n2) / self.vol
+            dcn2 = (model_from.cn2 - self.cn2) * dvol
+            self.cn2 = (self.cn2 * self.vol + dcn2) / self.vol
 
-            dc_h2o = (model_from.c_h2o - self.c_h2o) * dvol
-            self.c_h2o = (self.c_h2o * self.vol + dc_h2o) / self.vol
+            dch2o = (model_from.ch2o - self.ch2o) * dvol
+            self.ch2o = (self.ch2o * self.vol + dch2o) / self.vol
 
-            dc_other = (model_from.c_other - self.c_other) * dvol
-            self.c_other = (self.c_other * self.vol + dc_other) / self.vol
+            dcother = (model_from.cother - self.cother) * dvol
+            self.cother = (self.cother * self.vol + dcother) / self.vol
 
             # change temperature due to influx of gas
             dtemp = (model_from.temp - self.temp) * dvol
@@ -124,25 +124,25 @@ class GasCapacitance(Capacitance):
 
     def calc_gas_composition(self) -> None:
         # calculate the concentration in mmol/l using the sum of all concentrations
-        self.c_total = self.c_h2o + self.c_o2 + self.c_co2 + self.c_n2 + self.c_other
+        self.ctotal = self.ch2o + self.co2 + self.cco2 + self.cn2 + self.cother
 
         # protect against division by zero
-        if self.c_total == 0:
+        if self.ctotal == 0:
             return
 
         # calculate the partial pressures
-        self.p_h2o = (self.c_h2o / self.c_total) * self.pres
-        self.p_o2 = (self.c_o2 / self.c_total) * self.pres
-        self.p_co2 = (self.c_co2 / self.c_total) * self.pres
-        self.p_n2 = (self.c_n2 / self.c_total) * self.pres
-        self.p_other = (self.c_other / self.c_total) * self.pres
+        self.ph2o = (self.ch2o / self.ctotal) * self.pres
+        self.po2 = (self.co2 / self.ctotal) * self.pres
+        self.pco2 = (self.cco2 / self.ctotal) * self.pres
+        self.pn2 = (self.cn2 / self.ctotal) * self.pres
+        self.pother = (self.cother / self.ctotal) * self.pres
 
         # calculate the fractions
-        self.f_h2o = self.c_h2o / self.c_total
-        self.f_o2 = self.c_o2 / self.c_total
-        self.f_co2 = self.c_co2 / self.c_total
-        self.f_n2 = self.c_n2 / self.c_total
-        self.f_other = self.c_other / self.c_total
+        self.fh2o = self.ch2o / self.ctotal
+        self.fo2 = self.co2 / self.ctotal
+        self.fco2 = self.cco2 / self.ctotal
+        self.fn2 = self.cn2 / self.ctotal
+        self.fother = self.cother / self.ctotal
 
     def calc_watervapour_pressure(self) -> float:
         # calculate the water vapour pressure in air depending on the temperature
@@ -153,9 +153,9 @@ class GasCapacitance(Capacitance):
         pH2Ot: float = self.calc_watervapour_pressure()
 
         # do the diffusion from water vapour depending on the tissue water vapour and gas water vapour pressure
-        dH2O: float = 0.00001 * (pH2Ot - self.p_h2o) * self._t
+        dH2O: float = 0.00001 * (pH2Ot - self.ph2o) * self._t
         if self.vol > 0:
-            self.c_h2o = (self.c_h2o * self.vol + dH2O) / self.vol
+            self.ch2o = (self.ch2o * self.vol + dH2O) / self.vol
 
         # as the water vapour also takes volume this is added to the compliance
         if self.pres != 0:
@@ -171,7 +171,7 @@ class GasCapacitance(Capacitance):
         # change the volume as the temperature changes
         if self.pres != 0:
             # as Ctotal is in mmol/l we have convert it as the gas constant is in mol
-            dV: float = (self.c_total * self.vol *
+            dV: float = (self.ctotal * self.vol *
                          self._gas_constant * dT) / self.pres
             self.vol += dV / 1000.0
 

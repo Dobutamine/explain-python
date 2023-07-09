@@ -34,15 +34,15 @@ class GasExchanger(BaseModel):
         self._calc_oxy(self._blood)
 
         # get the partial pressures and gas concentrations from the components
-        po2_blood: float = self._blood.oxy['po2']
-        pco2_blood: float = self._blood.acidbase['pco2']
-        to2_blood: float = self._blood.oxy['to2']
-        tco2_blood: float = self._blood.acidbase['tco2']
+        po2_blood: float = self._blood.aboxy['po2']
+        pco2_blood: float = self._blood.aboxy['pco2']
+        to2_blood: float = self._blood.aboxy['to2']
+        tco2_blood: float = self._blood.aboxy['tco2']
 
-        co2_gas: float = self._gas.c_o2
-        cco2_gas: float = self._gas.c_co2
-        po2_gas: float = self._gas.p_o2
-        pco2_gas: float = self._gas.p_co2
+        co2_gas: float = self._gas.co2
+        cco2_gas: float = self._gas.cco2
+        po2_gas: float = self._gas.po2
+        pco2_gas: float = self._gas.pco2
 
         # calculate the O2 flux from the blood to the gas compartment
         self._flux_o2 = (po2_blood - po2_gas) * self.dif_o2 * \
@@ -74,7 +74,7 @@ class GasExchanger(BaseModel):
             new_cco2_gas = 0
 
         # transfer the new concentrations
-        self._blood.oxy['to2'] = new_to2_blood
-        self._blood.acidbase['tco2'] = new_tco2_blood
-        self._gas.c_o2 = new_co2_gas
-        self._gas.c_co2 = new_cco2_gas
+        self._blood.aboxy['to2'] = new_to2_blood
+        self._blood.aboxy['tco2'] = new_tco2_blood
+        self._gas.co2 = new_co2_gas
+        self._gas.cco2 = new_cco2_gas

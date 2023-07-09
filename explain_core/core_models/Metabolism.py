@@ -15,8 +15,8 @@ class Metabolism(BaseModel):
         for model, fvo2 in self.metabolic_active_models.items():
             # get the vol, tco2 and to2 from the blood compartment
             vol: float = self._model.models[model].vol
-            to2: float = self._model.models[model].oxy['to2']
-            tco2: float = self._model.models[model].acidbase['tco2']
+            to2: float = self._model.models[model].aboxy['to2']
+            tco2: float = self._model.models[model].aboxy['tco2']
 
             # calculate the change in oxygen concentration in this step
             dto2: float = vo2_step * fvo2
@@ -39,5 +39,5 @@ class Metabolism(BaseModel):
                 new_tco2 = 0
 
             # store the new to2 and tco2
-            self._model.models[model].oxy['to2'] = new_to2
-            self._model.models[model].acidbase['tco2'] = new_tco2
+            self._model.models[model].aboxy['to2'] = new_to2
+            self._model.models[model].aboxy['tco2'] = new_tco2

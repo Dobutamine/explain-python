@@ -816,21 +816,20 @@
       "model_type": "Blood",
       "is_enabled": true,
       "solutes": {},
-      "acidbase": {
+      "aboxy": {
+        "comps": ["AA"],
         "tco2": 24.7,
+        "to2": 9.7,
         "ph": 7.4,
+        "po2": 0.0,
         "pco2": 35.0,
         "hco3": 25.0,
         "be": 0.0,
+        "so2": 0.0,
         "sid": 41.6,
         "albumin": 30.0,
         "phosphates": 1.5,
-        "uma": 7.2
-      },
-      "oxy": {
-        "to2": 9.7,
-        "po2": 0.0,
-        "so2": 0.0,
+        "uma": 7.2,
         "dpg": 5.0,
         "hemoglobin": 10.0,
         "temp": 37.0
@@ -843,10 +842,10 @@
       "is_enabled": true,
       "pres_atm": 760,
       "dry_air": {
-        "f_o2": 0.205,
-        "f_co2": 0.000392,
-        "f_n2": 0.794608,
-        "f_other": 0
+        "fo2": 0.205,
+        "fco2": 0.000392,
+        "fn2": 0.794608,
+        "fother": 0
       },
       "humidity_settings": {
         "MOUTH": 0.5,
