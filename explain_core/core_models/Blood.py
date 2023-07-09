@@ -36,6 +36,7 @@ class Blood(BaseModel):
     # local parameters
     _update_interval = 0.015
     _update_counter = 0.0
+    _aa = {}
 
     def init_model(self, model: object) -> bool:
         super().init_model(model)
@@ -48,7 +49,13 @@ class Blood(BaseModel):
                 model.acidbase = {**self.acidbase}
                 model.oxy = {**self.oxy}
 
+        self._aa = self._model.models['AA']
+
         return self._is_initialized
+
+    def calc_model(self) -> None:
+        self.calc_acidbase_from_tco2(self._aa)
+        self.calc_oxygenation_from_to2(self._aa)
 
     def calc_acidbase_from_tco2(self, comp):
         # calculate the apparent strong ion difference (SID) in mEq/l

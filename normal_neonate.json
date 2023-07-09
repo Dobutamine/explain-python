@@ -771,8 +771,8 @@
       "dif_co2": 0.01,
       "dif_o2": 0.01
     },
-    "GASEX_LR": {
-      "name": "GASEX_LR",
+    "GASEX_RL": {
+      "name": "GASEX_RL",
       "description": "Gas exchanger blood-gas right lung",
       "model_type": "GasExchanger",
       "is_enabled": true,
@@ -883,6 +883,26 @@
       "exp_tidal_volume": 0.015942324797627,
       "minute_volume": 0.6282421711731222,
       "targets": ["CHEST_L", "CHEST_R"]
+    },
+    "Metabolism": {
+      "name": "Metabolism",
+      "description": "Metabolism model",
+      "model_type": "Metabolism",
+      "is_enabled": true,
+      "dependencies": [],
+      "vo2": 8.5,
+      "resp_q": 0.8,
+      "body_temp": 37,
+      "metabolic_active_models": {
+        "RLB": 0.15,
+        "INT": 0.15,
+        "LS": 0.1,
+        "KID": 0.1,
+        "RUB": 0.1,
+        "AA": 0.005,
+        "AD": 0.01,
+        "BR": 0.453
+      }
     }
   },
   "dateCreated": {
