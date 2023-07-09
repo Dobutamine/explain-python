@@ -681,6 +681,35 @@
       "el_base": 200.0,
       "el_k": 0
     },
+    "THORAX": {
+      "name": "THORAX",
+      "description": "thorax",
+      "model_type": "Container",
+      "is_enabled": true,
+      "dependencies": [],
+      "contained_components": [
+        "CHEST_L",
+        "CHEST_R",
+        "DS",
+        "IVCI",
+        "SVC",
+        "RA",
+        "RV",
+        "LA",
+        "LV",
+        "AA",
+        "AAR",
+        "PA",
+        "PV",
+        "LL",
+        "RL"
+      ],
+      "vol": 0.246,
+      "vol_ext": 0,
+      "u_vol": 0.27,
+      "el_base": 80,
+      "el_k": 0
+    },
     "MOUTH": {
       "name": "MOUTH",
       "description": "MOUTHside air",
@@ -855,7 +884,7 @@
       },
       "temp_settings": {
         "MOUTH": 20.0,
-        "DS": 37.0,
+        "DS": 32.0,
         "ALL": 37.0,
         "ALR": 37.0
       }
@@ -880,7 +909,7 @@
       "insp_tidal_volume": -0.016775444459014383,
       "exp_tidal_volume": 0.015942324797627,
       "minute_volume": 0.6282421711731222,
-      "targets": ["CHEST_L", "CHEST_R"]
+      "targets": ["THORAX"]
     },
     "Metabolism": {
       "name": "Metabolism",

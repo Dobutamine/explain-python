@@ -36,4 +36,4 @@ class Ans(BaseModel):
             ((1 / self.tc_map_hp) * (-self._d_map_hp + self._a_map)) + self._d_map_hp
 
         # apply the effects
-        self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hp
+        self._heart.heart_rate = self.heart_rate_ref  # + self.g_map_hp * self._d_map_hp
