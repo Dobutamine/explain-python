@@ -55,6 +55,15 @@ class BloodTimeVaryingElastance(TimeVaryingElastance):
     def volume_in(self, dvol: float, model_from: Capacitance) -> None:
         super().volume_in(dvol)
 
+        # process the to2 and tco2
+        d_to2: float = (model_from.oxy['to2'] - self.oxy['to2']) * dvol
+        self.oxy['to2'] = (self.oxy['to2'] * self.vol + d_to2) / self.vol
+
+        d_tco2: float = (
+            model_from.acidbase['tco2'] - self.acidbase['tco2']) * dvol
+        self.acidbase['tco2'] = (
+            self.acidbase['tco2'] * self.vol + d_tco2) / self.vol
+
         # process the solutes
         if self.vol > 0:
             for solute, conc in self.solutes.items():

@@ -815,11 +815,9 @@
       "description": "blood model",
       "model_type": "Blood",
       "is_enabled": true,
-      "solutes": {
-        "to2": 9.7,
-        "tco2": 24.7
-      },
+      "solutes": {},
       "acidbase": {
+        "tco2": 24.7,
         "ph": 7.4,
         "pco2": 35.0,
         "hco3": 25.0,
@@ -830,6 +828,7 @@
         "uma": 7.2
       },
       "oxy": {
+        "to2": 9.7,
         "po2": 0.0,
         "so2": 0.0,
         "dpg": 5.0,

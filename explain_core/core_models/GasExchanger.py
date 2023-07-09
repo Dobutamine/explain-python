@@ -36,8 +36,8 @@ class GasExchanger(BaseModel):
         # get the partial pressures and gas concentrations from the components
         po2_blood: float = self._blood.oxy['po2']
         pco2_blood: float = self._blood.acidbase['pco2']
-        to2_blood: float = self._blood.solutes['to2']
-        tco2_blood: float = self._blood.solutes['tco2']
+        to2_blood: float = self._blood.oxy['to2']
+        tco2_blood: float = self._blood.acidbase['tco2']
 
         co2_gas: float = self._gas.c_o2
         cco2_gas: float = self._gas.c_co2
@@ -74,7 +74,7 @@ class GasExchanger(BaseModel):
             new_cco2_gas = 0
 
         # transfer the new concentrations
-        self._blood.solutes['to2'] = new_to2_blood
-        self._blood.solutes['tco2'] = new_tco2_blood
+        self._blood.oxy['to2'] = new_to2_blood
+        self._blood.acidbase['tco2'] = new_tco2_blood
         self._gas.c_o2 = new_co2_gas
         self._gas.c_co2 = new_cco2_gas

@@ -63,7 +63,7 @@ class Blood(BaseModel):
         #     comp.magnesium - comp.chloride - comp.lactate - comp.urate
 
         # get the total co2 concentration in mmol/l
-        self.tco2 = comp.solutes['tco2']
+        self.tco2 = comp.acidbase['tco2']
 
         # store the apparent SID
         self.sid = comp.acidbase['sid']
@@ -147,7 +147,7 @@ class Blood(BaseModel):
 
     def calc_oxygenation_from_to2(self, comp):
         # get the for the oxygenation independent parameters from the component
-        self.to2 = comp.solutes['to2']
+        self.to2 = comp.oxy['to2']
         self.ph = comp.acidbase['ph']
         self.be = comp.acidbase['be']
         self.dpg = comp.oxy['dpg']
