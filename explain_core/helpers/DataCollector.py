@@ -20,12 +20,14 @@ class DataCollector:
         # try to add two always needed ecg properties to the watchlist
         try:
             self.ncc_ventricular = {'label': 'Heart.ncc_ventricular',
-                                    'model': self.model.models['Heart'], 'prop': 'ncc_ventricular'}
+                                    'model': self.model.models['Heart'], 'prop': 'ncc_ventricular', 'prop2': None}
             self.ncc_atrial = {'label': 'Heart.ncc_atrial',
-                               'model': self.model.models['Heart'], 'prop': 'ncc_atrial'}
+                               'model': self.model.models['Heart'], 'prop': 'ncc_atrial', 'prop2': None}
         except:
-            self.ncc_ventricular = {'label': '', 'model': None, 'prop': ''}
-            self.ncc_atrial = {'label': '', 'model': None, 'prop': ''}
+            self.ncc_ventricular = {'label': '',
+                                    'model': None, 'prop': '', 'prop2': None}
+            self.ncc_atrial = {'label': '',
+                               'model': None, 'prop': '', 'prop2': None}
 
         # add the two always there
         self.watch_list.append(self.ncc_atrial)
@@ -52,6 +54,7 @@ class DataCollector:
         self.sample_interval = new_interval
 
     def add_to_watchlist(self, property):
+
         # first clear all data
         self.clear_data()
 
@@ -67,6 +70,7 @@ class DataCollector:
             for parameter in self.watch_list:
                 label = parameter['label']
                 prop = parameter['prop']
+                prop2 = parameter['prop2']
                 weight = 1
                 time = 1
                 if prop == 'flow':
@@ -76,7 +80,11 @@ class DataCollector:
                     weight = self.model.weight
 
                 if parameter['model'] is not None:
-                    value = getattr(parameter['model'], parameter['prop'])
+                    if prop2 is None:
+                        value = getattr(parameter['model'], parameter['prop'])
+                    else:
+                        value = getattr(parameter['model'], parameter['prop'])
+                        value = value[parameter['prop2']]
 
                     data_object[label] = value / weight * time
 
