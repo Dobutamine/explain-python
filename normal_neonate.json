@@ -757,7 +757,7 @@
       "description": "Gas exchanger blood-gas left lung",
       "model_type": "GasExchanger",
       "is_enabled": true,
-      "dependencies": [],
+      "dependencies": ["LL", "ALL"],
       "comp_blood": "LL",
       "comp_gas": "ALL",
       "dif_co2": 0.01,
@@ -768,7 +768,7 @@
       "description": "Gas exchanger blood-gas right lung",
       "model_type": "GasExchanger",
       "is_enabled": true,
-      "dependencies": [],
+      "dependencies": ["RL", "ALR"],
       "comp_blood": "RL",
       "comp_gas": "ALR",
       "dif_co2": 0.01,
@@ -779,6 +779,7 @@
       "description": "heart model",
       "model_type": "Heart",
       "is_enabled": true,
+      "dependencies": ["LA", "RA", "LV", "RV"],
       "left_atrium": "LA",
       "right_atrium": "RA",
       "left_ventricle": "LV",
@@ -793,6 +794,7 @@
       "description": "autonomic nervous system model",
       "model_type": "Ans",
       "is_enabled": true,
+      "dependencies": ["AA", "BR"],
       "baroreceptor_location": "AA",
       "chemoreceptor_location": "BR",
       "heart_rate_ref": 140,
@@ -859,6 +861,7 @@
       "description": "breathing model",
       "model_type": "Breathing",
       "is_enabled": true,
+      "dependencies": ["THORAX"],
       "breathing_enabled": true,
       "resp_rate": 40.0,
       "target_minute_volume": 0.6,
@@ -890,12 +893,42 @@
         "BR": 0.453
       }
     },
+    "DuctusArteriosus": {
+      "name": "DuctusArteriosus",
+      "description": "ductus arteriosus model",
+      "model_type": "DuctusArteriosus",
+      "is_enabled": true,
+      "dependencies": ["AAR", "PA"],
+      "length": 0.01,
+      "diameter": 0.002,
+      "no_flow": false
+    },
+    "ForamenOvale": {
+      "name": "ForamenOvale",
+      "description": "foramen ovale model",
+      "model_type": "ForamenOvale",
+      "is_enabled": true,
+      "dependencies": ["LA", "RA"],
+      "length": 0.01,
+      "diameter": 0.002,
+      "no_flow": false
+    },
+    "VentricularSeptalDefect": {
+      "name": "VentricularSeptalDefect",
+      "description": "ventricular septal defect model",
+      "model_type": "ForamenOvale",
+      "is_enabled": true,
+      "dependencies": ["LV", "RV"],
+      "length": 0.01,
+      "diameter": 0.002,
+      "no_flow": true
+    },
     "MechanicalVentilator": {
       "name": "MechanicalVentilator",
       "description": "",
       "model_type": "MechanicalVentilator",
       "is_enabled": false,
-      "dependencies": [],
+      "dependencies": ["DS", "OUT", "MOUTH_DS"],
       "p_atm": 760,
       "vent_rate": 40,
       "tidal_volume": 0.017,
@@ -917,36 +950,6 @@
       "tube_diameter": 3.5,
       "tube_length": 0.15,
       "trigger_volume": 0.001
-    },
-    "DuctusArteriosus": {
-      "name": "DuctusArteriosus",
-      "description": "ductus arteriosus model",
-      "model_type": "DuctusArteriosus",
-      "is_enabled": true,
-      "dependencies": [],
-      "length": 0.01,
-      "diameter": 0.002,
-      "no_flow": true
-    },
-    "ForamenOvale": {
-      "name": "ForamenOvale",
-      "description": "foramen ovale model",
-      "model_type": "ForamenOvale",
-      "is_enabled": true,
-      "dependencies": [],
-      "length": 0.01,
-      "diameter": 0.002,
-      "no_flow": true
-    },
-    "VentricularSeptalDefect": {
-      "name": "VentricularSeptalDefect",
-      "description": "ventricular septal defect model",
-      "model_type": "ForamenOvale",
-      "is_enabled": true,
-      "dependencies": [],
-      "length": 0.01,
-      "diameter": 0.002,
-      "no_flow": true
     }
   },
   "dateCreated": {

@@ -102,10 +102,10 @@ class ModelEngine:
                     # try to import the module holding the model class from the custom models folder
                     model_module = importlib.import_module(
                         'custom_models.' + model_type)
-                except:
+                except Exception as error:
                     # a module holding the desired model class is not found in the core_models or custom_models folder
                     print(
-                        f"Load error: {model_type} model not found in the core_models nor in the custom_models folder.")
+                        f"Load error: {model_type} model not found in the core_models nor in the custom_models folder. Error: {error}")
                     error_counter += 1
             else:
                 # get the model class from the module
@@ -114,33 +114,32 @@ class ModelEngine:
                 # instantiate the model class with the properties stored in the model_definition file and a reference to the other components and add it to the components dictionary
                 try:
                     self.models[key] = model_class(**model)
-                except:
+                except Exception as error:
                     # a module holding the desired model class is producing an error while instantiating
                     print(
-                        f"Instantiation error: {model_type} model failed to instantiate.")
+                        f"Instantiation error: {model_type} model failed to instantiate. Error: {error}")
                     error_counter += 1
 
         # initialize a datacollector
         self.interface = Interface(self)
 
         # check the dependencies
-        self.check_dependencies()
+        dep_errors: int = self.check_dependencies()
 
         # initialize all the models
         if (error_counter == 0):
             init_errors = 0
             # initialize all components
             for _, model in self.models.items():
-                model.init_model(self)
-                # try:
-                #     model.init_model(self)
-                # except:
-                #     # a module holding the desired model class is producing an error while initiallizing
-                #     print(
-                #         f"Initialization error: {model_type} model failed to initialize.")
-                #     init_errors += 1
+                try:
+                    model.init_model(self)
+                except Exception as error:
+                    # a module holding the desired model class is producing an error while initiallizing
+                    print(
+                        f"Initialization error: {model_type} model failed to initialize with error: {error}")
+                    init_errors += 1
 
-            if init_errors > 0:
+            if init_errors > 0 or dep_errors > 0:
                 self._initialized = False
             else:
                 print(f"{self.name} model loaded and initialized correctly.")
@@ -153,7 +152,7 @@ class ModelEngine:
             print("")
             print(f"The '{self.name}' model failed to run.")
 
-    def check_dependencies(self):
+    def check_dependencies(self) -> int:
         dep_errors = 0
         # iterate over all models
         for _, model in self.models.items():
@@ -166,10 +165,11 @@ class ModelEngine:
                         present = True
                 if not present:
                     print(
-                        f'Dependency error: model {model.Name} depends on {dep} which is not present.')
+                        f'Dependency error: model {model.name} depends on {dep} which is not present.')
                     dep_errors += 1
         if dep_errors > 0:
             self._initialized = False
+        return dep_errors
 
     def start(self):
         # start the realtime model

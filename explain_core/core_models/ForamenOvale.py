@@ -29,8 +29,8 @@ class ForamenOvale(BaseModel):
             "no_back_flow": False,
             "comp_from": "LA",
             "comp_to": "RA",
-            "r_for": 1800,
-            "r_back": 1800,
+            "r_for": 1500,
+            "r_back": 1500,
             "r_k": 0
         }
         # instantiate a foramen ovale as a blood resistor
@@ -57,4 +57,4 @@ class ForamenOvale(BaseModel):
         self.flow = self._fo.flow
 
     def calc_resistance(self) -> float:
-        return 1800.0
+        return 1500.0

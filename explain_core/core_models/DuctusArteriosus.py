@@ -29,8 +29,8 @@ class DuctusArteriosus(BaseModel):
             "no_back_flow": False,
             "comp_from": "AAR",
             "comp_to": "PA",
-            "r_for": 1800,
-            "r_back": 1800,
+            "r_for": 40000.0,
+            "r_back": 40000.0,
             "r_k": 0
         }
         # instantiate a ductus arteriosus as a blood resistor
@@ -57,4 +57,4 @@ class DuctusArteriosus(BaseModel):
         self.flow = self._duct.flow
 
     def calc_resistance(self) -> float:
-        return 1800.0
+        return 40000.0
