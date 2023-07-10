@@ -105,7 +105,7 @@ class ModelEngine:
                 except Exception as error:
                     # a module holding the desired model class is not found in the core_models or custom_models folder
                     print(
-                        f"Load error: {model_type} model not found in the core_models nor in the custom_models folder. Error: {error}")
+                        f"Load error: {model_type} model not found in the core_models nor in the custom_models folder OR the model has a syntax error.")
                     error_counter += 1
             else:
                 # get the model class from the module
