@@ -189,7 +189,6 @@ class ModelEngine:
         # do all model steps
         for _ in range(_no_of_steps):
             # execute the model step method of all models
-            # iterate over all models
             for model in self.models.values():
                 model.step_model()
 

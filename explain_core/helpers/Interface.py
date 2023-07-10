@@ -82,7 +82,7 @@ class Interface:
     # plotters
 
     def plot_vitals(self, time):
-        self.plot_time_graph(["AA.systole", "AA.diastole", "ecg.heart_rate", "breathing.spont_resp_rate", "AA.so2"], time_to_calculate=time,
+        self.plot_time_graph(["AA.systole", "AA.diastole", "Heart.heart_rate", "breathing.spont_resp_rate", "AA.so2"], time_to_calculate=time,
                              combined=True, sharey=False, autoscale=False, ylowerlim=0, yupperlim=200, fill=False, fill_between=True)
 
     # lung plotters
@@ -186,7 +186,7 @@ class Interface:
     # getters
     def get_vitals(self, time_to_calculate=10):
         vitals = {
-            "heartrate": self.model.models['ecg'].heart_rate,
+            "heartrate": self.model.models['Heart'].heart_rate,
             "spo2_pre": self.model.models['AA'].so2,
             "abp_systole": self.model.models['AA'].systole,
             "abp_diastole": self.model.models['AA'].diastole,
@@ -510,7 +510,7 @@ class Interface:
                 if (sampleinterval != self.model.modeling_stepsize):
                     print(
                         f"Stroke volume calculation might be inaccurate. Try using a sampleinterval of {self.model.modeling_stepsize}")
-                    bpm = self.model.models['ecg'].heart_rate
+                    bpm = self.model.models['Heart'].heart_rate
                 sv = round(flow / bpm, 5)
                 print("{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min, stroke volume: {:10} ml/kg, ". format(
                     parameter, flow, flow_forward, flow_backward, sv))
