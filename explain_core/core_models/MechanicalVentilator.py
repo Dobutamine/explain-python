@@ -18,8 +18,6 @@ class MechanicalVentilator(BaseModel):
     ettube_length: float = 0.11
     ettube_volume: float = 0.0025
     ettube_elastance: float = 20000.0
-    ypiece_volume: float = 0.011
-    ypiece_elastance: float = 25000.0
     vent_mode: str = "PC"
     vent_rate: float = 40.0
     vent_sync: bool = True
@@ -32,25 +30,41 @@ class MechanicalVentilator(BaseModel):
     peep: float = 2.9
     tidal_volume: float = 0.015
 
+    # dependent parameters
+    flow: float = 0.0
+    flow_min: float = 0.0
+    flow_max: float = 0.0
+    flow_insp: float = 0.0
+    flow_exp: float = 0.0
+    pres: float = 0.0
+    pres_min: float = 0.0
+    pres_max: float = 0.0
+    vol: float = 0.0
+    vol_min: float = 0.0
+    vol_max: float = 0.0
+    vol_in: float = 0.0
+    vol_out: float = 0.0
+    exp_time: float = 0.15
+
     # ventilator parts
+    _vent_parts: list = []
     _ventin: GasCapacitance = {}
     _tubingin: GasCapacitance = {}
-    _ypiece: GasCapacitance = {}
     _ettube: GasCapacitance = {}
     _tubingout: GasCapacitance = {}
     _ventout: GasCapacitance = {}
-
     _insp_valve: GasResistor = {}
-    _tubingin_ypiece: GasResistor = {}
-    _ypiece_ettube: GasResistor = {}
+    _tubingin_ettube: GasResistor = {}
     _ettube_ds: GasResistor = {}
-    _ypiece_tubingout: GasResistor = {}
+    _ettube_tubingout: GasResistor = {}
     _exp_valve: GasResistor = {}
 
-    _vent_parts: list = []
-
-    # local constant
+    # local parameters
     _gas_constant: float = 62.36367
+    _insp_counter: float = 0.0
+    _exp_counter: float = 0.0
+    _inspiration: bool = True
+    _expiration: bool = False
 
     def init_model(self, model: object) -> bool:
         # initialize the base model
@@ -58,6 +72,80 @@ class MechanicalVentilator(BaseModel):
 
         # build the ventilator
         self.build_ventilator(model)
+
+    def switch_ventilator(self, state):
+        if state:
+            self._model.models['Breathing'].breathing_enabled = False
+            self._model.models['MOUTH_DS'].no_flow = True
+            self._model.models['MOUTH_DS'].is_enabled = False
+            self._ettube_ds.no_flow = False
+        else:
+            self._model.models['Breathing'].breathing_enabled = True
+            self._model.models['MOUTH_DS'].no_flow = False
+            self._model.models['MOUTH_DS'].is_enabled = True
+            self._ettube_ds.no_flow = True
+
+    def calc_model(self):
+        # calculate the expiration time
+        self.exp_time = (60.0 / self.vent_rate) - self.insp_time
+
+        # do the time cycling
+        if self._insp_counter > self.insp_time:
+            self._inspiration = False
+            self._expiration = True
+            self._exp_counter = 0
+            self._insp_counter = 0
+
+        if self._exp_counter > self.exp_time:
+            self._expiration = False
+            self._inspiration = True
+            self._insp_counter = 0
+            self._exp_counter = 0
+
+        # increase the timers
+        if self._inspiration:
+            self._insp_counter += self._t
+
+        if self._expiration:
+            self._exp_counter += self._t
+
+        # select the ventilator mode
+        self.pressure_control()
+
+        # calculate the models
+        for mp in self._vent_parts:
+            mp.calc_model()
+
+        self.pres = self._ettube.pres
+        self.flow = self._ettube_ds.flow
+        self.vol += self._ettube_ds.flow * self._t
+        # if (self._expiration):
+        #     # self.flow = -self._ettube_tubingout.flow
+        #     self.flow = self._tubingin_ettube.flow
+
+    def pressure_control(self):
+        if self._inspiration:
+            # open the inspiration valve and calculate the inspiratory valve position depending on the desired flow
+            self._insp_valve.no_flow = False
+            self._insp_valve.r_for = (400.0 / (self.insp_flow / 60.0)) - 100.0
+
+            # guard the inspiration pressures as this is pressure control
+            if self._ettube.pres > self.pip + self.p_atm:
+                self._insp_valve.no_flow = True
+
+            # close the expiration valve
+            self._exp_valve.no_flow = True
+
+        if self._expiration:
+            # close the inspiratory valve
+            self._insp_valve.no_flow = False
+            self._insp_valve.r_for = (400.0 / (self.exp_flow / 60.0)) - 100.0
+
+            # open the expiration valve and calculate the expiration valve position depending on the desired peep and flow
+            self._ventout.vol = (self.peep) / \
+                self._ventout.el_base + self._ventout.u_vol
+            self._exp_valve.no_flow = False
+            self._exp_valve.r_for = 15.0
 
     def build_ventilator(self, model):
         # clear the ventilator part list
@@ -71,7 +159,7 @@ class MechanicalVentilator(BaseModel):
             "is_enabled": True,
             "dependencies": [],
             "fixed_composition": True,
-            "vol": 5.2,
+            "vol": 5.4,
             "u_vol": 5.0,
             "el_base": 1000.0,
             "el_k": 0,
@@ -118,24 +206,6 @@ class MechanicalVentilator(BaseModel):
         self.set_air_composition(
             self._tubingout, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'])
         self._vent_parts.append(self._tubingout)
-
-        self._ypiece = GasCapacitance(**{
-            "name": "YPIECE",
-            "description": "ypiece of the mechanical ventilator",
-            "model_type": "GasCapacitance",
-            "is_enabled": True,
-            "dependencies": [],
-            "fixed_composition": False,
-            "vol": self.ypiece_volume,
-            "u_vol": self.ypiece_volume,
-            "el_base": self.ypiece_elastance,
-            "el_k": 0
-        })
-        self._ypiece.init_model(model)
-        self._ypiece.calc_model()
-        self.set_air_composition(
-            self._ypiece, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'])
-        self._vent_parts.append(self._ypiece)
 
         self._ettube = GasCapacitance(**{
             "name": "ETTUBE",
@@ -191,39 +261,22 @@ class MechanicalVentilator(BaseModel):
         self._insp_valve.init_model(model, self._ventin, self._tubingin)
         self._vent_parts.append(self._insp_valve)
 
-        self._tubingin_ypiece = GasResistor(**{
-            "name": "TUBINGIN_YPIECE",
-            "description": "connector between tubing in and ypiece of the mechanical ventilator",
+        self._tubingin_ettube = GasResistor(**{
+            "name": "TUBINGIN_ETTUBE",
+            "description": "connector between tubing in and et tube of the mechanical ventilator",
             "model_type": "GasResistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
             "no_back_flow": False,
             "comp_from": "TUBINGIN",
-            "comp_to": "YPIECE",
+            "comp_to": "ETTUBE",
             "r_for": 25,
             "r_back": 25,
             "r_k": 0,
         })
-        self._tubingin_ypiece.init_model(model, self._tubingin, self._ypiece)
-        self._vent_parts.append(self._tubingin_ypiece)
-
-        self._ypiece_ettube = GasResistor(**{
-            "name": "YPIECE_ETTUBE",
-            "description": "connector between ypiece and ettube of the mechanical ventilator",
-            "model_type": "GasResistor",
-            "is_enabled": True,
-            "dependencies": [],
-            "no_flow": False,
-            "no_back_flow": False,
-            "comp_from": "YPIECE",
-            "comp_to": "ETTUBE",
-            "r_for": 35,
-            "r_back": 35,
-            "r_k": 0,
-        })
-        self._ypiece_ettube.init_model(model, self._ypiece, self._ettube)
-        self._vent_parts.append(self._ypiece_ettube)
+        self._tubingin_ettube.init_model(model, self._tubingin, self._ettube)
+        self._vent_parts.append(self._tubingin_ettube)
 
         self._ettube_ds = GasResistor(**{
             "name": "ETTUBE_DS",
@@ -235,30 +288,30 @@ class MechanicalVentilator(BaseModel):
             "no_back_flow": False,
             "comp_from": "ETTUBE",
             "comp_to": "DS",
-            "r_for": 35,
-            "r_back": 35,
+            "r_for": 50,
+            "r_back": 50,
             "r_k": 0,
         })
         self._ettube_ds.init_model(
             model, self._ettube, self._model.models['DS'])
         self._vent_parts.append(self._ettube_ds)
 
-        self._ypiece_tubingout = GasResistor(**{
-            "name": "YPIECE_TUBINGOUT",
-            "description": "connector between the ypiece and the tubing out of the mechanical ventilator",
+        self._ettube_tubingout = GasResistor(**{
+            "name": "ETTUBE_TUBINGOUT",
+            "description": "connector between the et tube and the tubing out of the mechanical ventilator",
             "model_type": "GasResistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
             "no_back_flow": False,
-            "comp_from": "YPIECE",
+            "comp_from": "ETTUBE",
             "comp_to": "TUBINGOUT",
-            "r_for": 35,
-            "r_back": 35,
+            "r_for": 25,
+            "r_back": 25,
             "r_k": 0,
         })
-        self._ypiece_tubingout.init_model(model, self._ypiece, self._tubingout)
-        self._vent_parts.append(self._ypiece_tubingout)
+        self._ettube_tubingout.init_model(model, self._ettube, self._tubingout)
+        self._vent_parts.append(self._ettube_tubingout)
 
         self._exp_valve = GasResistor(**{
             "name": "EXPVALVE",
@@ -267,7 +320,7 @@ class MechanicalVentilator(BaseModel):
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
-            "no_back_flow": True,
+            "no_back_flow": False,
             "comp_from": "TUBINGOUT",
             "comp_to": "VENTOUT",
             "r_for": 300000,

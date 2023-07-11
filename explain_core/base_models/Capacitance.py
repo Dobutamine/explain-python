@@ -11,6 +11,7 @@ class Capacitance(BaseModel):
     el_base_factor: float = 1.0
     el_k: float = 0.0
     el_k_factor: float = 1.0
+    fixed_composition: bool = False
 
     # dependent variables
     vol: float = 0.0
@@ -39,6 +40,9 @@ class Capacitance(BaseModel):
         self.vol += dvol
 
     def volume_out(self, dvol: float) -> float:
+        if self.fixed_composition:
+            return 0
+
         # assume all dvol can be removed
         vol_not_removed: float = 0.0
 
