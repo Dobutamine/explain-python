@@ -244,13 +244,13 @@ class Ventilator(BaseModel):
             "dependencies": [],
             "no_flow": False,
             "no_back_flow": True,
-            "comp_from": "VENTIN",
-            "comp_to": "TUBINGIN",
+            "comp_from": self._ventin,
+            "comp_to": self._tubingin,
             "r_for": 30000,
             "r_back": 1000000,
             "r_k": 0,
         })
-        self._insp_valve.init_model(model, self._ventin, self._tubingin)
+        self._insp_valve.init_model(model)
         self._vent_parts.append(self._insp_valve)
 
         self._tubingin_ettube = GasResistor(**{
@@ -261,13 +261,13 @@ class Ventilator(BaseModel):
             "dependencies": [],
             "no_flow": False,
             "no_back_flow": False,
-            "comp_from": "TUBINGIN",
-            "comp_to": "ETTUBE",
+            "comp_from": self._tubingin,
+            "comp_to": self._ettube,
             "r_for": 25,
             "r_back": 25,
             "r_k": 0,
         })
-        self._tubingin_ettube.init_model(model, self._tubingin, self._ettube)
+        self._tubingin_ettube.init_model(model)
         self._vent_parts.append(self._tubingin_ettube)
 
         self._ettube_ds = GasResistor(**{
@@ -278,14 +278,13 @@ class Ventilator(BaseModel):
             "dependencies": [],
             "no_flow": True,
             "no_back_flow": False,
-            "comp_from": "ETTUBE",
-            "comp_to": "DS",
+            "comp_from": self._ettube,
+            "comp_to": self._model.models['DS'],
             "r_for": 50,
             "r_back": 50,
             "r_k": 0,
         })
-        self._ettube_ds.init_model(
-            model, self._ettube, self._model.models['DS'])
+        self._ettube_ds.init_model(model)
         self._vent_parts.append(self._ettube_ds)
 
         self._ettube_tubingout = GasResistor(**{
@@ -296,13 +295,13 @@ class Ventilator(BaseModel):
             "dependencies": [],
             "no_flow": False,
             "no_back_flow": False,
-            "comp_from": "ETTUBE",
-            "comp_to": "TUBINGOUT",
+            "comp_from": self._ettube,
+            "comp_to": self._tubingout,
             "r_for": 25,
             "r_back": 25,
             "r_k": 0,
         })
-        self._ettube_tubingout.init_model(model, self._ettube, self._tubingout)
+        self._ettube_tubingout.init_model(model)
         self._vent_parts.append(self._ettube_tubingout)
 
         self._exp_valve = GasResistor(**{
@@ -313,13 +312,13 @@ class Ventilator(BaseModel):
             "dependencies": [],
             "no_flow": False,
             "no_back_flow": False,
-            "comp_from": "TUBINGOUT",
-            "comp_to": "VENTOUT",
+            "comp_from": self._tubingout,
+            "comp_to": self._ventout,
             "r_for": 300000,
             "r_back": 300000,
             "r_k": 0,
         })
-        self._exp_valve.init_model(model, self._tubingout, self._ventout)
+        self._exp_valve.init_model(model)
         self._vent_parts.append(self._exp_valve)
 
     def set_air_composition(self, comp, fo2_dry, fco2_dry, fn2_dry, fother_dry, temp, humidity):

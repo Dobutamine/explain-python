@@ -24,6 +24,20 @@ class Resistor(BaseModel):
     _model_comp_from: Capacitance = {}
     _model_comp_to: Capacitance = {}
 
+    def init_model(self, model: object) -> bool:
+        super().init_model(model)
+
+        # get a reference to the model components which are connected by this resistor
+        if type(self.comp_from) is str:
+            self._model_comp_from = self._model.models[self.comp_from]
+        else:
+            self._model_comp_from = self.comp_from
+
+        if type(self.comp_to) is str:
+            self._model_comp_to = self._model.models[self.comp_to]
+        else:
+            self._model_comp_to = self.comp_to
+
     def calc_model(self) -> None:
         # get the pressures
         _p1: float = self._model_comp_from.pres + self.p1_ext

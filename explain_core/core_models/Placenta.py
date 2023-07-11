@@ -54,7 +54,7 @@ class Placenta(BaseModel):
             "el_k": 0
         })
         self._fpl.init_model(model)
-        self._placenta_parts.appen(self._fpl)
+        self._placenta_parts.append(self._fpl)
 
         self._mpl = BloodCapacitance(**{
             "name": "MPL",
@@ -68,7 +68,7 @@ class Placenta(BaseModel):
             "el_k": 0
         })
         self._mpl.init_model(model)
-        self._placenta_parts.appen(self._mpl)
+        self._placenta_parts.append(self._mpl)
 
         self._pl_diff = Diffusor(**{
             "name": "PLDIFF",
@@ -76,14 +76,14 @@ class Placenta(BaseModel):
             "model_type": "BloodCapacitance",
             "is_enabled": True,
             "dependencies": ["MPL", "FPL"],
-            "comp_blood1": "MPL",
-            "comp_blood2": "FPL",
+            "comp_blood1": self._mpl,
+            "comp_blood2": self._fpl,
             "dif_o2": 0.00001,
             "dif_co2": 0.00001,
 
         })
         self._pl_diff.init_model(model)
-        self._placenta_parts.appen(self._pl_diff)
+        self._placenta_parts.append(self._pl_diff)
 
         self._ua = BloodResistor(**{
             "name": "UA",
@@ -93,14 +93,14 @@ class Placenta(BaseModel):
             "dependencies": ["AD"],
             "no_flow": False,
             "no_back_flow": False,
-            "comp_from": "AD",
-            "comp_to": "FPL",
+            "comp_from": self._model.models["AD"],
+            "comp_to": self._fpl,
             "r_for": 2500,
             "r_back": 2500,
             "r_k": 0,
         })
         self._ua.init_model(model)
-        self._placenta_parts.appen(self._ua)
+        self._placenta_parts.append(self._ua)
 
         self._uv = BloodResistor(**{
             "name": "UV",
@@ -110,11 +110,11 @@ class Placenta(BaseModel):
             "dependencies": ["IVCE"],
             "no_flow": False,
             "no_back_flow": False,
-            "comp_from": "FPL",
-            "comp_to": "IVCE",
+            "comp_from": self._fpl,
+            "comp_to": self._model.models["IVCE"],
             "r_for": 2500,
             "r_back": 2500,
             "r_k": 0,
         })
         self._uv.init_model(model)
-        self._placenta_parts.appen(self._uv)
+        self._placenta_parts.append(self._uv)

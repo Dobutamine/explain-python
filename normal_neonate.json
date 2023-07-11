@@ -960,7 +960,7 @@
       "name": "Placenta",
       "description": "",
       "model_type": "Placenta",
-      "is_enabled": true,
+      "is_enabled": false,
       "dependencies": []
     }
   },
