@@ -48,10 +48,7 @@ class ForamenOvale(BaseModel):
         self._fo.no_flow = self.no_flow
 
         # calc the resistor
-        self._fo.step_model()
-
-        # execute the blood resistor class method
-        super().calc_model()
+        self._fo.calc_model()
 
         # get the state of the blood resistor
         self.flow = self._fo.flow

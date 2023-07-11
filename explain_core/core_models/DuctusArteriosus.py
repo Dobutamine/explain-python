@@ -48,10 +48,7 @@ class DuctusArteriosus(BaseModel):
         self._duct.no_flow = self.no_flow
 
         # calc the resistor
-        self._duct.step_model()
-
-        # execute the blood resistor class method
-        super().calc_model()
+        self._duct.calc_model()
 
         # get the state of the blood resistor
         self.flow = self._duct.flow

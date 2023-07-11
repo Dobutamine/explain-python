@@ -19,8 +19,8 @@ class VentricularSeptalDefect(BaseModel):
         # initialize the parent class
         super().init_model(model)
 
-        # configure a ventricular septal defect component
-        _args = {
+        # instantiate a ventricular septal defect as a blood resistor
+        self._vsd = BloodResistor(**{
             "name": "VSD",
             "description": "ventricular septal defect",
             "model_type": "BloodResistor",
@@ -32,9 +32,7 @@ class VentricularSeptalDefect(BaseModel):
             "r_vsdr": 1800,
             "r_back": 1800,
             "r_k": 0
-        }
-        # instantiate a ventricular septal defect as a blood resistor
-        self._vsd = BloodResistor(**_args)
+        })
 
         # initialize this blood resistor
         self._vsd.init_model(model)
@@ -48,10 +46,7 @@ class VentricularSeptalDefect(BaseModel):
         self._vsd.no_flow = self.no_flow
 
         # calc the resistor
-        self._vsd.step_model()
-
-        # execute the blood resistor class method
-        super().calc_model()
+        self._vsd.calc_model()
 
         # get the state of the blood resistor
         self.flow = self._vsd.flow
