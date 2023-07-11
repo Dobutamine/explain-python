@@ -4,7 +4,7 @@ from explain_core.core_models.GasCapacitance import GasCapacitance
 from explain_core.core_models.GasResistor import GasResistor
 
 
-class MechanicalVentilator(BaseModel):
+class Ventilator(BaseModel):
     # independent parameters
     p_atm: float = 760.0
     temp: float = 37.0
@@ -31,19 +31,9 @@ class MechanicalVentilator(BaseModel):
     tidal_volume: float = 0.015
 
     # dependent parameters
-    flow: float = 0.0
-    flow_min: float = 0.0
-    flow_max: float = 0.0
-    flow_insp: float = 0.0
-    flow_exp: float = 0.0
-    pres: float = 0.0
-    pres_min: float = 0.0
-    pres_max: float = 0.0
-    vol: float = 0.0
-    vol_min: float = 0.0
-    vol_max: float = 0.0
-    vol_in: float = 0.0
-    vol_out: float = 0.0
+    vent_flow: float = 0.0
+    vent_pres: float = 0.0
+    vent_vol: float = 0.0
     exp_time: float = 0.15
 
     # ventilator parts
@@ -65,6 +55,7 @@ class MechanicalVentilator(BaseModel):
     _exp_counter: float = 0.0
     _inspiration: bool = True
     _expiration: bool = False
+    _peep_reached = False
 
     def init_model(self, model: object) -> bool:
         # initialize the base model
@@ -116,21 +107,19 @@ class MechanicalVentilator(BaseModel):
         for mp in self._vent_parts:
             mp.calc_model()
 
-        self.pres = self._ettube.pres
-        self.flow = self._ettube_ds.flow
-        self.vol += self._ettube_ds.flow * self._t
-        # if (self._expiration):
-        #     # self.flow = -self._ettube_tubingout.flow
-        #     self.flow = self._tubingin_ettube.flow
+        self.vent_pres = self._ettube.pres
+        self.vent_flow = self._ettube_ds.flow * 60.0
+        self.vent_vol += self._ettube_ds.flow * self._t
 
     def pressure_control(self):
         if self._inspiration:
             # open the inspiration valve and calculate the inspiratory valve position depending on the desired flow
             self._insp_valve.no_flow = False
             self._insp_valve.r_for = (400.0 / (self.insp_flow / 60.0)) - 100.0
+            self._insp_valve.no_back_flow = True
 
-            # guard the inspiration pressures as this is pressure control
-            if self._ettube.pres > self.pip + self.p_atm:
+            # # guard the inspiration pressures as this is pressure control
+            if self._tubingin.pres > self.pip + self.p_atm:
                 self._insp_valve.no_flow = True
 
             # close the expiration valve
@@ -138,14 +127,17 @@ class MechanicalVentilator(BaseModel):
 
         if self._expiration:
             # close the inspiratory valve
-            self._insp_valve.no_flow = False
-            self._insp_valve.r_for = (400.0 / (self.exp_flow / 60.0)) - 100.0
+            self._insp_valve.no_flow = True
 
             # open the expiration valve and calculate the expiration valve position depending on the desired peep and flow
-            self._ventout.vol = (self.peep) / \
-                self._ventout.el_base + self._ventout.u_vol
             self._exp_valve.no_flow = False
             self._exp_valve.r_for = 15.0
+            # self._ventout.vol = (
+            #     (self.peep) / self._ventout.el_base) + self._ventout.u_vol
+            # # guard the inspiration pressures as this is pressure control
+            if self._tubingin.pres < self.peep + self.p_atm:
+                self._ventout.vol = (
+                    (self.peep) / self._ventout.el_base) + self._ventout.u_vol
 
     def build_ventilator(self, model):
         # clear the ventilator part list
@@ -168,7 +160,7 @@ class MechanicalVentilator(BaseModel):
         self._ventin.init_model(model)
         self._ventin.calc_model()
         self.set_air_composition(
-            self._ventin, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'])
+            self._ventin, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._ventin)
 
         self._tubingin = GasCapacitance(**{
@@ -186,7 +178,7 @@ class MechanicalVentilator(BaseModel):
         self._tubingin.init_model(model)
         self._tubingin.calc_model()
         self.set_air_composition(
-            self._tubingin, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'])
+            self._tubingin, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._tubingin)
 
         self._tubingout = GasCapacitance(**{
@@ -204,7 +196,7 @@ class MechanicalVentilator(BaseModel):
         self._tubingout.init_model(model)
         self._tubingout.calc_model()
         self.set_air_composition(
-            self._tubingout, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'])
+            self._tubingout, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._tubingout)
 
         self._ettube = GasCapacitance(**{
@@ -222,7 +214,7 @@ class MechanicalVentilator(BaseModel):
         self._ettube.init_model(model)
         self._ettube.calc_model()
         self.set_air_composition(
-            self._ettube, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'])
+            self._ettube, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._ettube)
 
         self._ventout = GasCapacitance(**{
@@ -240,7 +232,7 @@ class MechanicalVentilator(BaseModel):
         self._ventout.init_model(model)
         self._ventout.calc_model()
         self.set_air_composition(
-            self._ventout, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'])
+            self._ventout, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], 0, 0)
         self._vent_parts.append(self._ventout)
 
         # connect the parts using the gas resistor models
@@ -330,14 +322,17 @@ class MechanicalVentilator(BaseModel):
         self._exp_valve.init_model(model, self._tubingout, self._ventout)
         self._vent_parts.append(self._exp_valve)
 
-    def set_air_composition(self, comp, fo2_dry, fco2_dry, fn2_dry, fother_dry):
+    def set_air_composition(self, comp, fo2_dry, fco2_dry, fn2_dry, fother_dry, temp, humidity):
+        comp.temp = temp
+        comp.target_temp = temp
+        comp.humidity = humidity
         # calculate the concentration at this pressure and temperature in mmol/l using the gas law
         comp.ctotal = (
-            comp.pres / (self._gas_constant * (273.15 + self.temp))) * 1000.0
+            comp.pres / (self._gas_constant * (273.15 + temp))) * 1000.0
 
         # calculate the water vapour pressure, concentration and fraction for this temperature and humidity (0 - 1)
         comp.ph2o = math.pow(math.e, 20.386 - 5132 /
-                             (self.temp + 273)) * self.humidity
+                             (temp + 273)) * humidity
         comp.fh2o = comp.ph2o / comp.pres
         comp.ch2o = comp.fh2o * comp.ctotal
 

@@ -554,6 +554,35 @@ class Interface:
             self.analyze(properties, time_to_calculate,
                          sampleinterval, calculate=False)
 
+    def plot_time_graph_smooth(self, properties, time_to_calculate=10,  combined=True, sharey=True, ylabel='',  autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False, sampleinterval=0.005, analyze=True):
+        # first clear the watchllist and this also clears all data
+        self.dc.clear_watchlist()
+
+        # set the sample interval
+        self.dc.set_sample_interval(sampleinterval)
+
+        # add the property to the watchlist
+        if (isinstance(properties, str)):
+            properties = [properties]
+
+        # add the properties to the watch_list
+        for prop in properties:
+            prop_reference = self.find_model_prop(prop)
+            if (prop_reference != None):
+                self.dc.add_to_watchlist(prop_reference)
+
+        # calculate the model steps
+        self.calculate(time_to_calculate)
+
+        # plot the properties
+        self.draw_time_graph_smooth(sharey, combined, ylabel, autoscale,
+                                    ylowerlim, yupperlim, fill, fill_between, zeroline)
+
+        # analyze
+        if analyze:
+            self.analyze(properties, time_to_calculate,
+                         sampleinterval, calculate=False)
+
     def plot_xy_graph(self, property_x, property_y, time_to_calculate=2, sampleinterval=0.0005):
         # first clear the watchllist and this also clears all data
         self.dc.clear_watchlist()
@@ -614,6 +643,86 @@ class Interface:
         plt.show()
 
     def draw_time_graph(self, sharey=False, combined=True, ylabel='', autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False):
+        parameters = []
+        no_parameters = 0
+        # get the watch list of the datacollector
+        for watched_parameter in self.dc.watch_list:
+            if (watched_parameter['label'] != "Heart.ncc_ventricular" and watched_parameter['label'] != "Heart.ncc_atrial"):
+                parameters.append(watched_parameter['label'])
+
+        no_dp = len(self.dc.collected_data)
+        x = np.zeros(no_dp)
+        y = []
+
+        for parameter in enumerate(parameters):
+            y.append(np.zeros(no_dp))
+            no_parameters += 1
+
+        for index, t in enumerate(self.dc.collected_data):
+            x[index] = t['time']
+
+            for idx, parameter in enumerate(parameters):
+                y[idx][index] = t[parameter]
+
+        # determine number of needed plots
+        if (no_parameters == 1):
+            combined = True
+
+        if (combined == False):
+
+            fig, axs = plt.subplots(nrows=no_parameters, ncols=1, figsize=(
+                18, 3 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True)
+            if (no_parameters > 1):
+                for i, ax in enumerate(axs):
+                    ax.plot(x, y[i], self.lines[i], linewidth=1)
+                    ax.set_title(parameters[i], fontsize=10)
+                    ax.set_xlabel('time (s)', fontsize=8)
+                    ax.set_ylabel(ylabel, fontsize=8)
+                    if not autoscale:
+                        ax.set_ylim([ylowerlim, yupperlim])
+                    if zeroline:
+                        ax.hlines(0, np.amin(x), np.amax(
+                            x), linestyles='dashed')
+                    if fill:
+                        ax.fill_between(x, y[i], color='blue', alpha=0.3)
+            else:
+                axs.plot(x, y[0], self.lines[0], linewidth=1)
+                axs.set_title(parameters[0], fontsize=10)
+                axs.set_xlabel('time (s)', fontsize=8)
+                axs.set_ylabel(ylabel, fontsize=8)
+
+                if not autoscale:
+                    axs.set_ylim([ylowerlim, yupperlim])
+                if zeroline:
+                    ax.hlines(0, np.amin(x), np.amax(x), linestyles='dashed')
+                if fill:
+                    axs.fill_between(x, y[0], color='blue', alpha=0.3)
+
+        if (combined):
+            plt.figure(figsize=(18, 3), dpi=300)
+            if not autoscale:
+                plt.ylim([ylowerlim, yupperlim])
+            for index, parameter in enumerate(parameters):
+                # Subplot of figure 1 with id 211 the data (red line r-, first legend = parameter)
+                plt.plot(x, y[index], self.lines[index],
+                         linewidth=1, label=parameter)
+                if fill:
+                    plt.fill_between(x, y[index], color='blue', alpha=0.3)
+            if zeroline:
+                plt.hlines(0, np.amin(x), np.amax(x), linestyles='dashed')
+            plt.xlabel('time (s)', fontsize=8)
+            plt.ylabel(ylabel, fontsize=8)
+            plt.xticks(fontsize=8)
+            plt.yticks(fontsize=8)
+            # Add a legend
+            plt.legend(loc='upper center', bbox_to_anchor=(
+                0.5, 1.22), ncol=6, fontsize=8)
+            if fill_between:
+                plt.fill_between(x, y[0], y[1], color='blue', alpha=0.1)
+
+        plt.show()
+
+    def draw_time_graph_smooth(self, sharey=False, combined=True, ylabel='', autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False):
         parameters = []
         no_parameters = 0
         # get the watch list of the datacollector

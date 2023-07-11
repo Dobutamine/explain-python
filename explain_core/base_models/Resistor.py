@@ -45,7 +45,7 @@ class Resistor(BaseModel):
 
         # back flow
         if (_p1 < _p2):
-            self.flow = (_p1 - _p2) / (self.r_for * self.r_for_factor) + \
+            self.flow = (_p1 - _p2) / (self.r_back * self.r_back_factor) + \
                 self.r_k * self.r_k_factor * math.pow(self.no_flow, 2)
             self.update_volumes()
             return

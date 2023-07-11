@@ -923,12 +923,12 @@
       "diameter": 0.002,
       "no_flow": true
     },
-    "MechanicalVentilator": {
-      "name": "MechanicalVentilator",
+    "Ventilator": {
+      "name": "Ventilator",
       "description": "",
-      "model_type": "MechanicalVentilator",
+      "model_type": "Ventilator",
       "is_enabled": true,
-      "dependencies": ["DS", "OUT", "MOUTH_DS"],
+      "dependencies": ["DS", "MOUTH_DS"],
       "p_atm": 760.0,
       "temp": 37.0,
       "humidity": 1.0,
