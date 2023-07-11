@@ -6,6 +6,8 @@ from explain_core.base_models.Capacitance import Capacitance
 
 class Resistor(BaseModel):
     # independent variables
+    p1_ext: float = 0.0
+    p2_ext: float = 0.0
     r_for: float = 1.0
     r_for_factor: float = 1.0
     r_back: float = 1.0
@@ -24,8 +26,12 @@ class Resistor(BaseModel):
 
     def calc_model(self) -> None:
         # get the pressures
-        _p1: float = self._model_comp_from.pres
-        _p2: float = self._model_comp_to.pres
+        _p1: float = self._model_comp_from.pres + self.p1_ext
+        _p2: float = self._model_comp_to.pres + self.p2_ext
+
+        # reset the external pressures
+        self.p1_ext = 0
+        self.p2_ext = 0
 
         if self.no_flow:
             self.flow = 0.0

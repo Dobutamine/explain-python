@@ -955,6 +955,13 @@
       "pip_max": 20.0,
       "peep": 2.9,
       "tidal_volume": 0.015
+    },
+    "Placenta": {
+      "name": "Placenta",
+      "description": "",
+      "model_type": "Placenta",
+      "is_enabled": true,
+      "dependencies": []
     }
   },
   "dateCreated": {
