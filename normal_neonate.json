@@ -899,8 +899,9 @@
       "model_type": "DuctusArteriosus",
       "is_enabled": true,
       "dependencies": ["AAR", "PA"],
-      "length": 0.01,
-      "diameter": 0.002,
+      "length": 10.0,
+      "diameter": 2.0,
+      "nonlin": 0.0,
       "no_flow": false
     },
     "ForamenOvale": {
