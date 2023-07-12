@@ -1,5 +1,7 @@
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.base_models.Capacitance import Capacitance
+from explain_core.helpers.Acidbase import calc_acidbase_from_tco2
+from explain_core.helpers.Oxygenation import calc_oxygenation_from_to2
 
 
 class GasExchanger(BaseModel):
@@ -12,8 +14,6 @@ class GasExchanger(BaseModel):
     # local variables
     _blood: Capacitance = {}
     _gas: Capacitance = {}
-    _calc_acidbase = {}
-    _calc_oxy = {}
     _flux_o2: float = 0
     _flux_co2: float = 0
 
@@ -23,15 +23,13 @@ class GasExchanger(BaseModel):
         # get a reference to the gas and blood capacitance
         self._blood = self._model.models[self.comp_blood]
         self._gas = self._model.models[self.comp_gas]
-        self._calc_acidbase = self._model.models['Blood'].calc_acidbase_from_tco2
-        self._calc_oxy = self._model.models['Blood'].calc_oxygenation_from_to2
 
     def calc_model(self) -> None:
         super().calc_model()
 
         # calculate the po2 and pco2 in the blood compartments
-        self._calc_acidbase(self._blood)
-        self._calc_oxy(self._blood)
+        calc_acidbase_from_tco2(self._blood)
+        calc_oxygenation_from_to2(self._blood)
 
         # get the partial pressures and gas concentrations from the components
         po2_blood: float = self._blood.aboxy['po2']
