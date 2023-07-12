@@ -26,5 +26,17 @@ class Blood(BaseModel):
             self._update_counter = 0.0
             for c in self.aboxy['comps']:
                 calc_acidbase_from_tco2(self._model.models[c])
-                calc_oxygenation_from_to2(self._model.models[c])
+                # calculate the po2 and pco2 in the blood compartments
+                result_ab = calc_acidbase_from_tco2(self._model.models[c])
+                if result_ab is not None:
+                    self._model.models[c].aboxy['ph'] = result_ab['ph']
+                    self._model.models[c].aboxy['pco2'] = result_ab['pco2']
+                    self._model.models[c].aboxy['hco3'] = result_ab['hco3']
+                    self._model.models[c].aboxy['be'] = result_ab['be']
+
+                result_oxy = calc_oxygenation_from_to2(self._model.models[c])
+                if result_oxy is not None:
+                    self._model.models[c].aboxy['po2'] = result_oxy['po2']
+                    self._model.models[c].aboxy['so2'] = result_oxy['so2']
+
         self._update_counter += self._t

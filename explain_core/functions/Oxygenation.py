@@ -27,7 +27,7 @@ po2 = 0.0
 so2 = 0.0
 
 
-def calc_oxygenation_from_to2(comp):
+def calc_oxygenation_from_to2(comp) -> object:
     global to2, ph, be, dpg, hemoglobin, temp, po2
     # get the for the oxygenation independent parameters from the component
     to2 = comp.aboxy['to2']
@@ -41,11 +41,14 @@ def calc_oxygenation_from_to2(comp):
     po2 = brent_root_finding(
         oxygen_content, left_o2, right_o2, max_iterations, brent_accuracy)
 
-    # if a po2 is found then store the po2 and so2 into the component
+    # if a po2 is found then return the result
     if (po2 > 0):
-        # convert the po2 to mmHg
-        comp.aboxy['po2'] = po2 / 0.1333
-        comp.aboxy['so2'] = so2 * 100
+        return {
+            "po2": po2 / 0.1333,
+            "so2": so2 * 100.0
+        }
+    else:
+        return None
 
 
 def oxygen_content(po2_estimate):

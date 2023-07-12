@@ -26,7 +26,7 @@ uma: float = 0.0
 hemoglobin: float = 0.0
 
 
-def calc_acidbase_from_tco2(comp):
+def calc_acidbase_from_tco2(comp) -> object:
     global tco2, pco2, hco3, be, sid, albumin, phosphates, uma, hemoglobin
     # calculate the apparent strong ion difference (SID) in mEq/l
     # comp.sid = comp.sodium + comp.potassium + 2 * comp.calcium + 2 * \
@@ -54,13 +54,16 @@ def calc_acidbase_from_tco2(comp):
     hp = brent_root_finding(
         net_charge_plasma, left_hp, right_hp, max_iterations, brent_accuracy)
 
-    # if this hydrogen concentration is found then store it inside the compartment
+    # if this hydrogen concentration is found then return the result
     if (hp > 0):
-        # calculate the pH and store it inside the compartment
-        comp.aboxy['ph'] = (-math.log10(hp / 1000))
-        comp.aboxy['pco2'] = pco2
-        comp.aboxy['hco3'] = hco3
-        comp.aboxy['be'] = be
+        return {
+            "ph": (-math.log10(hp / 1000)),
+            "pco2": pco2,
+            "hco3": hco3,
+            "be": be
+        }
+    else:
+        return None
 
 
 def net_charge_plasma(hp_estimate):

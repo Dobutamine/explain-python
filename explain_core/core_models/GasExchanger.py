@@ -28,8 +28,17 @@ class GasExchanger(BaseModel):
         super().calc_model()
 
         # calculate the po2 and pco2 in the blood compartments
-        calc_acidbase_from_tco2(self._blood)
-        calc_oxygenation_from_to2(self._blood)
+        result = calc_acidbase_from_tco2(self._blood)
+        if result is not None:
+            self._blood.aboxy['ph'] = result['ph']
+            self._blood.aboxy['pco2'] = result['pco2']
+            self._blood.aboxy['hco3'] = result['hco3']
+            self._blood.aboxy['be'] = result['be']
+
+        result_oxy = calc_oxygenation_from_to2(self._blood)
+        if result_oxy is not None:
+            self._blood.aboxy['po2'] = result_oxy['po2']
+            self._blood.aboxy['so2'] = result_oxy['so2']
 
         # get the partial pressures and gas concentrations from the components
         po2_blood: float = self._blood.aboxy['po2']
