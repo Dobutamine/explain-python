@@ -1,7 +1,7 @@
 import math
 
 
-def calc_resistance_tube(diameter, length, viscosity=6):
+def calc_resistance_tube(diameter: float, length: float, viscosity: float = 6.0):
     # resistance is calculated using Poiseuille's Law : R = (8 * n * L) / (PI * r^4)
 
     # we have to watch the units carefully where we have to make sure that the units in the formula are

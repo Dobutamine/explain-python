@@ -1,12 +1,9 @@
-def brent_root_finding(f, x0, x1, max_iter, tolerance):
-    steps = 0
-
+def brent_root_finding(f, x0, x1, max_iter, tolerance) -> float:
     fx0 = f(x0)
     fx1 = f(x1)
 
     if (fx0 * fx1) > 0:
-        return (-1, steps, True)
-
+        return -1
     if abs(fx0) < abs(fx1):
         x0, x1 = x1, x0
         fx0, fx1 = fx1, fx0
@@ -57,5 +54,4 @@ def brent_root_finding(f, x0, x1, max_iter, tolerance):
     if (steps_taken >= max_iter):
         return -1
     else:
-        steps = steps_taken
         return x1

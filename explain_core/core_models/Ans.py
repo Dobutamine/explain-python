@@ -1,16 +1,20 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
-from explain_core.base_models.Capacitance import Capacitance
+from explain_core.core_models.BloodCapacitance import BloodCapacitance
 from explain_core.core_models.Heart import Heart
 from explain_core.helpers.ActivationFunction import activation_function
 
 
 class Ans(BaseModel):
     # local variables
-    _baroreceptor: Capacitance = {}
-    _chemoreceptor: Capacitance = {}
+    _baroreceptor: BloodCapacitance = {}
+    _chemoreceptor: BloodCapacitance = {}
     _heart: Heart = {}
     _a_map: float = 0.0
+    _a_ph: float = 0.0
+    _a_po2: float = 0.0
+    _a_pco2: float = 0.0
+
     _d_map_hp: float = 0.0
 
     def init_model(self, model: object) -> bool:
@@ -27,13 +31,13 @@ class Ans(BaseModel):
         # get the baroreflex input
         _baro_pres: float = self._baroreceptor.mean
 
-        # calculate the activation function
+        # calculate the activation function of the baroreceptor
         self._a_map = activation_function(
             _baro_pres, self.max_baro, self.set_baro, self.min_baro)
 
-        # calculate the effectors
+        # calculate the effectors and use the time constant
         self._d_map_hp = self._t * \
             ((1 / self.tc_map_hp) * (-self._d_map_hp + self._a_map)) + self._d_map_hp
 
-        # apply the effects
-        self._heart.heart_rate = self.heart_rate_ref  # + self.g_map_hp * self._d_map_hp
+        # apply the effects using the gain
+        self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hp

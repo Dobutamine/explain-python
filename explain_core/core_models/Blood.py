@@ -1,5 +1,6 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
+from explain_core.helpers.BrentRootFinding import brent_root_finding
 
 
 class Blood(BaseModel):
@@ -80,7 +81,7 @@ class Blood(BaseModel):
         self.hemoglobin = comp.aboxy['hemoglobin']
 
         # now try to find the hydrogen concentration at the point where the net charge of the plasma is zero within limits of the brent accuracy
-        hp = self.brent_root_finding(
+        hp = brent_root_finding(
             self.net_charge_plasma, self.left_hp, self.right_hp, self.max_iterations, self.brent_accuracy)
 
         # if this hydrogen concentration is found then store it inside the compartment
@@ -154,7 +155,7 @@ class Blood(BaseModel):
         self.temp = comp.aboxy['temp']
 
         # calculate the po2 from the to2 using a brent root finding function and oxygen dissociation curve
-        self.po2 = self.brent_root_finding(
+        self.po2 = brent_root_finding(
             self.oxygen_content, self.left_o2, self.right_o2, self.max_iterations, self.brent_accuracy)
 
         # if a po2 is found then store the po2 and so2 into the component
@@ -195,65 +196,3 @@ class Blood(BaseModel):
 
         # return the o2 saturation
         return 1.0 / (math.pow(math.e, -y) + 1.0)
-
-    def brent_root_finding(self, f, x0, x1, max_iter, tolerance):
-        steps = 0
-
-        fx0 = f(x0)
-        fx1 = f(x1)
-
-        if (fx0 * fx1) > 0:
-            return -1
-
-        if abs(fx0) < abs(fx1):
-            x0, x1 = x1, x0
-            fx0, fx1 = fx1, fx0
-
-        x2, fx2 = x0, fx0
-
-        mflag = True
-        steps_taken = 0
-
-        while steps_taken < max_iter and abs(x1 - x0) > tolerance:
-            fx0 = f(x0)
-            fx1 = f(x1)
-            fx2 = f(x2)
-
-            if fx0 != fx2 and fx1 != fx2:
-                L0 = (x0 * fx1 * fx2) / ((fx0 - fx1) * (fx0 - fx2))
-                L1 = (x1 * fx0 * fx2) / ((fx1 - fx0) * (fx1 - fx2))
-                L2 = (x2 * fx1 * fx0) / ((fx2 - fx0) * (fx2 - fx1))
-                new = L0 + L1 + L2
-
-            else:
-                new = x1 - ((fx1 * (x1 - x0)) / (fx1 - fx0))
-
-            if ((new < ((3 * x0 + x1) / 4) or new > x1) or
-                    (mflag == True and (abs(new - x1)) >= (abs(x1 - x2) / 2)) or
-                    (mflag == False and (abs(new - x1)) >= (abs(x2 - d) / 2)) or
-                    (mflag == True and (abs(x1 - x2)) < tolerance) or
-                    (mflag == False and (abs(x2 - d)) < tolerance)):
-                new = (x0 + x1) / 2
-                mflag = True
-
-            else:
-                mflag = False
-
-            fnew = f(new)
-            d, x2 = x2, x1
-
-            if (fx0 * fnew) < 0:
-                x1 = new
-            else:
-                x0 = new
-
-            if abs(fx0) < abs(fx1):
-                x0, x1 = x1, x0
-
-            steps_taken += 1
-
-        if (steps_taken >= max_iter):
-            return -1
-        else:
-            steps = steps_taken
-            return x1

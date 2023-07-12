@@ -272,7 +272,7 @@
       "r_k": 0
     },
     "RV_PA": {
-      "name": "LV_AA",
+      "name": "RV_PA",
       "description": "pulmonary valve valve",
       "model_type": "BloodValve",
       "is_enabled": true,
@@ -797,13 +797,13 @@
       "dependencies": ["AA", "BR"],
       "baroreceptor_location": "AA",
       "chemoreceptor_location": "BR",
-      "heart_rate_ref": 140,
+      "heart_rate_ref": 120,
       "minute_volume_ref": 0.6,
       "tidal_volume_ref": 0.015,
       "set_baro": 53.0,
       "max_baro": 76.0,
       "min_baro": 30.0,
-      "g_map_hp": 10.0,
+      "g_map_hp": -1,
       "tc_map_hp": 2.0
     },
     "Blood": {
@@ -894,35 +894,32 @@
       }
     },
     "DuctusArteriosus": {
-      "name": "DuctusArteriosus",
+      "name": "DA",
       "description": "ductus arteriosus model",
-      "model_type": "DuctusArteriosus",
+      "model_type": "Shunt",
       "is_enabled": true,
       "dependencies": ["AAR", "PA"],
+      "comp_from": "AAR",
+      "comp_to": "PA",
       "length": 10.0,
       "diameter": 2.0,
-      "nonlin": 0.0,
-      "no_flow": false
+      "non_lin_factor": 0.0,
+      "no_flow": true,
+      "no_back_flow": false
     },
     "ForamenOvale": {
-      "name": "ForamenOvale",
+      "name": "FO",
       "description": "foramen ovale model",
-      "model_type": "ForamenOvale",
+      "model_type": "Shunt",
       "is_enabled": true,
       "dependencies": ["LA", "RA"],
-      "length": 0.01,
-      "diameter": 0.002,
-      "no_flow": false
-    },
-    "VentricularSeptalDefect": {
-      "name": "VentricularSeptalDefect",
-      "description": "ventricular septal defect model",
-      "model_type": "ForamenOvale",
-      "is_enabled": true,
-      "dependencies": ["LV", "RV"],
-      "length": 0.01,
-      "diameter": 0.002,
-      "no_flow": true
+      "comp_from": "LA",
+      "comp_to": "RA",
+      "length": 1.0,
+      "diameter": 2.0,
+      "non_lin_factor": 0.0,
+      "no_flow": false,
+      "no_back_flow": false
     },
     "Ventilator": {
       "name": "Ventilator",
@@ -956,13 +953,6 @@
       "pip_max": 20.0,
       "peep": 2.9,
       "tidal_volume": 0.015
-    },
-    "Placenta": {
-      "name": "Placenta",
-      "description": "",
-      "model_type": "Placenta",
-      "is_enabled": false,
-      "dependencies": []
     }
   },
   "dateCreated": {

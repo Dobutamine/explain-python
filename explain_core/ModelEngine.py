@@ -1,7 +1,5 @@
 import json
 import importlib
-from explain_core.helpers.DataCollector import DataCollector
-from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.helpers.Interface import Interface
 
 # import the perfomance counter module to measure the model performance
@@ -101,19 +99,19 @@ class ModelEngine:
                 try:
                     # try to import the module holding the model class from the custom models folder
                     model_module = importlib.import_module(
-                        'custom_models.' + model_type)
-                except Exception as error:
-                    # a module holding the desired model class is not found in the core_models or custom_models folder
+                        'explain_core.custom_models.' + model_type)
+                except:
                     print(
-                        f"Load error: {model_type} model not found in the core_models nor in the custom_models folder OR the model has a syntax error.")
+                        f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}")
                     error_counter += 1
+
             else:
                 # get the model class from the module
                 model_class = getattr(model_module, model_type)
 
                 # instantiate the model class with the properties stored in the model_definition file and a reference to the other components and add it to the components dictionary
                 try:
-                    self.models[key] = model_class(**model)
+                    self.models[model['name']] = model_class(**model)
                 except Exception as error:
                     # a module holding the desired model class is producing an error while instantiating
                     print(
@@ -131,14 +129,13 @@ class ModelEngine:
             init_errors = 0
             # initialize all components
             for _, model in self.models.items():
-                model.init_model(self)
-                # try:
-                #     model.init_model(self)
-                # except Exception as error:
-                #     # a module holding the desired model class is producing an error while initiallizing
-                #     print(
-                #         f"Initialization error: {model_type} model failed to initialize with error: {error}")
-                #     init_errors += 1
+                try:
+                    model.init_model(self)
+                except Exception as error:
+                    # a module holding the desired model class is producing an error while initiallizing
+                    print(
+                        f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}")
+                    init_errors += 1
 
             if init_errors > 0 or dep_errors > 0:
                 self._initialized = False
