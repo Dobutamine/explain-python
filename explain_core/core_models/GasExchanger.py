@@ -1,7 +1,7 @@
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.base_models.Capacitance import Capacitance
-from explain_core.helpers.Acidbase import calc_acidbase_from_tco2
-from explain_core.helpers.Oxygenation import calc_oxygenation_from_to2
+from explain_core.functions.Acidbase import calc_acidbase_from_tco2
+from explain_core.functions.Oxygenation import calc_oxygenation_from_to2
 
 
 class GasExchanger(BaseModel):

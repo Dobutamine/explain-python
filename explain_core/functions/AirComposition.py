@@ -8,7 +8,7 @@ fn2_dry = 0.794608
 fother_dry = 0.0
 
 
-def set_air_composition(gascomp, fio2=0.205, temp=None, humidity=None):
+def calc_air_composition(gascomp, fio2=0.205, temp=None, humidity=None) -> object:
     # check that the gascomp is a gas capacitance
     if type(gascomp) is GasCapacitance:
         # make sure the latest pressure is available
@@ -27,13 +27,13 @@ def set_air_composition(gascomp, fio2=0.205, temp=None, humidity=None):
             gascomp.humidity = humidity
         # calculate the air composition
 
-        result = calc_air_composition(
+        result = air_composition(
             gascomp.pres, new_fo2_dry, new_fco2_dry, new_fn2_dry, new_fother_dry, gascomp.temp, gascomp.humidity)
-        for key, value in result.items():
-            setattr(gascomp, key, value)
+
+        return result
 
 
-def calc_air_composition(pressure, fo2_dry, fco2_dry, fn2_dry, fother_dry, temp, humidity):
+def air_composition(pressure, fo2_dry, fco2_dry, fn2_dry, fother_dry, temp, humidity):
     # local constant
     _gas_constant: float = 62.36367
 

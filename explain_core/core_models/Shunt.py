@@ -1,5 +1,5 @@
 from explain_core.base_models.Resistor import Resistor
-from explain_core.helpers.TubeResistance import calc_resistance_tube
+from explain_core.functions.TubeResistance import calc_resistance_tube
 
 
 class Shunt(Resistor):

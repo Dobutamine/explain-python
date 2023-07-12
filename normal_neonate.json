@@ -837,12 +837,7 @@
       "model_type": "Gas",
       "is_enabled": true,
       "pres_atm": 760,
-      "dry_air": {
-        "fo2": 0.205,
-        "fco2": 0.000392,
-        "fn2": 0.794608,
-        "fother": 0
-      },
+      "fio2": 0.21,
       "humidity_settings": {
         "MOUTH": 0.5,
         "DS": 1.0,

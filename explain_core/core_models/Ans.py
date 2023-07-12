@@ -2,7 +2,7 @@ import math
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.core_models.BloodCapacitance import BloodCapacitance
 from explain_core.core_models.Heart import Heart
-from explain_core.helpers.ActivationFunction import activation_function
+from explain_core.functions.ActivationFunction import activation_function
 
 
 class Ans(BaseModel):

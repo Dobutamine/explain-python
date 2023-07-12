@@ -1,5 +1,5 @@
 import math
-from explain_core.helpers.BrentRootFinding import brent_root_finding
+from explain_core.functions.BrentRootFinding import brent_root_finding
 
 # set the brent root finding properties
 brent_accuracy = 1e-8

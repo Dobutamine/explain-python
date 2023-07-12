@@ -1,6 +1,6 @@
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.core_models.BloodResistor import BloodResistor
-from explain_core.helpers.TubeResistance import calc_resistance_tube
+from explain_core.functions.TubeResistance import calc_resistance_tube
 
 
 class DuctusArteriosus(BaseModel):

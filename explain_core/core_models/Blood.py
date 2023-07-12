@@ -1,20 +1,18 @@
-import math
 from explain_core.base_models.BaseModel import BaseModel
-from explain_core.helpers.BrentRootFinding import brent_root_finding
-from explain_core.helpers.Acidbase import calc_acidbase_from_tco2
-from explain_core.helpers.Oxygenation import calc_oxygenation_from_to2
+from explain_core.functions.Acidbase import calc_acidbase_from_tco2
+from explain_core.functions.Oxygenation import calc_oxygenation_from_to2
 
 
 class Blood(BaseModel):
 
-    # local variables
+    # local variables which determine how often the acidbase and oxygenation is calculated. For performance reasons this is less often.
     _update_counter = 0.0
     _update_interval = 0.015
 
     def init_model(self, model: object) -> bool:
         super().init_model(model)
 
-        # find all models containing blood and set it's solutes
+        # find all models containing blood and set it's solutes, acidbase and oxygenation variables
         for model in self._model.models.values():
             if model.model_type == "BloodCapacitance" or model.model_type == "BloodTimeVaryingElastance":
                 # fill the solutes
