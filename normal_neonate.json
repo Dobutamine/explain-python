@@ -913,7 +913,21 @@
       "length": 1.0,
       "diameter": 2.0,
       "non_lin_factor": 0.0,
-      "no_flow": false,
+      "no_flow": true,
+      "no_back_flow": false
+    },
+    "VentricularSeptalDefect": {
+      "name": "VSD",
+      "description": "ventricular septal defect",
+      "model_type": "Shunt",
+      "is_enabled": true,
+      "dependencies": ["LV", "RV"],
+      "comp_from": "LV",
+      "comp_to": "RV",
+      "length": 1,
+      "diameter": 2.0,
+      "non_lin_factor": 0.0,
+      "no_flow": true,
       "no_back_flow": false
     },
     "Ventilator": {

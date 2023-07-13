@@ -34,6 +34,8 @@ class Ventilator(BaseModel):
     vent_flow: float = 0.0
     vent_pres: float = 0.0
     vent_vol: float = 0.0
+    co2: float = 0.0
+    etco2: float = 0.0
     exp_time: float = 0.15
 
     # ventilator parts
@@ -92,6 +94,7 @@ class Ventilator(BaseModel):
             self._inspiration = True
             self._insp_counter = 0
             self._exp_counter = 0
+            self.etco2 = self._ettube.co2
 
         # increase the timers
         if self._inspiration:
@@ -110,6 +113,7 @@ class Ventilator(BaseModel):
         self.vent_pres = self._ettube.pres
         self.vent_flow = self._ettube_ds.flow * 60.0
         self.vent_vol += self._ettube_ds.flow * self._t
+        self.co2 = self._ettube.pco2
 
     def pressure_control(self):
         if self._inspiration:

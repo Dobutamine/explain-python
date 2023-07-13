@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from explain_core.functions.Acidbase import calc_acidbase_from_tco2
+from explain_core.functions.Oxygenation import calc_oxygenation_from_to2
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -82,12 +84,12 @@ class Interface:
     # plotters
 
     def plot_vitals(self, time):
-        self.plot_time_graph(["AA.systole", "AA.diastole", "Heart.heart_rate", "breathing.spont_resp_rate", "AA.so2"], time_to_calculate=time,
+        self.plot_time_graph(["AA.systole", "AA.diastole", "Heart.heart_rate", "Breathing.resp_rate", "AA.aboxy.so2"], time_to_calculate=time,
                              combined=True, sharey=False, autoscale=False, ylowerlim=0, yupperlim=200, fill=False, fill_between=True)
 
     # lung plotters
     def plot_lung_pressures(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
-        self.plot_time_graph(["NCA.pres", "ALL.pres", "ALR.pres"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
+        self.plot_time_graph(["DS.pres", "ALL.pres", "ALR.pres"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_lung_volumes(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
@@ -95,11 +97,11 @@ class Interface:
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_lung_flows(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
-        self.plot_time_graph(["OUT_NCA.flow", "NCA_ALL.flow", "NCA_ALR.flow"], time_to_calculate=time, autoscale=True, combined=combined,
+        self.plot_time_graph(["MOUTH_DS.flow", "DS_ALL.flow", "DS_ALR.flow"], time_to_calculate=time, autoscale=True, combined=combined,
                              sharey=sharey, sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_lung_pressures_left(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
-        self.plot_time_graph(["NCA.pres", "ALL.pres"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
+        self.plot_time_graph(["DS.pres", "ALL.pres"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_lung_volumes_left(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
@@ -107,11 +109,11 @@ class Interface:
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_lung_flows_left(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
-        self.plot_time_graph(["OUT_NCA.flow", "NCA_ALL.flow"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
+        self.plot_time_graph(["MOUTH_DS.flow", "DS_ALL.flow"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_lung_pressures_right(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
-        self.plot_time_graph(["NCA.pres", "ALR.pres"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
+        self.plot_time_graph(["DS.pres", "ALR.pres"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_lung_volumes_right(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
@@ -119,7 +121,7 @@ class Interface:
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_lung_flows_right(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
-        self.plot_time_graph(["OUT_NCA.flow", "NCA_ALR.flow"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
+        self.plot_time_graph(["MOUTH_DS.flow", "DS_ALR.flow"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     # heart plotters
@@ -167,7 +169,7 @@ class Interface:
         self.plot_time_graph(["RA.pres", "RV.pres", "RA_RV.flow", "RV_PA.flow"], time_to_calculate=time, autoscale=True, combined=combined,
                              sharey=sharey, sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
-    def plot_pda(self, time=2, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=True, analyze=False):
+    def plot_da(self, time=2, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=True, analyze=False):
         self.plot_time_graph(["DA.flow"], time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey,
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
@@ -180,20 +182,20 @@ class Interface:
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_ventilator_curves(self, time=5, combined=False, sharey=False, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=True):
-        self.plot_time_graph(["MechanicalVentilator.sensor_pressure", "MechanicalVentilator.sensor_flow", "MechanicalVentilator.sensor_volume", "MechanicalVentilator.sensor_co2"],
+        self.plot_time_graph(["Ventilator.vent_pres", "Ventilator.vent_flow", "Ventilator.vent_vol", "Ventilator.co2"],
                              time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey, sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     # getters
     def get_vitals(self, time_to_calculate=10):
         vitals = {
             "heartrate": self.model.models['Heart'].heart_rate,
-            "spo2_pre": self.model.models['AA'].so2,
+            "spo2_pre": self.model.models['AA'].aboxy['so2'],
             "abp_systole": self.model.models['AA'].systole,
             "abp_diastole": self.model.models['AA'].diastole,
             "pap_systole": self.model.models['PA'].systole,
             "pap_diastole": self.model.models['PA'].diastole,
-            "cvp": (2 * self.model.models['RA'].diastole + self.model.models['RA'].systole) / 3,
-            "resp_rate": self.model.models['breathing'].spont_resp_rate
+            "cvp": self.model.models['RA'].mean,
+            "resp_rate": self.model.models['Breathing'].resp_rate
         }
 
         return vitals
@@ -204,12 +206,8 @@ class Interface:
         properties = []
         for component in self.model.models:
             component_type = self.model.models[component].model_type
-            try:
-                component_content = self.model.models[component].content
-            except:
-                component_content = ""
 
-            if (component_type == "GasResistor" or component_type == "Valve"):
+            if (component_type == "GasResistor"):
                 properties.append(component + ".flow")
 
         self.analyze(properties, time_to_calculate)
@@ -220,44 +218,33 @@ class Interface:
         properties = []
         for component in self.model.models:
             component_type = self.model.models[component].model_type
-            try:
-                component_content = self.model.models[component].content
-            except:
-                component_content = ""
 
-            if (component_type == "BloodResistor" or component_type == "Valve"):
+            if (component_type == "BloodResistor" or component_type == "BloodValve"):
                 properties.append(component + ".flow")
 
         self.analyze(properties, time_to_calculate, sampleinterval=0.0005)
 
-    def get_blood_gas(self, component='AA'):
+    def get_bloodgas(self, component='AA'):
         # define a dictionary which is going to hold the bloodgas
         bg = {}
 
         # find the component type as we only can calculate the bloodgas in a blood or time-varying elastance component
         component_type = self.model.models[component].model_type
 
-        # try to find the contents of the component. We only can use components which have blood inside
-        try:
-            component_content = self.model.models[component].content
-        except:
-            component_content = ""
-
         # check whether the desired component is of an appropriate type and contains blood.
-        if (component_type == "BloodCompliance" or component_type == "TimeVaryingElastance") and component_content == "blood":
+        if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
             # calculate the acidbase and oxygenation
-            self.model.models['blood'].acidbase(
-                self.model.models[component])
-            self.model.models['blood'].oxygenation(
+            result_ab = calc_acidbase_from_tco2(self.model.models[component])
+            result_oxy = calc_oxygenation_from_to2(
                 self.model.models[component])
 
             # build the bloodgas dictionnary
-            bg['ph'] = self.model.models[component].ph
-            bg['po2'] = self.model.models[component].po2
-            bg['pco2'] = self.model.models[component].pco2
-            bg['hco3'] = self.model.models[component].hco3
-            bg['be'] = self.model.models[component].be
-            bg['so2'] = self.model.models[component].so2
+            bg['ph'] = result_ab['ph']
+            bg['po2'] = result_oxy['po2']
+            bg['pco2'] = result_ab['pco2']
+            bg['hco3'] = result_ab['hco3']
+            bg['be'] = result_ab['be']
+            bg['so2'] = result_oxy['so2']
 
         return bg
 
@@ -267,12 +254,7 @@ class Interface:
         properties = []
         for component in self.model.models:
             component_type = self.model.models[component].model_type
-            try:
-                component_content = self.model.models[component].content
-            except:
-                component_content = ""
-
-            if (component_type == "BloodCompliance" or component_type == "TimeVaryingElastance") and component_content == "blood":
+            if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
                 properties.append(component + ".pres")
 
         self.analyze(properties, time_to_calculate)
@@ -291,12 +273,8 @@ class Interface:
 
         for component in self.model.models:
             component_type = self.model.models[component].model_type
-            try:
-                component_content = self.model.models[component].content
-            except:
-                component_content = ""
 
-            if (component_type == "BloodCompliance" or component_type == "TimeVaryingElastance") and component_content == "blood":
+            if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
                 total_volume += self.model.models[component].vol
             if component == 'PA' or component == 'PV':
                 pulm_blood_volume += self.model.models[component].vol
@@ -351,12 +329,8 @@ class Interface:
         properties = []
         for component in self.model.models:
             component_type = self.model.models[component].model_type
-            try:
-                component_content = self.model.models[component].content
-            except:
-                component_content = ""
 
-            if (component_type == "BloodCompliance" or component_type == "TimeVaryingElastance") and component_content == "blood":
+            if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
                 properties.append(component + ".vol")
 
         self.analyze(properties, time_to_calculate)
@@ -367,12 +341,8 @@ class Interface:
         properties = []
         for component in self.model.models:
             component_type = self.model.models[component].model_type
-            try:
-                component_content = self.model.models[component].content
-            except:
-                component_content = ""
 
-            if (component_type == "GasCompliance" or component_type == "TimeVaryingElastance") and component_content == "gas":
+            if (component_type == "GasCapacitance" or component_type == "GasTimeVaryingElastance"):
                 properties.append(component + ".pres")
 
         self.analyze(properties, time_to_calculate)
@@ -383,12 +353,8 @@ class Interface:
         properties = []
         for component in self.model.models:
             component_type = self.model.models[component].model_type
-            try:
-                component_content = self.model.models[component].content
-            except:
-                component_content = ""
 
-            if (component_type == "GasCompliance" or component_type == "TimeVaryingElastance") and component_content == "gas":
+            if (component_type == "GasCapacitance" or component_type == "GasTimeVaryingElastance"):
                 properties.append(component + ".vol")
 
         self.analyze(properties, time_to_calculate)
@@ -554,35 +520,6 @@ class Interface:
             self.analyze(properties, time_to_calculate,
                          sampleinterval, calculate=False)
 
-    def plot_time_graph_smooth(self, properties, time_to_calculate=10,  combined=True, sharey=True, ylabel='',  autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False, sampleinterval=0.005, analyze=True):
-        # first clear the watchllist and this also clears all data
-        self.dc.clear_watchlist()
-
-        # set the sample interval
-        self.dc.set_sample_interval(sampleinterval)
-
-        # add the property to the watchlist
-        if (isinstance(properties, str)):
-            properties = [properties]
-
-        # add the properties to the watch_list
-        for prop in properties:
-            prop_reference = self.find_model_prop(prop)
-            if (prop_reference != None):
-                self.dc.add_to_watchlist(prop_reference)
-
-        # calculate the model steps
-        self.calculate(time_to_calculate)
-
-        # plot the properties
-        self.draw_time_graph_smooth(sharey, combined, ylabel, autoscale,
-                                    ylowerlim, yupperlim, fill, fill_between, zeroline)
-
-        # analyze
-        if analyze:
-            self.analyze(properties, time_to_calculate,
-                         sampleinterval, calculate=False)
-
     def plot_xy_graph(self, property_x, property_y, time_to_calculate=2, sampleinterval=0.0005):
         # first clear the watchllist and this also clears all data
         self.dc.clear_watchlist()
@@ -643,86 +580,6 @@ class Interface:
         plt.show()
 
     def draw_time_graph(self, sharey=False, combined=True, ylabel='', autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False):
-        parameters = []
-        no_parameters = 0
-        # get the watch list of the datacollector
-        for watched_parameter in self.dc.watch_list:
-            if (watched_parameter['label'] != "Heart.ncc_ventricular" and watched_parameter['label'] != "Heart.ncc_atrial"):
-                parameters.append(watched_parameter['label'])
-
-        no_dp = len(self.dc.collected_data)
-        x = np.zeros(no_dp)
-        y = []
-
-        for parameter in enumerate(parameters):
-            y.append(np.zeros(no_dp))
-            no_parameters += 1
-
-        for index, t in enumerate(self.dc.collected_data):
-            x[index] = t['time']
-
-            for idx, parameter in enumerate(parameters):
-                y[idx][index] = t[parameter]
-
-        # determine number of needed plots
-        if (no_parameters == 1):
-            combined = True
-
-        if (combined == False):
-
-            fig, axs = plt.subplots(nrows=no_parameters, ncols=1, figsize=(
-                18, 3 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True)
-            if (no_parameters > 1):
-                for i, ax in enumerate(axs):
-                    ax.plot(x, y[i], self.lines[i], linewidth=1)
-                    ax.set_title(parameters[i], fontsize=10)
-                    ax.set_xlabel('time (s)', fontsize=8)
-                    ax.set_ylabel(ylabel, fontsize=8)
-                    if not autoscale:
-                        ax.set_ylim([ylowerlim, yupperlim])
-                    if zeroline:
-                        ax.hlines(0, np.amin(x), np.amax(
-                            x), linestyles='dashed')
-                    if fill:
-                        ax.fill_between(x, y[i], color='blue', alpha=0.3)
-            else:
-                axs.plot(x, y[0], self.lines[0], linewidth=1)
-                axs.set_title(parameters[0], fontsize=10)
-                axs.set_xlabel('time (s)', fontsize=8)
-                axs.set_ylabel(ylabel, fontsize=8)
-
-                if not autoscale:
-                    axs.set_ylim([ylowerlim, yupperlim])
-                if zeroline:
-                    ax.hlines(0, np.amin(x), np.amax(x), linestyles='dashed')
-                if fill:
-                    axs.fill_between(x, y[0], color='blue', alpha=0.3)
-
-        if (combined):
-            plt.figure(figsize=(18, 3), dpi=300)
-            if not autoscale:
-                plt.ylim([ylowerlim, yupperlim])
-            for index, parameter in enumerate(parameters):
-                # Subplot of figure 1 with id 211 the data (red line r-, first legend = parameter)
-                plt.plot(x, y[index], self.lines[index],
-                         linewidth=1, label=parameter)
-                if fill:
-                    plt.fill_between(x, y[index], color='blue', alpha=0.3)
-            if zeroline:
-                plt.hlines(0, np.amin(x), np.amax(x), linestyles='dashed')
-            plt.xlabel('time (s)', fontsize=8)
-            plt.ylabel(ylabel, fontsize=8)
-            plt.xticks(fontsize=8)
-            plt.yticks(fontsize=8)
-            # Add a legend
-            plt.legend(loc='upper center', bbox_to_anchor=(
-                0.5, 1.22), ncol=6, fontsize=8)
-            if fill_between:
-                plt.fill_between(x, y[0], y[1], color='blue', alpha=0.1)
-
-        plt.show()
-
-    def draw_time_graph_smooth(self, sharey=False, combined=True, ylabel='', autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False):
         parameters = []
         no_parameters = 0
         # get the watch list of the datacollector
