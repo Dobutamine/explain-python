@@ -796,7 +796,7 @@
       "is_enabled": true,
       "dependencies": ["AA", "BR"],
       "baroreceptor_location": "AA",
-      "chemoreceptor_location": "BR",
+      "chemoreceptor_location": "AA",
       "heart_rate_ref": 120,
       "minute_volume_ref": 0.6,
       "tidal_volume_ref": 0.015,
@@ -813,7 +813,7 @@
       "is_enabled": true,
       "solutes": {},
       "aboxy": {
-        "comps": ["AA"],
+        "comps": [],
         "tco2": 24.7,
         "to2": 9.7,
         "ph": 7.4,

@@ -83,9 +83,17 @@ class Interface:
 
     # plotters
 
-    def plot_vitals(self, time):
-        self.plot_time_graph(["AA.systole", "AA.diastole", "Heart.heart_rate", "Breathing.resp_rate", "AA.aboxy.so2"], time_to_calculate=time,
-                             combined=True, sharey=False, autoscale=False, ylowerlim=0, yupperlim=200, fill=False, fill_between=True)
+    def plot_vitals(self, time=30):
+        self.plot_time_graph(["AA.mean", "Heart.heart_rate", "Breathing.resp_rate", "AA.aboxy.so2"], time_to_calculate=time,
+                             combined=True, sharey=False, autoscale=False, ylowerlim=0, yupperlim=200, fill=False, fill_between=False)
+
+    def plot_bloodgas(self, time=30):
+        self.plot_time_graph(["AA.aboxy.ph", "AA.aboxy.pco2", "AA.aboxy.po2", "AA.aboxy.so2"], time_to_calculate=time,
+                             combined=False, sharey=False, fill=False)
+
+    def plot_ans(self, time=10):
+        self.plot_time_graph(["AA.aboxy.pco2", "Breathing.target_minute_volume", "Breathing.target_tidal_volume", "Breathing.resp_rate", "Breathing.exp_tidal_volume"], time_to_calculate=time,
+                             combined=False, sharey=False, fill=False)
 
     # lung plotters
     def plot_lung_pressures(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
@@ -511,6 +519,9 @@ class Interface:
         # calculate the model steps
         self.calculate(time_to_calculate)
 
+        # print status message
+        print("Preparing data plot.")
+
         # plot the properties
         self.draw_time_graph(sharey, combined, ylabel, autoscale,
                              ylowerlim, yupperlim, fill, fill_between, zeroline)
@@ -602,19 +613,31 @@ class Interface:
                 y[idx][index] = t[parameter]
 
         # determine number of needed plots
+        plt.style.use('dark_background')
+
         if (no_parameters == 1):
             combined = True
 
         if (combined == False):
 
             fig, axs = plt.subplots(nrows=no_parameters, ncols=1, figsize=(
-                18, 3 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True)
+                18, 2 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True, dpi=300)
+            # Change to the desired color
+            fig.patch.set_facecolor('#1E2029')
+
+            # Change the fontsize as desired
             if (no_parameters > 1):
                 for i, ax in enumerate(axs):
+                    ax.tick_params(axis='both', which='both', labelsize=6)
+                    ax.spines['right'].set_visible(False)
+                    ax.spines['top'].set_visible(False)
+                    ax.spines['bottom'].set_color('darkgray')
+                    ax.spines['left'].set_color('darkgray')
+                    ax.margins(x=0, y=0)
                     ax.plot(x, y[i], self.lines[i], linewidth=1)
-                    ax.set_title(parameters[i], fontsize=10)
-                    ax.set_xlabel('time (s)', fontsize=8)
-                    ax.set_ylabel(ylabel, fontsize=8)
+                    ax.set_title(parameters[i], fontsize=6)
+                    ax.set_xlabel('time (s)', fontsize=6)
+                    ax.set_ylabel(ylabel, fontsize=6)
                     if not autoscale:
                         ax.set_ylim([ylowerlim, yupperlim])
                     if zeroline:
@@ -622,21 +645,17 @@ class Interface:
                             x), linestyles='dashed')
                     if fill:
                         ax.fill_between(x, y[i], color='blue', alpha=0.3)
-            else:
-                axs.plot(x, y[0], self.lines[0], linewidth=1)
-                axs.set_title(parameters[0], fontsize=10)
-                axs.set_xlabel('time (s)', fontsize=8)
-                axs.set_ylabel(ylabel, fontsize=8)
-
-                if not autoscale:
-                    axs.set_ylim([ylowerlim, yupperlim])
-                if zeroline:
-                    ax.hlines(0, np.amin(x), np.amax(x), linestyles='dashed')
-                if fill:
-                    axs.fill_between(x, y[0], color='blue', alpha=0.3)
 
         if (combined):
-            plt.figure(figsize=(18, 3), dpi=300)
+            plt.figure(figsize=(18, 2), dpi=300,
+                       facecolor='#1E2029', edgecolor="#FF0000")
+            plt.tick_params(axis='both', which='both', labelsize=6)
+            ax = plt.gca()
+            ax.spines['right'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+            ax.spines['bottom'].set_color('darkgray')
+            ax.spines['left'].set_color('darkgray')
+            plt.margins(x=0, y=0)
             if not autoscale:
                 plt.ylim([ylowerlim, yupperlim])
             for index, parameter in enumerate(parameters):
@@ -647,13 +666,13 @@ class Interface:
                     plt.fill_between(x, y[index], color='blue', alpha=0.3)
             if zeroline:
                 plt.hlines(0, np.amin(x), np.amax(x), linestyles='dashed')
-            plt.xlabel('time (s)', fontsize=8)
-            plt.ylabel(ylabel, fontsize=8)
-            plt.xticks(fontsize=8)
-            plt.yticks(fontsize=8)
+            plt.xlabel('time (s)', fontsize=6)
+            plt.ylabel(ylabel, fontsize=6)
+            plt.xticks(fontsize=6)
+            plt.yticks(fontsize=6)
             # Add a legend
             plt.legend(loc='upper center', bbox_to_anchor=(
-                0.5, 1.22), ncol=6, fontsize=8)
+                0.5, 1.22), ncol=6, fontsize=6)
             if fill_between:
                 plt.fill_between(x, y[0], y[1], color='blue', alpha=0.1)
 
