@@ -33,7 +33,14 @@ class Interface:
 
         self.output_path = str(os.path.join(Path().absolute())) + r'/'
 
+        self.plot_background_color = '#1E2029'
+        self.plot_height = 2
+        self.plot_dpi = 300
+        self.plot_fontsize = 6
+        self.plot_axis_color = 'darkgray'
+
     # main model functions
+
     def calculate(self, time_to_calculate):
         # calculate the model steps
         no_steps: int = int(time_to_calculate / self.model.modeling_stepsize)
@@ -582,12 +589,23 @@ class Interface:
             x[index] = t[property_x]
             y[index] = t[property_y]
 
-        plt.figure(figsize=(10, 10), dpi=100)
+        # determine number of needed plots
+        plt.style.use('dark_background')
+
+        plt.figure(figsize=(2, 2), dpi=self.plot_dpi / 1.5,
+                   facecolor=self.plot_background_color)
         # Subplot of figure 1 with id 211 the data (red line r-, first legend = parameter)
         plt.plot(x, y, self.lines[0], linewidth=1)
-        plt.xlabel(property_x)
-        plt.ylabel(property_y)
-
+        ax = plt.gca()
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.spines['bottom'].set_color(self.plot_axis_color)
+        ax.spines['left'].set_color(self.plot_axis_color)
+        plt.xlabel(property_x, fontsize=self.plot_fontsize / 2, labelpad=1)
+        plt.ylabel(property_y, fontsize=self.plot_fontsize /
+                   2, rotation=90, labelpad=1)
+        plt.xticks(fontsize=self.plot_fontsize / 2)
+        plt.yticks(fontsize=self.plot_fontsize / 2)
         plt.show()
 
     def draw_time_graph(self, sharey=False, combined=True, ylabel='', autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False):
@@ -621,23 +639,24 @@ class Interface:
         if (combined == False):
 
             fig, axs = plt.subplots(nrows=no_parameters, ncols=1, figsize=(
-                18, 2 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True, dpi=300)
+                18, self.plot_height * no_parameters), sharex=True, sharey=sharey, constrained_layout=True, dpi=self.plot_dpi)
             # Change to the desired color
-            fig.patch.set_facecolor('#1E2029')
+            fig.patch.set_facecolor(self.plot_background_color)
 
             # Change the fontsize as desired
             if (no_parameters > 1):
                 for i, ax in enumerate(axs):
-                    ax.tick_params(axis='both', which='both', labelsize=6)
+                    ax.tick_params(axis='both', which='both',
+                                   labelsize=self.plot_fontsize)
                     ax.spines['right'].set_visible(False)
                     ax.spines['top'].set_visible(False)
-                    ax.spines['bottom'].set_color('darkgray')
-                    ax.spines['left'].set_color('darkgray')
+                    ax.spines['bottom'].set_color(self.plot_axis_color)
+                    ax.spines['left'].set_color(self.plot_axis_color)
                     ax.margins(x=0, y=0)
                     ax.plot(x, y[i], self.lines[i], linewidth=1)
-                    ax.set_title(parameters[i], fontsize=6)
-                    ax.set_xlabel('time (s)', fontsize=6)
-                    ax.set_ylabel(ylabel, fontsize=6)
+                    ax.set_title(parameters[i], fontsize=self.plot_fontsize)
+                    ax.set_xlabel('time (s)', fontsize=self.plot_fontsize)
+                    ax.set_ylabel(ylabel, fontsize=self.plot_fontsize)
                     if not autoscale:
                         ax.set_ylim([ylowerlim, yupperlim])
                     if zeroline:
@@ -647,14 +666,15 @@ class Interface:
                         ax.fill_between(x, y[i], color='blue', alpha=0.3)
 
         if (combined):
-            plt.figure(figsize=(18, 2), dpi=300,
-                       facecolor='#1E2029', edgecolor="#FF0000")
-            plt.tick_params(axis='both', which='both', labelsize=6)
+            plt.figure(figsize=(18, self.plot_height), dpi=self.plot_dpi,
+                       facecolor=self.plot_background_color)
+            plt.tick_params(axis='both', which='both',
+                            labelsize=self.plot_fontsize)
             ax = plt.gca()
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
-            ax.spines['bottom'].set_color('darkgray')
-            ax.spines['left'].set_color('darkgray')
+            ax.spines['bottom'].set_color(self.plot_axis_color)
+            ax.spines['left'].set_color(self.plot_axis_color)
             plt.margins(x=0, y=0)
             if not autoscale:
                 plt.ylim([ylowerlim, yupperlim])
@@ -666,13 +686,13 @@ class Interface:
                     plt.fill_between(x, y[index], color='blue', alpha=0.3)
             if zeroline:
                 plt.hlines(0, np.amin(x), np.amax(x), linestyles='dashed')
-            plt.xlabel('time (s)', fontsize=6)
-            plt.ylabel(ylabel, fontsize=6)
-            plt.xticks(fontsize=6)
-            plt.yticks(fontsize=6)
+            plt.xlabel('time (s)', fontsize=self.plot_fontsize)
+            plt.ylabel(ylabel, fontsize=self.plot_fontsize)
+            plt.xticks(fontsize=self.plot_fontsize)
+            plt.yticks(fontsize=self.plot_fontsize)
             # Add a legend
             plt.legend(loc='upper center', bbox_to_anchor=(
-                0.5, 1.22), ncol=6, fontsize=6)
+                0.5, 1.22), ncol=6, fontsize=self.plot_fontsize)
             if fill_between:
                 plt.fill_between(x, y[0], y[1], color='blue', alpha=0.1)
 
