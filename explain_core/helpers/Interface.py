@@ -2,6 +2,9 @@ from explain_core.helpers.DataCollector import DataCollector
 import math
 import os
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+import matplotlib.animation as animation
+import multitimer
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -34,12 +37,52 @@ class Interface:
         self.output_path = str(os.path.join(Path().absolute())) + r'/'
 
         self.plot_background_color = '#1E2029'
-        self.plot_height = 2
+        self.plot_height = 4
         self.plot_dpi = 300
-        self.plot_fontsize = 6
+        self.plot_fontsize = 12
         self.plot_axis_color = 'darkgray'
 
+        # realtime variables
+        self.x_rt = []
+        self.y_rt = []
+        self.parameters_rt = []
+        self.no_parameters_rt = 0
+        self.lines_rt = []
+        self.axs_rt = {}
+        self.fig_rt = {}
+
     # main model functions
+
+    def start(self):
+        # Create a Timer object to schedule the function execution
+        self.model._model_timer = multitimer.MultiTimer(
+            interval=self.model._model_rt_interval, function=self.model_step_rt)
+
+        # Start the timer
+        self.model._model_timer.start()
+        print("Realtime model running.")
+
+    def stop(self):
+        # stop the realtime model
+        self.model._model_timer.stop()
+        print("Realtime model stopped.")
+
+    def model_step_rt(self):
+        # calculate a number of seconds of the model
+        _no_of_steps: float = int(
+            self.model._model_rt_interval / self.model.modeling_stepsize)
+
+        # do all model steps
+        for _ in range(_no_of_steps):
+            # execute the model step method of all models
+            for model in self.model.models.values():
+                model.step_model()
+
+            # call the user interface
+            self.model.interface.step_model(self.model.model_time_total)
+
+            # increase the model clock
+            self.model.model_time_total += self.model.modeling_stepsize
 
     def calculate(self, time_to_calculate):
         # calculate the model steps
@@ -89,7 +132,6 @@ class Interface:
         return value
 
     # plotters
-
     def plot_vitals(self, time=30):
         self.plot_time_graph(["AA.mean", "Heart.heart_rate", "Breathing.resp_rate", "AA.aboxy.so2"], time_to_calculate=time,
                              combined=True, sharey=False, autoscale=False, ylowerlim=0, yupperlim=200, fill=False, fill_between=False)
@@ -593,7 +635,7 @@ class Interface:
         plt.style.use('dark_background')
 
         plt.figure(figsize=(2, 2), dpi=self.plot_dpi / 1.5,
-                   facecolor=self.plot_background_color)
+                   facecolor=self.plot_background_color, tight_layout=True)
         # Subplot of figure 1 with id 211 the data (red line r-, first legend = parameter)
         plt.plot(x, y, self.lines[0], linewidth=1)
         ax = plt.gca()
@@ -601,11 +643,12 @@ class Interface:
         ax.spines['top'].set_visible(False)
         ax.spines['bottom'].set_color(self.plot_axis_color)
         ax.spines['left'].set_color(self.plot_axis_color)
-        plt.xlabel(property_x, fontsize=self.plot_fontsize / 2, labelpad=1)
+
+        plt.xlabel(property_x, fontsize=self.plot_fontsize / 3, labelpad=0)
         plt.ylabel(property_y, fontsize=self.plot_fontsize /
-                   2, rotation=90, labelpad=1)
-        plt.xticks(fontsize=self.plot_fontsize / 2)
-        plt.yticks(fontsize=self.plot_fontsize / 2)
+                   3, rotation=90, labelpad=1)
+        plt.xticks(fontsize=self.plot_fontsize / 3)
+        plt.yticks(fontsize=self.plot_fontsize / 3)
         plt.show()
 
     def draw_time_graph(self, sharey=False, combined=True, ylabel='', autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False):
@@ -639,7 +682,7 @@ class Interface:
         if (combined == False):
 
             fig, axs = plt.subplots(nrows=no_parameters, ncols=1, figsize=(
-                18, self.plot_height * no_parameters), sharex=True, sharey=sharey, constrained_layout=True, dpi=self.plot_dpi)
+                18, self.plot_height * 0.75 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True, dpi=self.plot_dpi)
             # Change to the desired color
             fig.patch.set_facecolor(self.plot_background_color)
 
@@ -652,7 +695,7 @@ class Interface:
                     ax.spines['top'].set_visible(False)
                     ax.spines['bottom'].set_color(self.plot_axis_color)
                     ax.spines['left'].set_color(self.plot_axis_color)
-                    ax.margins(x=0, y=0)
+                    ax.margins(x=0)
                     ax.plot(x, y[i], self.lines[i], linewidth=1)
                     ax.set_title(parameters[i], fontsize=self.plot_fontsize)
                     ax.set_xlabel('time (s)', fontsize=self.plot_fontsize)
@@ -667,7 +710,7 @@ class Interface:
 
         if (combined):
             plt.figure(figsize=(18, self.plot_height), dpi=self.plot_dpi,
-                       facecolor=self.plot_background_color)
+                       facecolor=self.plot_background_color, tight_layout=True)
             plt.tick_params(axis='both', which='both',
                             labelsize=self.plot_fontsize)
             ax = plt.gca()
@@ -713,6 +756,92 @@ class Interface:
                     return {'label': prop, 'model': self.model.models[t[0]], 'prop': t[1], 'prop2': t[2]}
 
         return None
+
+    def plot_time_graph_rt(self, properties, time_to_calculate=10,  combined=True, sharey=True, ylabel='',  autoscale=True, ylowerlim=0, yupperlim=100, fill=False, fill_between=False, zeroline=False, sampleinterval=0.005, analyze=True):
+        # first clear the watchllist and this also clears all data
+        self.dc.clear_watchlist()
+
+        # set the sample interval
+        self.dc.set_sample_interval(sampleinterval)
+
+        # add the property to the watchlist
+        if (isinstance(properties, str)):
+            properties = [properties]
+
+        # print status message
+        print("Preparing the model datacollector.")
+
+        # add the properties to the watch_list
+        for prop in properties:
+            prop_reference = self.find_model_prop(prop)
+            if (prop_reference != None):
+                self.dc.add_to_watchlist(prop_reference)
+
+        # preparing the realtime plot
+        print("Preparing data structure of the plot.")
+
+        self.parameters_rt = []
+        self.no_parameters_rt = 0
+        # get the watch list of the datacollector
+        for watched_parameter in self.dc.watch_list:
+            if (watched_parameter['label'] != "Heart.ncc_ventricular" and watched_parameter['label'] != "Heart.ncc_atrial"):
+                self.parameters_rt.append(watched_parameter['label'])
+                self.no_parameters_rt += 1
+
+        no_dp = 300
+        no_parameters = 2
+        self.x_rt = np.arange(0, no_dp)
+        self.y_rt = []
+        self.lines_rt = []
+        self.y_rt.append(np.random.rand(300))
+        self.y_rt.append(np.random.rand(300))
+
+        print("Preparing data the plot.")
+        plt.style.use('dark_background')
+        self.fig_rt, self.axs_rt = plt.subplots(nrows=no_parameters, ncols=1, figsize=(
+            18, self.plot_height * 0.75 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True, dpi=self.plot_dpi)
+        # Change to the desired color
+        self.fig_rt.patch.set_facecolor(self.plot_background_color)
+        # Change the fontsize as desired
+        if (no_parameters > 1):
+            for i, ax in enumerate(self.axs_rt):
+                ax.tick_params(axis='both', which='both',
+                               labelsize=self.plot_fontsize)
+                ax.spines['right'].set_visible(False)
+                ax.spines['top'].set_visible(False)
+                ax.spines['bottom'].set_color(self.plot_axis_color)
+                ax.spines['left'].set_color(self.plot_axis_color)
+                ax.margins(x=0)
+                # ax.plot(self.x_rt, self.y_rt[i], self.lines[i], linewidth=1)
+                ax.set_title("t", fontsize=self.plot_fontsize)
+                ax.set_xlabel('time (s)', fontsize=self.plot_fontsize)
+                ax.set_ylabel(ylabel, fontsize=self.plot_fontsize)
+                if not autoscale:
+                    ax.set_ylim([ylowerlim, yupperlim])
+                # if zeroline:
+                #     ax.hlines(0, np.amin(self.x_rt), np.amax(
+                #         self.x_rt), linestyles='dashed')
+                # if fill:
+                #     ax.fill_between(
+                #         self.x_rt, self.y_rt[i], color='blue', alpha=0.3)
+                self.lines_rt.append(
+                    Line2D(self.x_rt, self.y_rt[i]))
+                ax.add_line(self.lines_rt[i])
+
+        plt.show()
+
+    def update_rt_data(self):
+        for _, t in enumerate(self.dc.collected_data):
+            self.x_rt.append(t['time'])
+
+            for idx, parameter in enumerate(self.parameters_rt):
+                self.y_rt.append(t[parameter])
+
+    def draw_time_graph_rt(self):
+        for index, parameter in enumerate(self.parameters_rt):
+            # Subplot of figure 1 with id 211 the data (red line r-, first legend = parameter)
+            plt.plot(
+                self.x_rt, self.y_rt[index], self.lines[index], linewidth=1, label=parameter)
 
 
 class propChange:

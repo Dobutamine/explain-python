@@ -1,4 +1,6 @@
 import json
+import multitimer
+import time
 import importlib
 from explain_core.helpers.Interface import Interface
 
@@ -53,7 +55,12 @@ class ModelEngine:
     # define local attributes
     _initialized: bool = False
 
+    # define a model timer object
+    _model_timer = {}
+    _model_rt_interval = 1.0
+
     # define the constructor
+
     def __init__(self, model_definition_filename: str):
         # initialize all model components with the parameters from the JSON file
         self.initialized = self.init_model(model_definition_filename)
@@ -170,12 +177,19 @@ class ModelEngine:
         return dep_errors
 
     def start(self):
-        # start the realtime model
-        pass
+        # Create a Timer object to schedule the function execution
+        self._model_timer = multitimer.MultiTimer(
+            interval=self._model_rt_interval, function=self.model_step_rt)
+
+        # Start the timer
+        self._model_timer.start()
+
+        print("Realtime model running.")
 
     def stop(self):
         # stop the realtime model
-        pass
+        self._model_timer.stop()
+        print("Realtime model stopped.")
 
     def calculate(self, time_to_calculate: float = 10.0):
         # calculate a number of seconds of the model
@@ -202,3 +216,20 @@ class ModelEngine:
         # store the performance metrics
         self.run_duration = perf_stop - perf_start
         self.step_duration = (self.run_duration / _no_of_steps) * 1000
+
+    def model_step_rt(self):
+        # calculate a number of seconds of the model
+        _no_of_steps: float = int(
+            self._model_rt_interval / self.modeling_stepsize)
+
+        # do all model steps
+        for _ in range(_no_of_steps):
+            # execute the model step method of all models
+            for model in self.models.values():
+                model.step_model()
+
+            # call the user interface
+            self.interface.step_model(self.model_time_total)
+
+            # increase the model clock
+            self.model_time_total += self.modeling_stepsize
