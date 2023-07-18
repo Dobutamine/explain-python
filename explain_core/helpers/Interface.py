@@ -2,7 +2,6 @@
 import os
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import multitimer
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -42,57 +41,141 @@ class Interface:
         self.plot_axis_color = 'darkgray'
 
         # realtime variables
+        self.plot_rt_background_color = 'black'
+        self.plot_rt_height = 4
+        self.plot_rt_dpi = 300
+        self.plot_rt_fontsize = 8
+        self.plot_rt_axis_color = 'darkgray'
+
         self.x_rt = []
         self.y_rt = []
-
+        self.ani = {}
         self.no_dp = 1200
+        self.rt_time_window = 10.0
+        self.rt_update_interval = 0.2
+        self.combined = False
+        self.rescale_counter = 0.0
+        self.rescale_interval = 2.0
+        self.rescale_enabled = False
         self.parameters_rt = []
-
         self.fig_rt = {}
         self.ax_rt = []
+        self.axs_rt = []
         self.x = {}
         self.y = {}
         self.line_rt = []
+        self.lines_rt = []
 
-    def build_rt_graph(self):
-        self.fig_rt, self.ax_rt = plt.subplots(nrows=1, ncols=1, figsize=(
-            14, self.plot_height / 2), sharex=True, sharey=False, constrained_layout=True, dpi=self.plot_dpi / 3)
-        # self.fig_rt.patch.set_facecolor(self.plot_background_color)
-        self.ax_rt.set_ylim(0, 100)
-        self.ax_rt.tick_params(axis='both', which='both',
-                               labelsize=self.plot_fontsize)
-        self.ax_rt.spines['right'].set_visible(False)
-        self.ax_rt.spines['top'].set_visible(False)
-        self.ax_rt.spines['bottom'].set_color(self.plot_axis_color)
-        self.ax_rt.spines['left'].set_color(self.plot_axis_color)
-        self.ax_rt.margins(x=0)
-        self.ax_rt.set_xlabel('time (s)', fontsize=self.plot_fontsize)
+    def build_rt_graph(self, y_min=0.0, y_max=100.0):
+        # get the number of parameters to show in the graph
+        no_params = len(self.parameters_rt)
 
-    def init_graph(self):
+        # set the style of the plotter
+        plt.style.use('dark_background')
+
+        # build the plot
+        if not self.combined:
+            self.fig_rt, self.axs_rt = plt.subplots(nrows=no_params, ncols=1, figsize=(
+                14, self.plot_height / 2.0 * no_params), sharex=True, sharey=False, constrained_layout=True, dpi=self.plot_dpi / 3)
+
+        if self.combined:
+            self.fig_rt, self.axs_rt = plt.subplots(nrows=1, ncols=1, figsize=(
+                14, self.plot_height / 1.5), sharex=True, sharey=False, constrained_layout=True, dpi=self.plot_dpi / 3)
+
+        self.fig_rt.patch.set_facecolor(self.plot_rt_background_color)
+        self.fig_rt.set_label('')
+        self.fig_rt.canvas.header_visible = False
+
+        if (no_params < 2 or self.combined):
+            self.axs_rt = [self.axs_rt]
+
+        for i, ax in enumerate(self.axs_rt):
+            ax.tick_params(
+                axis='x', labelsize=self.plot_rt_fontsize, color='white')
+            ax.tick_params(
+                axis='y', labelsize=self.plot_rt_fontsize, color='white')
+            ax.set_xticks([])
+            ax.set_ylim(y_min, y_max)
+            ax.set_facecolor('black')
+            ax.spines['right'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+            ax.spines['bottom'].set_color(self.plot_rt_axis_color)
+            ax.spines['left'].set_color(self.plot_rt_axis_color)
+            ax.margins(x=0)
+            ax.set_xlabel(
+                'timeframe ' + str(self.rt_time_window) + ' (s)', fontsize=self.plot_rt_fontsize, color='white')
+            ax.set_ylabel(
+                self.parameters_rt[i], fontsize=self.plot_rt_fontsize, color='white')
+            # Set the color of tick labels
+            ax.tick_params(axis='x', colors=self.plot_rt_axis_color)
+            ax.tick_params(axis='y', colors=self.plot_rt_axis_color)
+
+    def init_graph(self, combined=False):
+        self.lines_rt = []
         self.x = np.arange(0, self.no_dp)
-        self.line_rt, = self.ax_rt.plot(self.x, np.random.rand(self.no_dp))
-        return self.line_rt,
+        if not self.combined:
+            for i, ax in enumerate(self.axs_rt):
+                line_rt, = ax.plot(self.x, np.random.rand(
+                    self.no_dp), self.lines[i], linewidth=1)
+                self.lines_rt.append(line_rt)
+        else:
+            for i, param in enumerate(self.parameters_rt):
+                line_rt, = self.axs_rt[0].plot(self.x, np.random.rand(
+                    self.no_dp), self.lines[i], linewidth=1)
+                self.lines_rt.append(line_rt)
+
+        return self.lines_rt
+
+    def rescale_graph(self):
+        max_c = -1000
+        min_c = 1000
+        if self.combined:
+            for i, l in enumerate(self.lines_rt):
+                max = np.max(self.y_rt[i])
+                min = np.min(self.y_rt[i])
+                if max > max_c:
+                    max_c = max
+                if min < min_c:
+                    min_c = min
+                self.axs_rt[0].set_ylim(
+                    min_c - 0.1 * min_c, max_c + 0.1 * max_c)
+        else:
+            for i, ax in enumerate(self.axs_rt):
+                max = np.max(self.y_rt[i])
+                min = np.min(self.y_rt[i])
+                ax.set_ylim(min - 0.1 * min, max + 0.1 * max)
 
     def animate(self, i):
         self.model_step_rt()
-        self.line_rt.set_ydata(self.y_rt[0])  # update the data.
-        return self.line_rt,
+        self.rescale_counter += self.rt_update_interval
+        if self.rescale_counter > self.rescale_interval:
+            self.rescale_counter = 0
+            if self.rescale_enabled:
+                self.rescale_graph()
 
-    def test_anim(self):
-        self.model._model_rt_interval = 0.2
-        self.start()
-        self.y_rt[0] = np.random.rand(self.no_dp)
-        self.build_rt_graph()
-        ani = animation.FuncAnimation(
-            self.fig_rt, self.animate, init_func=self.init_graph, interval=100, blit=False, save_count=50)
+        for i, line in enumerate(self.lines_rt):
+            line.set_ydata(self.y_rt[i])  # update the data.
+        return self.lines_rt
+
+    def plot_rt(self, properties=["AA.pres"], autoscale=True, combined=True, time_window=5.0, sample_interval=0.005, y_min=0, y_max=100):
+        # get the properties
+        self.rt_time_window = time_window
+        self.dc.sample_interval = sample_interval
+        self.rescale_enabled = autoscale
+        self.combined = combined
+
+        # calculate the number of datapoints on the x-axis
+        self.no_dp = int(self.rt_time_window / self.dc.sample_interval)
+
+        self.model._model_rt_interval = self.rt_update_interval
+        self.start_rt(properties, sample_interval)
+        self.build_rt_graph(y_min=y_min, y_max=y_max)
+        self.ani = animation.FuncAnimation(
+            self.fig_rt, self.animate, init_func=self.init_graph, interval=self.rt_update_interval * 1000.0, blit=True, save_count=50)
 
         plt.show()
 
-    def start(self, properties=["AA.pres", "PA.pres"], sampleinterval=0.005):
-        # Create a Timer object to schedule the function execution
-        # self.model._model_timer = multitimer.MultiTimer(
-        #     interval=self.model._model_rt_interval, function=self.model_step_rt)
-
+    def start_rt(self, properties, sampleinterval=0.005):
         # first clear the watchllist and this also clears all data
         self.dc.clear_watchlist()
 
@@ -127,13 +210,13 @@ class Interface:
         # self.model._model_timer.start()
         print("Realtime model ready.")
 
-    def stop(self):
-        # first clear the watchllist and this also clears all data
-        # self.dc.clear_watchlist()
-
-        # stop the realtime model
-        self.model._model_timer.stop()
+    def stop_rt(self):
+        self.ani.pause()
         print("Realtime model stopped.")
+
+    def resume_rt(self):
+        self.ani.resume()
+        print("Realtime model resumed.")
 
     def model_step_rt(self):
         # calculate a number of seconds of the model
