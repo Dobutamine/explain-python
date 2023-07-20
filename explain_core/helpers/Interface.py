@@ -65,6 +65,8 @@ class Interface:
         self.y = {}
         self.line_rt = []
         self.lines_rt = []
+        self.xy = False
+        self.x_prop = ""
 
     def build_rt_graph(self, y_min=0.0, y_max=100.0):
         # get the number of parameters to show in the graph
@@ -73,15 +75,24 @@ class Interface:
         # set the style of the plotter
         plt.style.use('dark_background')
 
+        # if the type is an xy graph then set the flag to combined
+        if self.xy:
+            self.combined = True
+
         # build the plot
         if not self.combined:
             self.fig_rt, self.axs_rt = plt.subplots(nrows=no_params, ncols=1, figsize=(
                 14, self.plot_height / 2.0 * no_params), sharex=True, sharey=False, constrained_layout=True, dpi=self.plot_dpi / 3)
 
         if self.combined:
-            self.fig_rt, self.axs_rt = plt.subplots(nrows=1, ncols=1, figsize=(
-                14, self.plot_height / 1.5), sharex=True, sharey=False, constrained_layout=True, dpi=self.plot_dpi / 3)
+            if self.xy:
+                self.fig_rt, self.axs_rt = plt.subplots(nrows=1, ncols=1, figsize=(
+                    5, self.plot_height / 1.5), sharex=True, sharey=False, constrained_layout=True, dpi=self.plot_dpi / 3)
+            else:
+                self.fig_rt, self.axs_rt = plt.subplots(nrows=1, ncols=1, figsize=(
+                    14, self.plot_height / 1.5), sharex=True, sharey=False, constrained_layout=True, dpi=self.plot_dpi / 3)
 
+        # set the background color and erase the labels and headers
         self.fig_rt.patch.set_facecolor(self.plot_rt_background_color)
         self.fig_rt.set_label('')
         self.fig_rt.canvas.header_visible = False
@@ -110,7 +121,7 @@ class Interface:
             ax.tick_params(axis='x', colors=self.plot_rt_axis_color)
             ax.tick_params(axis='y', colors=self.plot_rt_axis_color)
 
-    def init_graph(self, combined=False):
+    def init_rt_graph(self, combined=False):
         self.lines_rt = []
         self.x = np.arange(0, self.no_dp)
         if not self.combined:
@@ -126,9 +137,20 @@ class Interface:
 
         return self.lines_rt
 
-    def rescale_graph(self):
+    def rescale_rt_graph(self):
         max_c = -1000
         min_c = 1000
+        if self.xy:
+            for i, ax in enumerate(self.axs_rt):
+                max = np.max(self.x_rt)
+                min = np.min(self.x_rt)
+                ax.set_xlim(min - 0.1 * min, max + 0.1 * max)
+                for i, ax in enumerate(self.axs_rt):
+                    max = np.max(self.y_rt[i])
+                    min = np.min(self.y_rt[i])
+                    ax.set_ylim(min - 0.1 * min, max + 0.1 * max)
+            return
+
         if self.combined:
             for i, l in enumerate(self.lines_rt):
                 max = np.max(self.y_rt[i])
@@ -145,37 +167,57 @@ class Interface:
                 min = np.min(self.y_rt[i])
                 ax.set_ylim(min - 0.1 * min, max + 0.1 * max)
 
-    def animate(self, i):
+    def animate_rt_graph(self, i):
         self.model_step_rt()
         self.rescale_counter += self.rt_update_interval
         if self.rescale_counter > self.rescale_interval:
             self.rescale_counter = 0
             if self.rescale_enabled:
-                self.rescale_graph()
+                self.rescale_rt_graph()
 
         for i, line in enumerate(self.lines_rt):
             line.set_ydata(self.y_rt[i])  # update the data.
+
+        if self.xy:
+            line.set_xdata(self.x_rt)
+
         return self.lines_rt
 
-    def plot_rt(self, properties=["AA.pres"], autoscale=True, combined=True, time_window=5.0, sample_interval=0.005, y_min=0, y_max=100):
+    def plot_rt_graph(self, properties=["AA.pres"], autoscale=True, combined=True, time_window=5.0, sample_interval=0.005, y_min=0, y_max=100, xy=False):
         # get the properties
         self.rt_time_window = time_window
         self.dc.sample_interval = sample_interval
         self.rescale_enabled = autoscale
         self.combined = combined
+        self.xy = xy
 
         # calculate the number of datapoints on the x-axis
         self.no_dp = int(self.rt_time_window / self.dc.sample_interval)
 
         self.model._model_rt_interval = self.rt_update_interval
-        self.start_rt(properties, sample_interval)
-        self.build_rt_graph(y_min=y_min, y_max=y_max)
-        self.ani = animation.FuncAnimation(
-            self.fig_rt, self.animate, init_func=self.init_graph, interval=self.rt_update_interval * 1000.0, blit=True, save_count=50)
+        self.x_prop = ""
+        if self.xy:
+            if len(properties) != 2:
+                print("Error: Provide an x and y property.")
+                return
+            else:
+                self.x_prop = properties[0]
+                del properties[0]
 
+        # initialize the datacollector
+        self.start_rt_graph(properties, sample_interval)
+
+        # build the realtime plot
+        self.build_rt_graph(y_min=y_min, y_max=y_max)
+
+        # start the animation timer
+        self.ani = animation.FuncAnimation(
+            self.fig_rt, self.animate_rt_graph, init_func=self.init_rt_graph, interval=self.rt_update_interval * 1000.0, blit=True, save_count=50)
+
+        # show the plot
         plt.show()
 
-    def start_rt(self, properties, sampleinterval=0.005):
+    def start_rt_graph(self, properties, sampleinterval=0.005):
         # first clear the watchllist and this also clears all data
         self.dc.clear_watchlist()
 
@@ -193,12 +235,22 @@ class Interface:
         self.no_parameters_rt = 0
 
         # add the properties to the watch_list
-        for prop in properties:
-            prop_reference = self.find_model_prop(prop)
-            if (prop_reference != None):
-                self.y_rt.append(np.random.rand(self.no_dp))
-                self.no_parameters_rt += 1
-                self.dc.add_to_watchlist(prop_reference)
+        if not self.xy:
+            for prop in properties:
+                prop_reference = self.find_model_prop(prop)
+                if (prop_reference != None):
+                    self.y_rt.append(np.random.rand(self.no_dp))
+                    self.no_parameters_rt += 1
+                    self.dc.add_to_watchlist(prop_reference)
+        else:
+            prop_reference_x = self.find_model_prop(self.x_prop)
+            if (prop_reference_x != None):
+                self.dc.add_to_watchlist(prop_reference_x)
+            prop_reference_y = self.find_model_prop(properties[0])
+            if (prop_reference_y != None):
+                self.dc.add_to_watchlist(prop_reference_y)
+            self.y_rt.append(np.random.rand(self.no_dp))
+            self.no_parameters_rt = 1
 
         # save the watched parameters to the parameter list
         self.parameters_rt = []
@@ -206,15 +258,20 @@ class Interface:
             if (watched_parameter['label'] != "Heart.ncc_ventricular" and watched_parameter['label'] != "Heart.ncc_atrial"):
                 self.parameters_rt.append(watched_parameter['label'])
 
-        # Start the timer
-        # self.model._model_timer.start()
+        if self.xy:
+            del self.parameters_rt[0]
+
         print("Realtime model ready.")
 
-    def stop_rt(self):
+    def remove_rt_graph(self):
+        self.ani.event_source.stop()
+        del self.ani
+
+    def stop_rt_graph(self):
         self.ani.pause()
         print("Realtime model stopped.")
 
-    def resume_rt(self):
+    def resume_rt_graph(self):
         self.ani.resume()
         print("Realtime model resumed.")
 
@@ -238,15 +295,15 @@ class Interface:
         # update the realtime data structure
         for _, t in enumerate(self.dc.collected_data):
             self.x_rt = self.x_rt[1:]
-            self.x_rt = np.append(self.x_rt, t['time'])
-
-            for idx, parameter in enumerate(self.parameters_rt):
-                self.y_rt[idx][self.no_dp - 1] = t[parameter]
-                self.y_rt[idx] = np.roll(self.y_rt[idx], -1)
-
-        # self.y_rt[0] = self.y_rt[0].reshape(self.no_dp,)
-        # print(len(self.y_rt[0]))
-        # print(self.y_rt[0])
+            if self.xy:
+                self.x_rt = np.append(self.x_rt, t[self.x_prop])
+                self.y_rt[0][self.no_dp - 1] = t[self.parameters_rt[0]]
+                self.y_rt[0] = np.roll(self.y_rt[0], -1)
+            else:
+                self.x_rt = np.append(self.x_rt, t['time'])
+                for idx, parameter in enumerate(self.parameters_rt):
+                    self.y_rt[idx][self.no_dp - 1] = t[parameter]
+                    self.y_rt[idx] = np.roll(self.y_rt[idx], -1)
 
         # clear the data collector
         self.dc.clear_data()
