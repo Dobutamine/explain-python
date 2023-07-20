@@ -50,7 +50,7 @@ def calc_oxygenation_from_to2(comp) -> object:
     # if a po2 is found then return the result
     if (po2 > 0):
         return {
-            "po2": po2 * 7.5,
+            "po2": po2,
             "so2": so2 * 100.0
         }
     else:
@@ -62,12 +62,10 @@ def oxygen_content(po2_estimate: float) -> float:
     # calculate the saturation from the current po2 from the current po2 estimate
     so2 = oxygen_dissociation_curve(po2_estimate)
     # calculate the to2 from the current po2 estimate
-    # convert the hemoglobin unit from mmol/l to g/dL  (= factor 1.6113)
-    # convert the po2 from kPa to mmHg
-    # convert to output from ml O2/dL blood to ml O2/l blood
-
-    # O2 bound to Hb (ml/dL) = SaO2 (%) × Hb (g/dL) × 1.34
-    to2_new_estimate = (0.0031 * (po2_estimate / 0.1333) +
+    # INPUTS: po2 in mmHg, so2 in fraction, hemoglobin in mmol/l
+    # convert the hemoglobin unit from mmol/l to g/dL  (/ 0.6206)
+    # convert to output from ml O2/dL blood to ml O2/l blood (* 10.0)
+    to2_new_estimate = (0.0031 * po2_estimate +
                         1.36 * (hemoglobin / 0.6206) * so2) * 10.0
 
     # conversion factor for converting ml O2/l to mmol/l
@@ -90,7 +88,7 @@ def oxygen_dissociation_curve(po2_estimate: float) -> float:
     x0 = 1.875 + a + b
     h0 = 3.5 + a
     k = 0.5343
-    x = math.log(po2_estimate, math.e)
+    x = math.log((po2_estimate * 0.1333), math.e)  # po2 in kPa
     y = x - x0 + h0 * math.tanh(k * (x - x0)) + y0
 
     # return the o2 saturation in fraction so 0.98
