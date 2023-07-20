@@ -188,7 +188,8 @@ class Interface:
         return self.lines_rt
 
     def plot_rt(self, properties=["AA.pres"], update_interval=0.2, autoscale=True, autoscale_interval=2.0, combined=True, time_window=5.0, sample_interval=0.005, y_min=0, y_max=100, xy=False):
-        # get the properties
+        self.remove_rt()
+        self.ani = {}
         self.rt_time_window = time_window
         self.dc.sample_interval = sample_interval
         self.rescale_enabled = autoscale
@@ -267,19 +268,18 @@ class Interface:
         if self.xy:
             del self.parameters_rt[0]
 
-        print("Realtime model ready.")
-
     def remove_rt(self):
-        self.ani.event_source.stop()
-        del self.ani
+        try:
+            self.ani.event_source.stop()
+            del self.ani
+        except:
+            pass
 
     def stop_rt(self):
         self.ani.pause()
-        print("Realtime model stopped.")
 
     def restart_rt(self):
         self.ani.resume()
-        print("Realtime model resumed.")
 
     def model_step_rt(self):
         # calculate a number of seconds of the model
@@ -373,6 +373,11 @@ class Interface:
     def plot_ans(self, time=10):
         self.plot_time_graph(["AA.aboxy.pco2", "Breathing.target_minute_volume", "Breathing.target_tidal_volume", "Breathing.resp_rate", "Breathing.exp_tidal_volume"], time_to_calculate=time,
                              combined=False, sharey=False, fill=False)
+
+    # realtime plotters
+    def plot_heart_pv_rt(self):
+        self.plot_rt(["LV.vol", "LV.pres"], autoscale=True, autoscale_interval=1.0,
+                     time_window=1.0, sample_interval=0.001, xy=True, update_interval=0.1)
 
     # lung plotters
     def plot_lung_pressures(self, time=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
