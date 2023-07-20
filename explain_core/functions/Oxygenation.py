@@ -33,7 +33,7 @@ so2 = 0.0
 
 
 def calc_oxygenation_from_to2(comp) -> object:
-    global to2, ph, be, dpg, hemoglobin, temp, po2
+    global to2, ph, be, dpg, hemoglobin, temp, po2, pres
     # get the for the oxygenation independent parameters from the component
     to2 = comp.aboxy['to2']
     ph = comp.aboxy['ph']
