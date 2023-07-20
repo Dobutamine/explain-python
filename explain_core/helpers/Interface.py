@@ -35,9 +35,9 @@ class Interface:
         self.output_path = str(os.path.join(Path().absolute())) + r'/'
 
         self.plot_background_color = '#1E2029'
-        self.plot_height = 4
+        self.plot_height = 3
         self.plot_dpi = 300
-        self.plot_fontsize = 12
+        self.plot_fontsize = 8
         self.plot_axis_color = 'darkgray'
 
         # realtime variables
@@ -187,7 +187,7 @@ class Interface:
 
         return self.lines_rt
 
-    def plot_rt(self, properties=["AA.pres"], update_interval = 0.2, autoscale=True, autoscale_interval = 2.0, combined=True, time_window=5.0, sample_interval=0.005, y_min=0, y_max=100, xy=False):
+    def plot_rt(self, properties=["AA.pres"], update_interval=0.2, autoscale=True, autoscale_interval=2.0, combined=True, time_window=5.0, sample_interval=0.005, y_min=0, y_max=100, xy=False):
         # get the properties
         self.rt_time_window = time_window
         self.dc.sample_interval = sample_interval
@@ -906,6 +906,7 @@ class Interface:
 
         # determine number of needed plots
         plt.style.use('dark_background')
+        # set the background color and erase the labels and headers
 
         if (no_parameters == 1):
             combined = True
@@ -913,9 +914,11 @@ class Interface:
         if (combined == False):
 
             fig, axs = plt.subplots(nrows=no_parameters, ncols=1, figsize=(
-                18, self.plot_height * 0.75 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True, dpi=self.plot_dpi)
+                14, self.plot_height * 0.75 * no_parameters), sharex=True, sharey=sharey, constrained_layout=True, dpi=self.plot_dpi/3)
             # Change to the desired color
             fig.patch.set_facecolor(self.plot_background_color)
+            fig.set_label('')
+            fig.canvas.header_visible = False
 
             # Change the fontsize as desired
             if (no_parameters > 1):
@@ -940,10 +943,14 @@ class Interface:
                         ax.fill_between(x, y[i], color='blue', alpha=0.3)
 
         if (combined):
-            plt.figure(figsize=(18, self.plot_height), dpi=self.plot_dpi,
-                       facecolor=self.plot_background_color, tight_layout=True)
+            fig = plt.figure(figsize=(14, self.plot_height), dpi=self.plot_dpi/3,
+                             facecolor=self.plot_background_color, tight_layout=True)
             plt.tick_params(axis='both', which='both',
                             labelsize=self.plot_fontsize)
+            fig.patch.set_facecolor(self.plot_background_color)
+            fig.set_label('')
+            fig.canvas.header_visible = False
+
             ax = plt.gca()
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
