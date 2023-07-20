@@ -34,6 +34,7 @@ class GasExchanger(BaseModel):
             self._blood.aboxy['pco2'] = result['pco2']
             self._blood.aboxy['hco3'] = result['hco3']
             self._blood.aboxy['be'] = result['be']
+            self._blood.aboxy['sid_app'] = result['sid_app']
 
         result_oxy = calc_oxygenation_from_to2(self._blood)
         if result_oxy is not None:

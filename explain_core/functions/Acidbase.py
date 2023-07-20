@@ -20,6 +20,7 @@ pco2: float = 0.0
 hco3: float = 0.0
 be: float = 0.0
 sid: float = 0.0
+sid_app: float = 0.0
 albumin: float = 0.0
 phosphates: float = 0.0
 uma: float = 0.0
@@ -60,7 +61,8 @@ def calc_acidbase_from_tco2(comp) -> object:
             "ph": (-math.log10(hp / 1000)),
             "pco2": pco2,
             "hco3": hco3,
-            "be": be
+            "be": be,
+            "sid_app": sid
         }
     else:
         return None

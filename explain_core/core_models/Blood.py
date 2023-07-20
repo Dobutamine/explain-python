@@ -18,6 +18,9 @@ class Blood(BaseModel):
                 # fill the solutes
                 model.solutes = {**self.solutes}
                 model.aboxy = {**self.aboxy}
+                # calculate the to2 from the spo2 and hemoglobin
+                model.aboxy['to2'] = ((1.36 * (model.aboxy['hemoglobin'] / 0.6206)
+                                       * model.aboxy['so2'] / 100.0) * 10.0) / 25.5
 
         return self._is_initialized
 
@@ -33,6 +36,7 @@ class Blood(BaseModel):
                     self._model.models[c].aboxy['pco2'] = result_ab['pco2']
                     self._model.models[c].aboxy['hco3'] = result_ab['hco3']
                     self._model.models[c].aboxy['be'] = result_ab['be']
+                    self._model.models[c].aboxy['sid_app'] = result_ab['sid_app']
 
                 result_oxy = calc_oxygenation_from_to2(self._model.models[c])
                 if result_oxy is not None:

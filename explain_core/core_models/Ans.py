@@ -48,6 +48,7 @@ class Ans(BaseModel):
             self._chemoreceptor.aboxy['pco2'] = result['pco2']
             self._chemoreceptor.aboxy['hco3'] = result['hco3']
             self._chemoreceptor.aboxy['be'] = result['be']
+            self._chemoreceptor.aboxy['sid_app'] = result['sid_app']
 
         result_oxy = calc_oxygenation_from_to2(self._chemoreceptor)
         if result_oxy is not None:
