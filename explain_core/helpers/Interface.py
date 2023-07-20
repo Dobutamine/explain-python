@@ -113,8 +113,12 @@ class Interface:
             ax.spines['bottom'].set_color(self.plot_rt_axis_color)
             ax.spines['left'].set_color(self.plot_rt_axis_color)
             ax.margins(x=0)
-            ax.set_xlabel(
-                'timeframe ' + str(self.rt_time_window) + ' (s)', fontsize=self.plot_rt_fontsize, color='white')
+            if self.xy:
+                ax.set_xlabel(
+                    self.x_prop, fontsize=self.plot_rt_fontsize, color='white')
+            else:
+                ax.set_xlabel(
+                    'timeframe ' + str(self.rt_time_window) + ' (s)', fontsize=self.plot_rt_fontsize, color='white')
             ax.set_ylabel(
                 self.parameters_rt[i], fontsize=self.plot_rt_fontsize, color='white')
             # Set the color of tick labels
@@ -183,11 +187,13 @@ class Interface:
 
         return self.lines_rt
 
-    def plot_rt_graph(self, properties=["AA.pres"], autoscale=True, combined=True, time_window=5.0, sample_interval=0.005, y_min=0, y_max=100, xy=False):
+    def plot_rt(self, properties=["AA.pres"], update_interval = 0.2, autoscale=True, autoscale_interval = 2.0, combined=True, time_window=5.0, sample_interval=0.005, y_min=0, y_max=100, xy=False):
         # get the properties
         self.rt_time_window = time_window
         self.dc.sample_interval = sample_interval
         self.rescale_enabled = autoscale
+        self.rescale_interval = autoscale_interval
+        self.rt_update_interval = update_interval
         self.combined = combined
         self.xy = xy
 
@@ -263,15 +269,15 @@ class Interface:
 
         print("Realtime model ready.")
 
-    def remove_rt_graph(self):
+    def remove_rt(self):
         self.ani.event_source.stop()
         del self.ani
 
-    def stop_rt_graph(self):
+    def stop_rt(self):
         self.ani.pause()
         print("Realtime model stopped.")
 
-    def resume_rt_graph(self):
+    def restart_rt(self):
         self.ani.resume()
         print("Realtime model resumed.")
 
