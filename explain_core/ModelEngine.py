@@ -192,28 +192,28 @@ class ModelEngine:
         print("Realtime model stopped.")
 
     def calculate(self, time_to_calculate: float = 10.0):
-        # calculate a number of seconds of the model
-        _no_of_steps: float = int(time_to_calculate / self.modeling_stepsize)
+        # Calculate the number of steps of the model
+        _no_of_steps = int(time_to_calculate / self.modeling_stepsize)
 
-        # start the performance counter
+        # Start the performance counter
         perf_start = perf_counter()
 
-        # do all model steps
+        # Do all model steps
         for _ in range(_no_of_steps):
-            # execute the model step method of all models
+            # Execute the model step method of all models
             for model in self.models.values():
                 model.step_model()
 
-            # call the user interface
+            # Call the user interface
             self.interface.step_model(self.model_time_total)
 
-            # increase the model clock
+            # Increase the model clock
             self.model_time_total += self.modeling_stepsize
 
-        # stop the performance counter
+        # Stop the performance counter
         perf_stop = perf_counter()
 
-        # store the performance metrics
+        # Store the performance metrics
         self.run_duration = perf_stop - perf_start
         self.step_duration = (self.run_duration / _no_of_steps) * 1000
 
