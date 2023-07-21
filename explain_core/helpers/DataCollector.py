@@ -62,31 +62,23 @@ class DataCollector:
         self.watch_list.append(property)
 
     def collect_data(self, model_clock):
-        if (self._interval_counter >= self.sample_interval):
+        # self._interval_counter += self.modeling_stepsize
+        if self._interval_counter >= self.sample_interval:
             self._interval_counter = 0
-            data_object = {
-                'time': model_clock
-            }
+            data_object = {'time': model_clock}
+
             for parameter in self.watch_list:
-                label = parameter['label']
                 prop = parameter['prop']
-                prop2 = parameter['prop2']
-                weight = 1
-                time = 1
-                if prop == 'flow':
-                    weight = self.model.weight
-                    time = 60
-                if prop == 'vol':
-                    weight = self.model.weight
+                prop2 = parameter.get('prop2')
+                weight = self.model.weight if prop in ('flow', 'vol') else 1
+                time = 60 if prop == 'flow' else 1
 
                 if parameter['model'] is not None:
-                    if prop2 is None:
-                        value = getattr(parameter['model'], parameter['prop'])
-                    else:
-                        value = getattr(parameter['model'], parameter['prop'])
-                        value = value[parameter['prop2']]
+                    value = getattr(parameter['model'], prop)
+                    if prop2 is not None:
+                        value = value.get(prop2, 0)
 
-                    data_object[label] = value / weight * time
+                    data_object[parameter['label']] = value / weight * time
 
             self.collected_data.append(data_object)
 
