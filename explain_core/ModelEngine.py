@@ -2,7 +2,7 @@ import json
 import multitimer
 import time
 import importlib
-from explain_core.helpers.Interface import Interface
+from explain_core.helpers.DataCollector import DataCollector
 
 # import the perfomance counter module to measure the model performance
 from time import perf_counter
@@ -12,17 +12,11 @@ class ModelEngine:
     # define an object holding the entire model and submodels
     models: dict = {}
 
-    # define an object holding the model engine properties
-    model_engine: dict = {}
-
     # define an object holding the model properties of the current model
     model_definition: dict = {}
 
     # define an object holding the high resolution model data
     model_data: dict = {}
-
-    # define an object holding the low resolution model data
-    model_data_slow: dict = {}
 
     # define an attribute holding the name of the model
     name: str = ""
@@ -42,9 +36,6 @@ class ModelEngine:
     # define an obvject holding the  datacollector
     datacollector: dict = {}
 
-    # define an obvject holding the  datacollector
-    interface: dict = {}
-
     # define an object holding the task scheduler
     task_scheduler: dict = {}
 
@@ -59,8 +50,14 @@ class ModelEngine:
     _model_timer = {}
     _model_rt_interval = 1.0
 
-    # define the constructor
+    # define a status message object
+    status = {
+        "log": [],
+        "error_log": [],
+        "initialized": False
+    }
 
+    # define the constructor
     def __init__(self, model_definition_filename: str):
         # initialize all model components with the parameters from the JSON file
         self.initialized = self.init_model(model_definition_filename)
@@ -68,6 +65,11 @@ class ModelEngine:
     def init_model(self, model_definition_filename: str):
         # set the error counter = 0
         error_counter = 0
+        self.status = {
+            "log": [],
+            "error_log": [],
+            "initialized": False
+        }
 
         # try to open the json file
         try:
@@ -86,7 +88,7 @@ class ModelEngine:
 
         except:
             # signal that the json file failed to load
-            print(
+            self.status["error_log"].append(
                 f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!")
             self._initialized = False
 
@@ -108,7 +110,7 @@ class ModelEngine:
                     model_module = importlib.import_module(
                         'explain_core.custom_models.' + model_type)
                 except:
-                    print(
+                    self.status["error_log"].append(
                         f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}")
                     error_counter += 1
 
@@ -121,12 +123,12 @@ class ModelEngine:
                     self.models[model['name']] = model_class(**model)
                 except Exception as error:
                     # a module holding the desired model class is producing an error while instantiating
-                    print(
+                    self.status["error_log"].append(
                         f"Instantiation error: {model_type} model failed to instantiate. Error: {error}")
                     error_counter += 1
 
         # initialize a datacollector
-        self.interface = Interface(self)
+        self.datacollector = DataCollector(self)
 
         # check the dependencies
         dep_errors: int = self.check_dependencies()
@@ -140,22 +142,21 @@ class ModelEngine:
                     model.init_model(self)
                 except Exception as error:
                     # a module holding the desired model class is producing an error while initiallizing
-                    print(
+                    self.status["error_log"].append(
                         f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}")
                     init_errors += 1
 
             if init_errors > 0 or dep_errors > 0:
                 self._initialized = False
             else:
-                print(f"{self.name} model loaded and initialized correctly.")
+                self.status["log"].append(
+                    f" Model '{self.name}' loaded and initialized correctly.")
                 self._initialized = True
 
         else:
             self._initialized = False
 
-        if not self._initialized:
-            print("")
-            print(f"The '{self.name}' model failed to run.")
+        self.status['initialized'] = self._initialized
 
     def check_dependencies(self) -> int:
         dep_errors = 0
@@ -169,7 +170,7 @@ class ModelEngine:
                     if dep_model.name == dep:
                         present = True
                 if not present:
-                    print(
+                    self.status["error_log"].append(
                         f'Dependency error: model {model.name} depends on {dep} which is not present.')
                     dep_errors += 1
         if dep_errors > 0:
@@ -184,16 +185,16 @@ class ModelEngine:
         # Start the timer
         self._model_timer.start()
 
-        print("Realtime model running.")
-
     def stop(self):
         # stop the realtime model
         self._model_timer.stop()
-        print("Realtime model stopped.")
 
-    def calculate(self, time_to_calculate: float = 10.0):
+    def calculate(self, time_to_calculate: float = 10.0, output=False):
         # Calculate the number of steps of the model
         _no_of_steps = int(time_to_calculate / self.modeling_stepsize)
+
+        # clear the data collector
+        self.datacollector.clear_data()
 
         # Start the performance counter
         perf_start = perf_counter()
@@ -204,8 +205,8 @@ class ModelEngine:
             for model in self.models.values():
                 model.step_model()
 
-            # Call the user interface
-            self.interface.step_model(self.model_time_total)
+            # Call the datacollector
+            self.datacollector.collect_data(self.model_time_total)
 
             # Increase the model clock
             self.model_time_total += self.modeling_stepsize
@@ -216,6 +217,21 @@ class ModelEngine:
         # Store the performance metrics
         self.run_duration = perf_stop - perf_start
         self.step_duration = (self.run_duration / _no_of_steps) * 1000
+
+        ret = {
+            "time_total": int(self.model_time_total),
+            "time_run": int(time_to_calculate),
+            "steps": _no_of_steps,
+            "duration":  round(self.run_duration, 3),
+            "step_duration": round(self.step_duration, 4),
+            "data": []
+        }
+
+        if output:
+            if len(self.datacollector.watch_list) > 2:
+                ret['data'] = self.datacollector.collected_data.copy()
+
+        return ret
 
     def model_step_rt(self):
         # calculate a number of seconds of the model
@@ -228,8 +244,8 @@ class ModelEngine:
             for model in self.models.values():
                 model.step_model()
 
-            # call the user interface
-            self.interface.step_model(self.model_time_total)
+             # Call the datacollector
+            self.datacollector.collect_data(self.model_time_total)
 
             # increase the model clock
             self.model_time_total += self.modeling_stepsize
