@@ -27,15 +27,11 @@ class BloodTimeVaryingElastance(TimeVaryingElastance):
         super().calc_model()
 
         # determine systole and diastole
-        if self.pres > self._temp_max_pres:
-            self._temp_max_pres = self.pres
-        if self.pres < self._temp_min_pres:
-            self._temp_min_pres = self.pres
+        self._temp_max_pres = max(self.pres, self._temp_max_pres)
+        self._temp_min_pres = min(self.pres, self._temp_min_pres)
 
-        if self.vol > self._temp_max_vol:
-            self._temp_max_vol = self.vol
-        if self.vol < self._temp_min_vol:
-            self._temp_min_vol = self.vol
+        self._temp_max_vol = max(self.vol, self._temp_max_vol)
+        self._temp_min_vol = min(self.vol, self._temp_min_vol)
 
         # store diastole and systole
         if self._model.models['Heart'].ncc_ventricular == 0:
@@ -55,19 +51,16 @@ class BloodTimeVaryingElastance(TimeVaryingElastance):
     def volume_in(self, dvol: float, model_from: Capacitance) -> None:
         super().volume_in(dvol)
 
-        # process the to2 and tco2
-        d_to2: float = (model_from.aboxy['to2'] - self.aboxy['to2']) * dvol
-        self.aboxy['to2'] = (self.aboxy['to2'] * self.vol + d_to2) / self.vol
+        if self.vol <= 0:
+            return
 
-        d_tco2: float = (
-            model_from.aboxy['tco2'] - self.aboxy['tco2']) * dvol
-        self.aboxy['tco2'] = (
-            self.aboxy['tco2'] * self.vol + d_tco2) / self.vol
+        # process the to2 and tco2
+        for solute in ['to2', 'tco2']:
+            d_solute = (model_from.aboxy[solute] - self.aboxy[solute]) * dvol
+            self.aboxy[solute] += d_solute / self.vol
 
         # process the solutes
-        if self.vol > 0:
-            for solute, conc in self.solutes.items():
-                d_solute: float = (
-                    model_from.solutes[solute] - conc) * dvol
-                self.solutes[solute] = (
-                    (conc * self.vol) + d_solute) / self.vol
+        for solute, conc in self.solutes.items():
+            conc_from = model_from.solutes[solute]
+            d_solute = (conc_from - conc) * dvol
+            self.solutes[solute] += d_solute / self.vol

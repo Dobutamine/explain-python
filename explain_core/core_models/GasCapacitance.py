@@ -58,15 +58,11 @@ class GasCapacitance(Capacitance):
         self.calc_gas_composition()
 
         # determine systole and diastole
-        if self.pres > self._temp_max_pres:
-            self._temp_max_pres = self.pres
-        if self.pres < self._temp_min_pres:
-            self._temp_min_pres = self.pres
+        self._temp_max_pres = max(self.pres, self._temp_max_pres)
+        self._temp_min_pres = min(self.pres, self._temp_min_pres)
 
-        if self.vol > self._temp_max_vol:
-            self._temp_max_vol = self.vol
-        if self.vol < self._temp_min_vol:
-            self._temp_min_vol = self.vol
+        self._temp_max_vol = max(self.vol, self._temp_max_vol)
+        self._temp_min_vol = min(self.vol, self._temp_min_vol)
 
         # store min and max
         if self._model.models['Heart'].ncc_ventricular == 0:
