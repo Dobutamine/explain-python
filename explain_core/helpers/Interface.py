@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import pandas as pd
+import pickle
+
 from pathlib import Path
 from explain_core.functions.Acidbase import calc_acidbase_from_tco2
 from explain_core.functions.Oxygenation import calc_oxygenation_from_to2
@@ -67,6 +69,16 @@ class Interface:
         self.lines_rt = []
         self.xy = False
         self.x_prop = ""
+
+    def save_state(self, file_name):
+        # use the binary mode 'wb' to save the model state
+        with open(file_name, "wb") as file:
+            pickle.dump(self.model, file)
+
+    def load_state(self, file_name):
+        # use the binary mode 'rb' to load the model state
+        with open(file_name, "rb") as file:
+            self.model = pickle.load(file)
 
     def build_rt_graph(self, y_min=0.0, y_max=100.0):
         # get the number of parameters to show in the graph
