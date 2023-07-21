@@ -82,14 +82,14 @@ def oxygen_content(po2_estimate: float) -> float:
 
 def oxygen_dissociation_curve(po2_estimate: float) -> float:
     # calculate the saturation from the po2 depending on the ph,be, temperature and dpg level.
+    # calculate the saturation from the po2 depending on the ph,be, temperature and dpg level.
     a = 1.04 * (7.4 - ph) + 0.005 * be + 0.07 * (dpg - 5.0)
     b = 0.055 * (temp + 273.15 - 310.15)
-    y0 = 1.875
     x0 = 1.875 + a + b
     h0 = 3.5 + a
-    k = 0.5343
     x = math.log((po2_estimate * 0.1333), math.e)  # po2 in kPa
-    y = x - x0 + h0 * math.tanh(k * (x - x0)) + y0
+    y = x - x0 + h0 * math.tanh(0.5343 * (x - x0)) + 1.875
 
     # return the o2 saturation in fraction so 0.98
-    return 1.0 / (math.pow(math.e, -y) + 1.0)
+    # return 1.0 / (math.pow(math.e, -y) + 1.0)
+    return 1.0 / (math.exp(-y) + 1.0)

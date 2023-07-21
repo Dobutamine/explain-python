@@ -40,35 +40,25 @@ class Resistor(BaseModel):
 
     def calc_model(self) -> None:
         # get the pressures
-        _p1: float = self._model_comp_from.pres + self.p1_ext
-        _p2: float = self._model_comp_to.pres + self.p2_ext
+        _p1 = self._model_comp_from.pres + self.p1_ext
+        _p2 = self._model_comp_to.pres + self.p2_ext
 
         # reset the external pressures
         self.p1_ext = 0
         self.p2_ext = 0
 
-        if self.no_flow:
+        # calculate the flow
+        if self.no_flow or (_p1 <= _p2 and self.no_back_flow):
             self.flow = 0.0
-            return
-
-        # forward flow
-        if (_p1 > _p2):
+        elif _p1 > _p2:  # forward flow
             self.flow = (_p1 - _p2) / (self.r_for * self.r_for_factor) - \
-                self.r_k * self.r_k_factor * math.pow(self.no_flow, 2)
-            self.update_volumes()
-            return
-
-        # so there is no forward flow, if no_back_flow is true then set flow to zero and return
-        if self.no_back_flow:
-            self.flow = 0.0
-            return
-
-        # back flow
-        if (_p1 < _p2):
+                self.r_k * self.r_k_factor * self.no_flow**2
+        else:  # back flow
             self.flow = (_p1 - _p2) / (self.r_back * self.r_back_factor) + \
-                self.r_k * self.r_k_factor * math.pow(self.no_flow, 2)
-            self.update_volumes()
-            return
+                self.r_k * self.r_k_factor * self.no_flow**2
+
+        # update the volume
+        self.update_volumes()
 
     def update_volumes(self) -> None:
         # now update the volumes of the model components which are connected by this resistor
