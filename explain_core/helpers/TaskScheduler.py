@@ -13,3 +13,6 @@ class TaskScheduler:
 
         # signal that the component has been initialized
         self._is_initialized = True
+
+    def add_task(self, new_task):
+        print(new_task)
