@@ -1,5 +1,4 @@
 import json
-import multitimer
 import time
 import importlib
 from explain_core.helpers.DataCollector import DataCollector
@@ -34,21 +33,17 @@ class ModelEngine:
     model_time_total: float = 0.0
 
     # define an obvject holding the  datacollector
-    datacollector: dict = {}
+    _datacollector: dict = {}
 
     # define an object holding the task scheduler
-    task_scheduler: dict = {}
+    _task_scheduler: dict = {}
 
     # performance
     run_duration: float = 0.0
     step_duration: float = 0.0
 
     # define local attributes
-    _initialized: bool = False
-
-    # define a model timer object
-    _model_timer = {}
-    _model_rt_interval = 1.0
+    initialized: bool = False
 
     # define a status message object
     status = {
@@ -90,7 +85,7 @@ class ModelEngine:
             # signal that the json file failed to load
             self.status["error_log"].append(
                 f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!")
-            self._initialized = False
+            self.initialized = False
 
             # terminate function
             return
@@ -128,7 +123,7 @@ class ModelEngine:
                     error_counter += 1
 
         # initialize a datacollector
-        self.datacollector = DataCollector(self)
+        self._datacollector = DataCollector(self)
 
         # check the dependencies
         dep_errors: int = self.check_dependencies()
@@ -147,16 +142,16 @@ class ModelEngine:
                     init_errors += 1
 
             if init_errors > 0 or dep_errors > 0:
-                self._initialized = False
+                self.initialized = False
             else:
                 self.status["log"].append(
                     f" Model '{self.name}' loaded and initialized correctly.")
-                self._initialized = True
+                self.initialized = True
 
         else:
-            self._initialized = False
+            self.initialized = False
 
-        self.status['initialized'] = self._initialized
+        self.status['initialized'] = self.initialized
 
     def check_dependencies(self) -> int:
         dep_errors = 0
@@ -174,30 +169,19 @@ class ModelEngine:
                         f'Dependency error: model {model.name} depends on {dep} which is not present.')
                     dep_errors += 1
         if dep_errors > 0:
-            self._initialized = False
+            self.initialized = False
         return dep_errors
 
-    def start(self):
-        # Create a Timer object to schedule the function execution
-        self._model_timer = multitimer.MultiTimer(
-            interval=self._model_rt_interval, function=self.model_step_rt)
-
-        # Start the timer
-        self._model_timer.start()
-
-    def stop(self):
-        # stop the realtime model
-        self._model_timer.stop()
-
-    def calculate(self, time_to_calculate: float = 10.0, output=False):
+    def calculate(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
         # Calculate the number of steps of the model
-        _no_of_steps = int(time_to_calculate / self.modeling_stepsize)
+        _no_of_steps: int = int(time_to_calculate / self.modeling_stepsize)
 
-        # clear the data collector
-        self.datacollector.clear_data()
+        # reset the data collector
+        self._datacollector.clear_data()
 
         # Start the performance counter
-        perf_start = perf_counter()
+        if performance:
+            perf_start: float = perf_counter()
 
         # Do all model steps
         for _ in range(_no_of_steps):
@@ -206,46 +190,21 @@ class ModelEngine:
                 model.step_model()
 
             # Call the datacollector
-            self.datacollector.collect_data(self.model_time_total)
+            self._datacollector.collect_data(self.model_time_total)
 
             # Increase the model clock
             self.model_time_total += self.modeling_stepsize
 
         # Stop the performance counter
-        perf_stop = perf_counter()
+        if performance:
+            # stop the performance counter
+            perf_stop: float = perf_counter()
 
-        # Store the performance metrics
-        self.run_duration = perf_stop - perf_start
-        self.step_duration = (self.run_duration / _no_of_steps) * 1000
+            # Store the performance metrics
+            self.run_duration: float = perf_stop - perf_start
+            self.step_duration: float = (
+                self.run_duration / _no_of_steps) * 1000
 
-        ret = {
-            "time_total": int(self.model_time_total),
-            "time_run": int(time_to_calculate),
-            "steps": _no_of_steps,
-            "duration":  round(self.run_duration, 3),
-            "step_duration": round(self.step_duration, 4),
-            "data": []
-        }
-
-        if output:
-            if len(self.datacollector.watch_list) > 2:
-                ret['data'] = self.datacollector.collected_data.copy()
-
-        return ret
-
-    def model_step_rt(self):
-        # calculate a number of seconds of the model
-        _no_of_steps: float = int(
-            self._model_rt_interval / self.modeling_stepsize)
-
-        # do all model steps
-        for _ in range(_no_of_steps):
-            # execute the model step method of all models
-            for model in self.models.values():
-                model.step_model()
-
-             # Call the datacollector
-            self.datacollector.collect_data(self.model_time_total)
-
-            # increase the model clock
-            self.model_time_total += self.modeling_stepsize
+        # store a reference to the collected data in model_data and return it
+        self.model_data = self._datacollector.collected_data
+        return self.model_data
