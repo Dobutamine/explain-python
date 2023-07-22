@@ -4,12 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import pandas as pd
-import pickle
 
 from pathlib import Path
-from explain_core.functions.Acidbase import calc_acidbase_from_tco2
-from explain_core.functions.Oxygenation import calc_oxygenation_from_to2
-from explain_core.helpers.DataCollector import DataCollector
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -21,10 +17,7 @@ class Interface:
         self.model = model
 
         # get the modeling stepsize from the model
-        self.t = model.modeling_stepsize
-
-        # initialize a datacollector
-        self.model.datacollector = DataCollector(model)
+        self._t = model.modeling_stepsize
 
         # plot line colors
         self.lines = ['r-', 'b-', 'g-', 'c-', 'm-', 'y-', 'k-', 'w-']
@@ -49,6 +42,7 @@ class Interface:
         self.plot_rt_fontsize = 8
         self.plot_rt_axis_color = 'darkgray'
 
+        # define realtime intermediates
         self.x_rt = []
         self.y_rt = []
         self.ani = {}
@@ -69,16 +63,6 @@ class Interface:
         self.lines_rt = []
         self.xy = False
         self.x_prop = ""
-
-    def save_state(self, file_name):
-        # use the binary mode 'wb' to save the model state
-        with open(file_name, "wb") as file:
-            pickle.dump(self.model, file)
-
-    def load_state(self, file_name):
-        # use the binary mode 'rb' to load the model state
-        with open(file_name, "rb") as file:
-            self.model = pickle.load(file)
 
     def build_rt_graph(self, y_min=0.0, y_max=100.0):
         # get the number of parameters to show in the graph
@@ -203,7 +187,7 @@ class Interface:
         self.remove_rt()
         self.ani = {}
         self.rt_time_window = time_window
-        self.model.datacollector.sample_interval = sample_interval
+        self.model._datacollector.sample_interval = sample_interval
         self.rescale_enabled = autoscale
         self.rescale_interval = autoscale_interval
         self.rt_update_interval = update_interval
@@ -212,7 +196,7 @@ class Interface:
 
         # calculate the number of datapoints on the x-axis
         self.no_dp = int(self.rt_time_window /
-                         self.model.datacollector.sample_interval)
+                         self.model._datacollector.sample_interval)
 
         self.model._model_rt_interval = self.rt_update_interval
         self.x_prop = ""
@@ -239,10 +223,10 @@ class Interface:
 
     def start_rt_graph(self, properties, sampleinterval=0.005):
         # first clear the watchllist and this also clears all data
-        self.model.datacollector.clear_watchlist()
+        self.model._datacollector.clear_watchlist()
 
         # set the sample interval
-        self.model.datacollector.set_sample_interval(sampleinterval)
+        self.model._datacollector.set_sample_interval(sampleinterval)
 
         # add the property to the watchlist
         if (isinstance(properties, str)):
@@ -261,20 +245,20 @@ class Interface:
                 if (prop_reference != None):
                     self.y_rt.append(np.random.rand(self.no_dp))
                     self.no_parameters_rt += 1
-                    self.model.datacollector.add_to_watchlist(prop_reference)
+                    self.model._datacollector.add_to_watchlist(prop_reference)
         else:
             prop_reference_x = self.find_model_prop(self.x_prop)
             if (prop_reference_x != None):
-                self.model.datacollector.add_to_watchlist(prop_reference_x)
+                self.model._datacollector.add_to_watchlist(prop_reference_x)
             prop_reference_y = self.find_model_prop(properties[0])
             if (prop_reference_y != None):
-                self.model.datacollector.add_to_watchlist(prop_reference_y)
+                self.model._datacollector.add_to_watchlist(prop_reference_y)
             self.y_rt.append(np.random.rand(self.no_dp))
             self.no_parameters_rt = 1
 
         # save the watched parameters to the parameter list
         self.parameters_rt = []
-        for watched_parameter in self.model.datacollector.watch_list:
+        for watched_parameter in self.model._datacollector.watch_list:
             if (watched_parameter['label'] != "Heart.ncc_ventricular" and watched_parameter['label'] != "Heart.ncc_atrial"):
                 self.parameters_rt.append(watched_parameter['label'])
 
@@ -306,13 +290,13 @@ class Interface:
                 model.step_model()
 
             # call the user interface
-            self.model.datacollector.collect_data(self.model.model_time_total)
+            self.model._datacollector.collect_data(self.model.model_time_total)
 
             # increase the model clock
             self.model.model_time_total += self.model.modeling_stepsize
 
         # update the realtime data structure
-        for _, t in enumerate(self.model.datacollector.collected_data):
+        for _, t in enumerate(self.model._datacollector.collected_data):
             self.x_rt = self.x_rt[1:]
             if self.xy:
                 self.x_rt = np.append(self.x_rt, t[self.x_prop])
@@ -325,7 +309,7 @@ class Interface:
                     self.y_rt[idx] = np.roll(self.y_rt[idx], -1)
 
         # clear the data collector
-        self.model.datacollector.clear_data()
+        self.model._datacollector.clear_data()
 
     def calculate(self, time_to_calculate):
 
@@ -337,41 +321,6 @@ class Interface:
         result = self.model.calculate(time_to_calculate)
         print(
             f'Ready in {result["duration"]} sec. Average model step in {result["step_duration"]} ms.')
-
-    def step_model(self, model_clock):
-        self.model.datacollector.collect_data(model_clock)
-        # process the propchanges
-        if (self.prop_update_counter >= self.prop_update_interval):
-            self.prop_update_counter = 0
-            for change in self.propChanges:
-                change.update()
-                if change.completed:
-                    self.propChanges.remove(change)
-
-        self.prop_update_counter += self.t
-
-    # property setters and getters
-    def set_property(self, prop, new_value, in_time=0, at_time=0):
-        prop = self.find_model_prop(prop)
-        if (prop != None):
-            # check whether the type of new_value is the same as the model type
-            if type(new_value) == type(getattr(prop['model'], prop['prop'])):
-                new_prop_change = propChange(prop, new_value, in_time, at_time)
-                self.propChanges.append(new_prop_change)
-                print(f"{prop['label']} is scheduled to change from {new_prop_change.initial_value} to {new_value} in {in_time} sec. at {at_time} sec. during next model run.")
-            else:
-                current_value_type = type(getattr(prop['model'], prop['prop']))
-                new_value_type = type(new_value)
-                print(
-                    f'property type mismatch. model property type = {current_value_type}, new value type = {new_value_type}')
-        else:
-            print("property not found in model")
-
-    def get_property(self, prop):
-        prop = self.find_model_prop(prop)
-        if (prop != None):
-            value = getattr(prop['model'], prop['prop'])
-        return value
 
     # plotters
     def plot_vitals(self, time=30):
@@ -505,7 +454,7 @@ class Interface:
         return vitals
 
     def get_gas_flows(self, time_to_calculate=10):
-        self.model.datacollector.clear_watchlist()
+        self.model._datacollector.clear_watchlist()
 
         properties = []
         for component in self.model.models:
@@ -517,7 +466,7 @@ class Interface:
         self.analyze(properties, time_to_calculate)
 
     def get_blood_flows(self, time_to_calculate=10):
-        self.model.datacollector.clear_watchlist()
+        self.model._datacollector.clear_watchlist()
 
         properties = []
         for component in self.model.models:
@@ -553,7 +502,7 @@ class Interface:
         return bg
 
     def get_blood_pressures(self, time_to_calculate=10):
-        self.model.datacollector.clear_watchlist()
+        self.model._datacollector.clear_watchlist()
 
         properties = []
         for component in self.model.models:
@@ -628,7 +577,7 @@ class Interface:
         return total_volume
 
     def get_blood_volumes(self, time_to_calculate=10):
-        self.model.datacollector.clear_watchlist()
+        self.model._datacollector.clear_watchlist()
 
         properties = []
         for component in self.model.models:
@@ -640,7 +589,7 @@ class Interface:
         self.analyze(properties, time_to_calculate)
 
     def get_gas_pressures(self, time_to_calculate=10):
-        self.model.datacollector.clear_watchlist()
+        self.model._datacollector.clear_watchlist()
 
         properties = []
         for component in self.model.models:
@@ -652,7 +601,7 @@ class Interface:
         self.analyze(properties, time_to_calculate)
 
     def get_gas_volumes(self, time_to_calculate=10):
-        self.model.datacollector.clear_watchlist()
+        self.model._datacollector.clear_watchlist()
 
         properties = []
         for component in self.model.models:
@@ -663,32 +612,13 @@ class Interface:
 
         self.analyze(properties, time_to_calculate)
 
-    # inspectors
-    def inspect_model(self):
-        model = {}
-        for component_name, component in self.model.models.items():
-            model[component_name] = component.description
-
-        return model
-
-    def inspect_model_component(self, component):
-        content = {}
-        for attribute in dir(self.model.models[component]):
-            if not attribute.startswith('__'):
-                attr_type = type(
-                    getattr(self.model.models[component], attribute))
-                if (attr_type is str) or (attr_type is float) or (attr_type is bool) or (attr_type is int):
-                    content[attribute] = getattr(
-                        self.model.models[component], attribute)
-        return content
-
     def analyze(self, properties, time_to_calculate=10, sampleinterval=0.005, calculate=True):
         if calculate:
             # first clear the watchllist and this also clears all data
-            self.model.datacollector.clear_watchlist()
+            self.model._datacollector.clear_watchlist()
 
             # set the sample interval
-            self.model.datacollector.set_sample_interval(sampleinterval)
+            self.model._datacollector.set_sample_interval(sampleinterval)
 
             # add the property to the watchlist
             if (isinstance(properties, str)):
@@ -698,7 +628,7 @@ class Interface:
             for prop in properties:
                 prop_reference = self.find_model_prop(prop)
                 if (prop_reference != None):
-                    self.model.datacollector.add_to_watchlist(prop_reference)
+                    self.model._datacollector.add_to_watchlist(prop_reference)
 
             # calculate the model steps
             self.calculate(time_to_calculate)
@@ -708,10 +638,10 @@ class Interface:
         parameters = []
         no_parameters = 0
         # get the watch list of the datacollector
-        for watched_parameter in self.model.datacollector.watch_list:
+        for watched_parameter in self.model._datacollector.watch_list:
             parameters.append(watched_parameter['label'])
 
-        no_dp = len(self.model.datacollector.collected_data)
+        no_dp = len(self.model._datacollector.collected_data)
         x = np.zeros(no_dp)
         y = []
         heartbeats = 0
@@ -720,7 +650,7 @@ class Interface:
             y.append(np.zeros(no_dp))
             no_parameters += 1
 
-        for index, t in enumerate(self.model.datacollector.collected_data):
+        for index, t in enumerate(self.model._datacollector.collected_data):
             x[index] = t['time']
 
             for idx, parameter in enumerate(parameters):
@@ -797,10 +727,10 @@ class Interface:
 
     def plot_time_graph(self, properties, time_to_calculate=10,  combined=True, sharey=True, ylabel='',  autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False, sampleinterval=0.005, analyze=True):
         # first clear the watchllist and this also clears all data
-        self.model.datacollector.clear_watchlist()
+        self.model.clear_watchlist()
 
         # set the sample interval
-        self.model.datacollector.set_sample_interval(sampleinterval)
+        self.model.set_sample_interval(sampleinterval)
 
         # add the property to the watchlist
         if (isinstance(properties, str)):
@@ -808,18 +738,16 @@ class Interface:
 
         # add the properties to the watch_list
         for prop in properties:
-            prop_reference = self.find_model_prop(prop)
-            if (prop_reference != None):
-                self.model.datacollector.add_to_watchlist(prop_reference)
+            self.model.add_to_watchlist(prop)
 
         # calculate the model steps
-        self.calculate(time_to_calculate)
+        collected_data = self.model.calculate(time_to_calculate)
 
         # print status message
         print("Preparing data plot.")
 
         # plot the properties
-        self.draw_time_graph(sharey, combined, ylabel, autoscale,
+        self.draw_time_graph(collected_data, properties, sharey, combined, ylabel, autoscale,
                              ylowerlim, yupperlim, fill, fill_between, zeroline)
 
         # analyze
@@ -829,18 +757,18 @@ class Interface:
 
     def plot_xy_graph(self, property_x, property_y, time_to_calculate=2, sampleinterval=0.0005):
         # first clear the watchllist and this also clears all data
-        self.model.datacollector.clear_watchlist()
+        self.model._datacollector.clear_watchlist()
 
         # set the sample interval
-        self.model.datacollector.set_sample_interval(sampleinterval)
+        self.model._datacollector.set_sample_interval(sampleinterval)
 
         prop_reference_x = self.find_model_prop(property_x)
         if (prop_reference_x != None):
-            self.model.datacollector.add_to_watchlist(prop_reference_x)
+            self.model._datacollector.add_to_watchlist(prop_reference_x)
 
         prop_reference_y = self.find_model_prop(property_y)
         if (prop_reference_y != None):
-            self.model.datacollector.add_to_watchlist(prop_reference_y)
+            self.model._datacollector.add_to_watchlist(prop_reference_y)
 
         # calculate the model steps
         self.calculate(time_to_calculate)
@@ -854,12 +782,12 @@ class Interface:
         parameters = ['time']
         no_parameters = 0
         # get the watch list of the datacollector
-        for watched_parameter in self.model.datacollector.watch_list:
+        for watched_parameter in self.model._datacollector.watch_list:
             if (watched_parameter['label'] != "Heart.ncc_ventricular" and watched_parameter['label'] != "Heart.ncc_atrial"):
                 parameters.append(watched_parameter['label'])
 
         data = []
-        for index, t in enumerate(self.model.datacollector.collected_data):
+        for index, t in enumerate(self.model._datacollector.collected_data):
             dataline = []
             for idx, parameter in enumerate(parameters):
                 dataline.append(t[parameter])
@@ -870,11 +798,11 @@ class Interface:
         df.to_excel(path)
 
     def draw_xy_graph(self, property_x, property_y):
-        no_dp = len(self.model.datacollector.collected_data)
+        no_dp = len(self.model._datacollector.collected_data)
         x = np.zeros(no_dp)
         y = np.zeros(no_dp)
 
-        for index, t in enumerate(self.model.datacollector.collected_data):
+        for index, t in enumerate(self.model._datacollector.collected_data):
             x[index] = t[property_x]
             y[index] = t[property_y]
 
@@ -898,15 +826,11 @@ class Interface:
         plt.yticks(fontsize=self.plot_fontsize / 3)
         plt.show()
 
-    def draw_time_graph(self, sharey=False, combined=True, ylabel='', autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False):
-        parameters = []
+    def draw_time_graph(self, collected_data, properties, sharey=False, combined=True, ylabel='', autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False):
+        parameters = properties
         no_parameters = 0
-        # get the watch list of the datacollector
-        for watched_parameter in self.model.datacollector.watch_list:
-            if (watched_parameter['label'] != "Heart.ncc_ventricular" and watched_parameter['label'] != "Heart.ncc_atrial"):
-                parameters.append(watched_parameter['label'])
 
-        no_dp = len(self.model.datacollector.collected_data)
+        no_dp = len(collected_data)
         self.counter = no_dp
         x = np.zeros(no_dp)
         y = []
@@ -915,7 +839,7 @@ class Interface:
             y.append(np.zeros(no_dp))
             no_parameters += 1
 
-        for index, t in enumerate(self.model.datacollector.collected_data):
+        for index, t in enumerate(collected_data):
             x[index] = t['time']
 
             for idx, parameter in enumerate(parameters):
@@ -996,22 +920,6 @@ class Interface:
 
         plt.show()
 
-    def find_model_prop(self, prop):
-        # split the model from the prop
-        t = prop.split(sep=".")
-        if (len(t) == 2):
-            # try to find the parameter in the model
-            if t[0] in self.model.models:
-                if (hasattr(self.model.models[t[0]], t[1])):
-                    return {'label': prop, 'model': self.model.models[t[0]], 'prop': t[1], 'prop2': None}
-        if (len(t) == 3):
-            # try to find the parameter in the model
-            if t[0] in self.model.models:
-                if (hasattr(self.model.models[t[0]], t[1])):
-                    return {'label': prop, 'model': self.model.models[t[0]], 'prop': t[1], 'prop2': t[2]}
-
-        return None
-
 
 class propChange:
     def __init__(self, prop, new_value, in_time, at_time=0, update_interval=0.015):
@@ -1019,13 +927,13 @@ class propChange:
         self.prop = prop
         self.current_value = getattr(prop['model'], prop['prop'])
         self.initial_value = self.current_value
-        self.target_value = new_value
+        self._target_value = new_value
         self.at_time = at_time
         self.in_time = in_time
 
         if (in_time > 0):
             self.step_size = (
-                (self.target_value - self.current_value) / self.in_time) * update_interval
+                (self._target_value - self.current_value) / self.in_time) * update_interval
         else:
             self.step_size = 0
 
@@ -1049,14 +957,14 @@ class propChange:
 
             if (self.running):
                 self.current_value += self.step_size
-                if abs(self.current_value - self.target_value) < abs(self.step_size):
-                    self.current_value = self.target_value
+                if abs(self.current_value - self._target_value) < abs(self.step_size):
+                    self.current_value = self._target_value
                     self.step_size = 0
                     self.running = False
                     self.completed = True
 
                 if (self.step_size == 0):
-                    self.current_value = self.target_value
+                    self.current_value = self._target_value
                     self.completed = True
                     print(
                         f"- {self.prop['label']} change stopped at {self.running_time}. New value: {self.current_value}")
@@ -1072,6 +980,6 @@ class propChange:
 
     def complete(self):
         self.step_size = 0
-        self.current_value = self.target_value
+        self.current_value = self._target_value
         self.completed = True
         setattr(self.prop['model'], self.prop['prop'], self.current_value)

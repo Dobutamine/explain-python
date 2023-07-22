@@ -189,19 +189,19 @@ class ModelEngine:
             self.initialized = False
         return dep_errors
 
-    def calculate_perf(self, time_to_calculate: float = 1.0) -> list:
+    def calculate_perf(self, time_to_calculate: float = 1.0):
         # this routine will quickly calculate a model run but the caller needs to take care of
         # all data processing and cleanup of the datacollector as the data stays in the data collector
         # and the data collector watchlist will not be reset
         # this routine is especially suitable for realtime running model applications
 
-        # Calculate the number of steps of the model
-        no_of_steps: int = int(time_to_calculate / self.modeling_stepsize)
-
         # Cache the attributes for faster access during the model loop
         collect_data = self._datacollector.collect_data
         model_time_total = self.model_time_total
         modeling_stepsize = self.modeling_stepsize
+
+        # Calculate the number of steps of the model
+        no_of_steps: int = int(time_to_calculate / modeling_stepsize)
 
         # Do all model steps
         for _ in range(no_of_steps):
@@ -254,9 +254,6 @@ class ModelEngine:
             print(
                 f'Ready in {run_duration:.1f} sec. Average model step in {step_duration:.4f} ms.')
 
-        # clear the datacollector watchlist
-        self._datacollector.clear_watchlist()
-
         # store a reference to the collected data in model_data and return it
         self.model_data = self._datacollector.collected_data
         return self.model_data
@@ -272,7 +269,7 @@ class ModelEngine:
         # add properties to watch list of the datacollector
         self._datacollector.add_to_watchlist(properties)
 
-    def set_data_sampling_interval(self, interval: float = 0.005):
+    def set_sample_interval(self, interval: float = 0.005):
         if interval > 0.0005:
             self._datacollector.set_sample_interval(interval)
 
