@@ -189,6 +189,32 @@ class ModelEngine:
             self.initialized = False
         return dep_errors
 
+    def calculate_perf(self, time_to_calculate: float = 1.0) -> list:
+        # this routine will quickly calculate a model run but the caller needs to take care of
+        # all data processing and cleanup of the datacollector as the data stays in the data collector
+        # and the data collector watchlist will not be reset
+        # this routine is especially suitable for realtime running model applications
+
+        # Calculate the number of steps of the model
+        no_of_steps: int = int(time_to_calculate / self.modeling_stepsize)
+
+        # Cache the attributes for faster access during the model loop
+        collect_data = self._datacollector.collect_data
+        model_time_total = self.model_time_total
+        modeling_stepsize = self.modeling_stepsize
+
+        # Do all model steps
+        for _ in range(no_of_steps):
+            # Execute the model step method of all models
+            for model in self.models.values():
+                model.step_model()
+
+            # Call the data collector
+            collect_data(model_time_total)
+
+            # Increase the model clock
+            model_time_total += modeling_stepsize
+
     def calculate(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
         # Calculate the number of steps of the model
         no_of_steps: int = int(time_to_calculate / self.modeling_stepsize)
@@ -226,7 +252,10 @@ class ModelEngine:
             run_duration = perf_stop - perf_start
             step_duration = (run_duration / no_of_steps) * 1000
             print(
-                f'Ready in {run_duration:.0f} sec. Average model step in {step_duration:.4f} ms.')
+                f'Ready in {run_duration:.1f} sec. Average model step in {step_duration:.4f} ms.')
+
+        # clear the datacollector watchlist
+        self._datacollector.clear_watchlist()
 
         # store a reference to the collected data in model_data and return it
         self.model_data = self._datacollector.collected_data
