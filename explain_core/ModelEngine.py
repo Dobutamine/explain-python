@@ -191,38 +191,42 @@ class ModelEngine:
 
     def calculate(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
         # Calculate the number of steps of the model
-        _no_of_steps: int = int(time_to_calculate / self.modeling_stepsize)
+        no_of_steps: int = int(time_to_calculate / self.modeling_stepsize)
 
         # reset the data collector
         self._datacollector.clear_data()
 
         # Start the performance counter
         if performance:
-            perf_start: float = perf_counter()
+            perf_start = perf_counter()
+
+        # Cache the attributes for faster access during the model loop
+        collect_data = self._datacollector.collect_data
+        model_time_total = self.model_time_total
+        modeling_stepsize = self.modeling_stepsize
 
         # Do all model steps
-        for _ in range(_no_of_steps):
+        for _ in range(no_of_steps):
             # Execute the model step method of all models
             for model in self.models.values():
                 model.step_model()
 
-            # Call the datacollector
-            self._datacollector.collect_data(self.model_time_total)
+            # Call the data collector
+            collect_data(model_time_total)
 
             # Increase the model clock
-            self.model_time_total += self.modeling_stepsize
+            model_time_total += modeling_stepsize
 
         # Stop the performance counter
         if performance:
             # stop the performance counter
-            perf_stop: float = perf_counter()
+            perf_stop = perf_counter()
 
             # Store the performance metrics
-            self.run_duration: float = perf_stop - perf_start
-            self.step_duration: float = (
-                self.run_duration / _no_of_steps) * 1000
+            run_duration = perf_stop - perf_start
+            step_duration = (run_duration / no_of_steps) * 1000
             print(
-                f'Ready in {round(self.run_duration,0)} sec. Average model step in {round(self.step_duration, 4)} ms.')
+                f'Ready in {run_duration:.0f} sec. Average model step in {step_duration:.4f} ms.')
 
         # store a reference to the collected data in model_data and return it
         self.model_data = self._datacollector.collected_data
