@@ -4,6 +4,8 @@ import pickle
 import importlib
 import copy
 import multitimer
+import math
+import random
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.base_models.BaseModel import BaseModel
@@ -107,7 +109,7 @@ class ModelEngine:
 
         except:
             # signal that the json file failed to load
-            self.update_log(
+            self._update_log(
                 f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!", "error")
             self.initialized = False
 
@@ -129,7 +131,7 @@ class ModelEngine:
                     model_module = importlib.import_module(
                         'explain_core.custom_models.' + model_type)
                 except:
-                    self.update_log(
+                    self._update_log(
                         f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}", "error")
                     error_counter += 1
 
@@ -142,7 +144,7 @@ class ModelEngine:
                     self.models[model['name']] = model_class(**model)
                 except Exception as error:
                     # a module holding the desired model class is producing an error while instantiating
-                    self.update_log(
+                    self._update_log(
                         f"Instantiation error: {model_type} model failed to instantiate. Error: {error}", "error")
                     error_counter += 1
 
@@ -164,14 +166,14 @@ class ModelEngine:
                     model.init_model(self)
                 except Exception as error:
                     # a module holding the desired model class is producing an error while initiallizing
-                    self.update_log(
+                    self._update_log(
                         f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}", "error")
                     init_errors += 1
 
             if init_errors > 0 or dep_errors > 0:
                 self.initialized = False
             else:
-                self.update_log(
+                self._update_log(
                     f" Model '{self.name}' loaded and initialized correctly.")
                 self.initialized = True
 
@@ -192,14 +194,14 @@ class ModelEngine:
                     if dep_model.name == dep:
                         present = True
                 if not present:
-                    self.update_log(
+                    self._update_log(
                         f'Dependency error: model {model.name} depends on {dep} which is not present.', "error")
                     dep_errors += 1
         if dep_errors > 0:
             self.initialized = False
         return dep_errors
 
-    def update_log(self, message, log_type="log"):
+    def _update_log(self, message, log_type="log"):
         if log_type == "log":
             self.status['log'].append(message)
 
@@ -213,7 +215,7 @@ class ModelEngine:
             self.status['error_log'].pop(0)
 
     # realtime model routines without data collection
-    def start_rt(self, rt_interval=0.015):
+    def start(self, rt_interval=0.015):
         # set the realtime interval
         self._rt_interval = rt_interval
 
@@ -231,12 +233,12 @@ class ModelEngine:
         # start the realtime clock
         self._rt_clock.start()
         self._rt_running = True
-        self.update_log(
+        self._update_log(
             f"Model '{self.name}' is running in realtime with a {self._rt_interval} sec. resolution.")
 
-    def stop_rt(self):
+    def stop(self):
         try:
-            self.update_log(f"Model '{self.name}' is stopped.")
+            self._update_log(f"Model '{self.name}' is stopped.")
             self._rt_clock.stop()
             self._rt_clock = None
             self._rt_running = False
@@ -250,7 +252,7 @@ class ModelEngine:
         # for example models['AA'].pres  for the pressure in AA
 
         # Cache the attributes for faster access during the model loop
-        collect_data = self._datacollector.collect_data
+        run_tasks = self._task_scheduler.run_tasks
         model_time_total = self.model_time_total
         modeling_stepsize = self.modeling_stepsize
 
@@ -260,38 +262,22 @@ class ModelEngine:
             for model in self.models.values():
                 model.step_model()
 
+             # call the task scheduler
+            run_tasks(model_time_total)
+
             # Increase the model clock
             model_time_total += modeling_stepsize
 
-    def calculate_perf(self, time_to_calculate: float = 1.0):
-        # this performance optimized routine will quickly calculate a model run
-        # but does not clear the datacollector data and has no performance
+    def calculate(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
 
         # Cache the attributes for faster access during the model loop
         collect_data = self._datacollector.collect_data
+        run_tasks = self._task_scheduler.run_tasks
         model_time_total = self.model_time_total
         modeling_stepsize = self.modeling_stepsize
 
         # Calculate the number of steps of the model
         no_of_steps: int = int(time_to_calculate / modeling_stepsize)
-
-        # Do all model steps
-        for _ in range(no_of_steps):
-            # Execute the model step method of all models
-            for model in self.models.values():
-                model.step_model()
-
-            # Call the data collector
-            collect_data(model_time_total)
-
-            # Increase the model clock
-            model_time_total += modeling_stepsize
-
-        return self._datacollector.collected_data
-
-    def calculate(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
-        # Calculate the number of steps of the model
-        no_of_steps: int = int(time_to_calculate / self.modeling_stepsize)
 
         # reset the data collector
         self._datacollector.clear_data()
@@ -300,11 +286,6 @@ class ModelEngine:
         if performance:
             perf_start = perf_counter()
 
-        # Cache the attributes for faster access during the model loop
-        collect_data = self._datacollector.collect_data
-        model_time_total = self.model_time_total
-        modeling_stepsize = self.modeling_stepsize
-
         # Do all model steps
         for _ in range(no_of_steps):
             # Execute the model step method of all models
@@ -313,6 +294,9 @@ class ModelEngine:
 
             # Call the data collector
             collect_data(model_time_total)
+
+            # call the task scheduler
+            run_tasks(model_time_total)
 
             # Increase the model clock
             model_time_total += modeling_stepsize
@@ -347,6 +331,7 @@ class ModelEngine:
 
     def set_property(self, property: str, new_value: float, in_time: float = 1.0, at_time: float = 0.0) -> bool:
         # define some placeholders
+        task_id: int = random.randint(0, 1000)
         m: BaseModel = None
         p1: str = None
         p2: str = None
@@ -373,6 +358,7 @@ class ModelEngine:
 
         # define a task for the task scheduler
         task = {
+            "id": task_id,
             "model": self.models[m],
             "prop1": p1,
             "prop2": p2,

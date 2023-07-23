@@ -271,7 +271,7 @@ class Interface:
     def model_step_rt(self):
 
         # calculate the model step
-        collected_data = self.model.calculate_perf(self.rt_update_interval)
+        collected_data = self.model.calculate(self.rt_update_interval, False)
 
         # update the realtime data structure
         for _, t in enumerate(collected_data):
@@ -285,9 +285,6 @@ class Interface:
                 for idx, parameter in enumerate(self.parameters_rt):
                     self.y_rt[idx][self.no_dp - 1] = t[parameter]
                     self.y_rt[idx] = np.roll(self.y_rt[idx], -1)
-
-        # clear the data collector
-        self.model._datacollector.clear_data()
 
     # plotters
     def plot_heart_pv_rt(self):

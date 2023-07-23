@@ -96,7 +96,8 @@ class DataCollector:
             # try to find the parameter in the model
             if t[0] in self.model.models:
                 if (hasattr(self.model.models[t[0]], t[1])):
-                    return {'label': prop, 'model': self.model.models[t[0]], 'prop1': t[1], 'prop2': None}
+                    r = getattr(self.model.models[t[0]], t[1])
+                    return {'label': prop, 'model': self.model.models[t[0]], 'prop1': t[1], 'prop2': None, 'ref': r}
 
         # if 2 properties are present
         if (len(t) == 3):
@@ -120,6 +121,7 @@ class DataCollector:
                 prop1 = parameter['prop1']
                 prop2 = parameter.get('prop2')
                 value = getattr(parameter['model'], prop1)
+                # faster way maybe: value = parameter['model'].__dict__.get(prop1)
                 if prop2 is not None:
                     value = value.get(prop2, 0)
 
