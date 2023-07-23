@@ -254,10 +254,8 @@ class ModelEngine:
             perf_stop = perf_counter()
 
             # Store the performance metrics
-            run_duration = perf_stop - perf_start
-            step_duration = (run_duration / no_of_steps) * 1000
-            print(
-                f'Ready in {run_duration:.1f} sec. Average model step in {step_duration:.4f} ms.')
+            self.run_duration = perf_stop - perf_start
+            self.step_duration = (self.run_duration / no_of_steps) * 1000
 
         # store a reference to the collected data in model_data and return it
         self.model_data = self._datacollector.collected_data
@@ -406,7 +404,7 @@ class ModelEngine:
 
         return new_model_def
 
-    def restart_model(self, filename = None):
+    def restart_model(self, filename=None):
         if filename is None:
             self.initialized = self.init_model(self.model_definition_filename)
         else:

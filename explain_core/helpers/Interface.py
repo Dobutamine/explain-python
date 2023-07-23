@@ -11,7 +11,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-class Plotter:
+class Interface:
     def __init__(self, model):
         # store a reference to the model instance
         self.model = model
@@ -852,6 +852,13 @@ class Plotter:
                 plt.fill_between(x, y[0], y[1], color='blue', alpha=0.1)
 
         plt.show()
+
+    def calculate(self, time_to_calculate=30, performance=True):
+        t = self.model.calculate(
+            time_to_calculate=time_to_calculate, performance=performance)
+
+        print(
+            f'Ready in {self.model.run_duration:.1f} sec. Average model step in {self.model.step_duration:.4f} ms.')
 
 
 class propChange:
