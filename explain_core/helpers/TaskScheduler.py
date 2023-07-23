@@ -23,7 +23,24 @@ class TaskScheduler:
         new_task['running'] = False
         new_task['completed'] = False
 
-        self._tasks.append(new_task)
+        # get the current value
+        current_value = getattr(new_task['model'], new_task['prop1'])
+        if new_task['prop2'] is not None:
+            current_value = current_value.get(new_task['prop2'])
+        new_task['current_value'] = current_value
+
+        # get the type of the current value
+        if isinstance(current_value, float) or isinstance(current_value, int):
+            # calculate the stepsize
+            if new_task['in_time'] > 0:
+                new_task['stepsize'] = (
+                    new_task['new_value'] - current_value) / new_task['in_time']
+            self._tasks.append(new_task)
+
+        if isinstance(current_value, bool) or isinstance(current_value, str):
+            # calculate the stepsize
+            new_task['stepsize'] = 0.0
+            self._tasks.append(new_task)
 
     def clear_task(self, task_id):
         pass

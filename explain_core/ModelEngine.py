@@ -335,12 +335,11 @@ class ModelEngine:
         m: BaseModel = None
         p1: str = None
         p2: str = None
-        p3: str = None
 
         # build a task scheduler object
         t = property.split(".")
 
-        if len(t) < 5 and len(t) > 1:
+        if len(t) < 4 and len(t) > 1:
             if len(t) == 2:
                 m = t[0]
                 p1 = t[1]
@@ -348,11 +347,6 @@ class ModelEngine:
                 m = t[0]
                 p1 = t[1]
                 p2 = t[2]
-            if len(t) == 4:
-                m = t[0]
-                p1 = t[1]
-                p2 = t[2]
-                p3 = t[3]
         else:
             return False
 
@@ -362,7 +356,6 @@ class ModelEngine:
             "model": self.models[m],
             "prop1": p1,
             "prop2": p2,
-            "prop3": p3,
             "new_value": new_value,
             "in_time": in_time,
             "at_time": at_time
