@@ -289,11 +289,10 @@ class Interface:
         # clear the data collector
         self.model._datacollector.clear_data()
 
+    # plotters
     def plot_heart_pv_rt(self):
         self.plot_rt(["LV.vol", "LV.pres"], autoscale=True, autoscale_interval=1.0,
                      time_window=1.0, sample_interval=0.001, xy=True, update_interval=0.1)
-
-    # plotters
 
     def plot_vitals(self, time=30):
         self.plot_time_graph(["AA.mean", "Heart.heart_rate", "Breathing.resp_rate", "AA.aboxy.so2"], time_to_calculate=time,

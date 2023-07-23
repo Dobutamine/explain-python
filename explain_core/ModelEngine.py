@@ -3,6 +3,7 @@ import time
 import pickle
 import importlib
 import copy
+import multitimer
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.base_models.BaseModel import BaseModel
@@ -59,6 +60,12 @@ class ModelEngine:
         "initialized": False
     }
 
+    # realtime object
+    _rt_clock = None
+    _rt_running = False
+    _rt_interval = 0.015
+    _rt_no_of_steps = 30
+
     # define the constructor
     def __init__(self, model_definition_filename: str):
         # initialize all model components with the parameters from the JSON file
@@ -100,8 +107,8 @@ class ModelEngine:
 
         except:
             # signal that the json file failed to load
-            self.status["error_log"].append(
-                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!")
+            self.update_log(
+                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!", "error")
             self.initialized = False
 
             # terminate function
@@ -122,8 +129,8 @@ class ModelEngine:
                     model_module = importlib.import_module(
                         'explain_core.custom_models.' + model_type)
                 except:
-                    self.status["error_log"].append(
-                        f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}")
+                    self.update_log(
+                        f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}", "error")
                     error_counter += 1
 
             else:
@@ -135,8 +142,8 @@ class ModelEngine:
                     self.models[model['name']] = model_class(**model)
                 except Exception as error:
                     # a module holding the desired model class is producing an error while instantiating
-                    self.status["error_log"].append(
-                        f"Instantiation error: {model_type} model failed to instantiate. Error: {error}")
+                    self.update_log(
+                        f"Instantiation error: {model_type} model failed to instantiate. Error: {error}", "error")
                     error_counter += 1
 
         # initialize a datacollector
@@ -157,14 +164,14 @@ class ModelEngine:
                     model.init_model(self)
                 except Exception as error:
                     # a module holding the desired model class is producing an error while initiallizing
-                    self.status["error_log"].append(
-                        f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}")
+                    self.update_log(
+                        f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}", "error")
                     init_errors += 1
 
             if init_errors > 0 or dep_errors > 0:
                 self.initialized = False
             else:
-                self.status["log"].append(
+                self.update_log(
                     f" Model '{self.name}' loaded and initialized correctly.")
                 self.initialized = True
 
@@ -185,12 +192,69 @@ class ModelEngine:
                     if dep_model.name == dep:
                         present = True
                 if not present:
-                    self.status["error_log"].append(
-                        f'Dependency error: model {model.name} depends on {dep} which is not present.')
+                    self.update_log(
+                        f'Dependency error: model {model.name} depends on {dep} which is not present.', "error")
                     dep_errors += 1
         if dep_errors > 0:
             self.initialized = False
         return dep_errors
+
+    def update_log(self, message, log_type="log"):
+        if log_type == "log":
+            self.status['log'].append(message)
+
+        if len(self.status['log']) > 5:
+            self.status['log'].pop(0)
+
+        if log_type == "error":
+            self.status['error_log'].append(message)
+
+        if len(self.status['error_log']) > 5:
+            self.status['error_log'].pop(0)
+
+    def start_rt(self, rt_interval=0.015):
+        # set the realtime interval
+        self._rt_interval = rt_interval
+
+        # calculate the number of steps of the model
+        self._rt_no_of_steps: int = int(
+            self._rt_interval / self.modeling_stepsize)
+
+        # empty the datacollector
+        self._datacollector.clear_data()
+
+        # declare the realtime counter
+        self._rt_clock = multitimer.RepeatingTimer(
+            rt_interval, self.calculate_rt)
+
+        # start the realtime clock
+        self._rt_clock.start()
+        self._rt_running = True
+        self.update_log(
+            f"Model '{self.name}' is running in realtime with a {self._rt_interval} sec. resolution.")
+
+    def stop_rt(self):
+        self.update_log(f"Model '{self.name}' is stopped.")
+        self._rt_clock.stop()
+        self._rt_clock = None
+        self._rt_running = False
+
+    def calculate_rt(self):
+        # this routine will quickly calculate a model run but does not record any data
+
+        # Cache the attributes for faster access during the model loop
+        collect_data = self._datacollector.collect_data
+        model_time_total = self.model_time_total
+        modeling_stepsize = self.modeling_stepsize
+
+        # Do all model steps
+        for _ in range(self._rt_no_of_steps):
+            # Execute the model step method of all models
+            for model in self.models.values():
+                model.step_model()
+
+            # Increase the model clock
+            model_time_total += modeling_stepsize
 
     def calculate_perf(self, time_to_calculate: float = 1.0):
         # this routine will quickly calculate a model run but the caller needs to take care of
