@@ -2,6 +2,7 @@ import json
 import time
 import pickle
 import importlib
+import copy
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.base_models.BaseModel import BaseModel
@@ -372,8 +373,44 @@ class ModelEngine:
         with open(filename, "rb") as file:
             return pickle.load(file)
 
-    def restart_model(self):
-        self.initialized = self.init_model(self.model_definition_filename)
+    def save_model_state_json(self, filename):
+        if ".json" not in filename:
+            filename += ".json"
+
+        new_model_def = self.model_definition.copy()
+
+        # first copy all main properties
+        for key in self.model_definition.keys():
+            if key != 'models':
+                new_model_def[key] = getattr(self, key)
+
+        # now process the models
+        for m_name, m in self.model_definition['models'].items():
+            # process the model
+            for km in m.keys():
+                # now get the current value in the model
+                value = getattr(self.models[m['name']], km)
+                if isinstance(value, dict) or isinstance(value, list):
+                    new_value = value.copy()
+                else:
+                    new_value = value
+
+                new_model_def['models'][m_name][km] = value
+
+        # Convert the python object to a json string
+        json_data = json.dumps(new_model_def, indent=4)
+
+        # Write the JSON data to the file
+        with open(filename, "w") as file:
+            file.write(json_data)
+
+        return new_model_def
+
+    def restart_model(self, filename = None):
+        if filename is None:
+            self.initialized = self.init_model(self.model_definition_filename)
+        else:
+            self.initialized = self.init_model(filename)
 
     def calc_bloodgas(self, component) -> object:
         # define a dictionary which is going to hold the bloodgas

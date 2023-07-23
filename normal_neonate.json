@@ -1,13 +1,7 @@
 {
-  "_id": {
-    "$oid": "63d8e58405364c78c5ec20dc"
-  },
   "name": "normal neonate",
   "description": "normal 3.3 kg neonate at an age of 24h with shunts",
   "weight": 3.3,
-  "user": "Timothy Antonius",
-  "protected": false,
-  "shared": true,
   "modeling_stepsize": 0.0005,
   "model_time_total": 0.0,
   "models": {
@@ -963,14 +957,5 @@
       "peep": 2.9,
       "tidal_volume": 0.015
     }
-  },
-  "dateCreated": {
-    "$date": "2023-01-31T09:55:16.146Z"
-  },
-  "dateUpdated": {
-    "$date": "2023-05-12T09:44:46.591Z"
-  },
-  "__v": 0,
-  "diagram": "explain",
-  "engine": "explain"
+  }
 }
