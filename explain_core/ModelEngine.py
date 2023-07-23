@@ -212,6 +212,7 @@ class ModelEngine:
         if len(self.status['error_log']) > 5:
             self.status['error_log'].pop(0)
 
+    # realtime model routines without data collection
     def start_rt(self, rt_interval=0.015):
         # set the realtime interval
         self._rt_interval = rt_interval
@@ -234,13 +235,19 @@ class ModelEngine:
             f"Model '{self.name}' is running in realtime with a {self._rt_interval} sec. resolution.")
 
     def stop_rt(self):
-        self.update_log(f"Model '{self.name}' is stopped.")
-        self._rt_clock.stop()
-        self._rt_clock = None
-        self._rt_running = False
+        try:
+            self.update_log(f"Model '{self.name}' is stopped.")
+            self._rt_clock.stop()
+            self._rt_clock = None
+            self._rt_running = False
+        except:
+            pass
 
     def calculate_rt(self):
-        # this routine will quickly calculate a model run but does not record any data
+        # this performance optimized routine will quickly calculate a model run
+        # but does not use the datacollector module record any data
+        # so only instantaneous data is available by explicit request
+        # for example models['AA'].pres  for the pressure in AA
 
         # Cache the attributes for faster access during the model loop
         collect_data = self._datacollector.collect_data
@@ -257,10 +264,8 @@ class ModelEngine:
             model_time_total += modeling_stepsize
 
     def calculate_perf(self, time_to_calculate: float = 1.0):
-        # this routine will quickly calculate a model run but the caller needs to take care of
-        # all data processing and cleanup of the datacollector as the data stays in the data collector
-        # and the data collector watchlist will not be reset
-        # this routine is especially suitable for realtime running model applications
+        # this performance optimized routine will quickly calculate a model run
+        # but does not clear the datacollector data and has no performance
 
         # Cache the attributes for faster access during the model loop
         collect_data = self._datacollector.collect_data
