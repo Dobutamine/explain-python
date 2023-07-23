@@ -5,6 +5,8 @@ import importlib
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.base_models.BaseModel import BaseModel
+from explain_core.functions.Acidbase import calc_acidbase_from_tco2
+from explain_core.functions.Oxygenation import calc_oxygenation_from_to2
 
 # import the perfomance counter module to measure the model performance
 from time import perf_counter
@@ -215,6 +217,8 @@ class ModelEngine:
             # Increase the model clock
             model_time_total += modeling_stepsize
 
+        return self._datacollector.collected_data
+
     def calculate(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
         # Calculate the number of steps of the model
         no_of_steps: int = int(time_to_calculate / self.modeling_stepsize)
@@ -370,6 +374,29 @@ class ModelEngine:
 
     def restart_model(self):
         self.initialized = self.init_model(self.model_definition_filename)
+
+    def calc_bloodgas(self, component) -> object:
+        # define a dictionary which is going to hold the bloodgas
+        bg = {}
+
+        # find the component type as we only can calculate the bloodgas in a blood or time-varying elastance component
+        component_type = self.models[component].model_type
+
+        # check whether the desired component is of an appropriate type and contains blood.
+        if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
+            # calculate the acidbase and oxygenation
+            result_ab = calc_acidbase_from_tco2(self.models[component])
+            result_oxy = calc_oxygenation_from_to2(self.models[component])
+
+            # build the bloodgas dictionnary
+            bg['ph'] = result_ab['ph']
+            bg['po2'] = result_oxy['po2']
+            bg['pco2'] = result_ab['pco2']
+            bg['hco3'] = result_ab['hco3']
+            bg['be'] = result_ab['be']
+            bg['so2'] = result_oxy['so2']
+
+        return bg
 
     def _find_model_prop(self, prop):
         # split the model from the prop

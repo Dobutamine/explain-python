@@ -111,7 +111,7 @@ def net_charge_plasma(hp_estimate):
     netcharge = hp_estimate + sid - hco3p - 2.0 * co3p - ohp - a_base - uma
 
     # calculate the base excess according to the van Slyke equation
-    be = (hco3p - 24.4 + (2.3 * hemoglobin + 7.7)
+    be = (hco3p - 25.1 + (2.3 * hemoglobin + 7.7)
           * (ph - 7.4)) * (1.0 - 0.023 * hemoglobin)
 
     # calculate the pco2 and store the plasma hco3
