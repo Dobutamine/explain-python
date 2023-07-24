@@ -329,7 +329,7 @@ class ModelEngine:
         if interval > 0.0005:
             self._datacollector.set_sample_interval(interval)
 
-    def add_task(self, properties: str, new_value: float, in_time: float = 1.0, at_time: float = 0.0):
+    def add_tasks(self, properties: list, new_value: float, in_time: float = 1.0, at_time: float = 0.0):
         # make sure the properties are of a list type
         if isinstance(properties, str):
             properties = [properties]
@@ -339,11 +339,26 @@ class ModelEngine:
             self.set_property(p, new_value=new_value,
                               in_time=in_time, at_time=at_time)
 
-    def stop_task(self, task_id):
-        pass
+    def get_all_tasks(self):
+        return self._task_scheduler.get_all_tasks()
 
-    def delete_task(self, task_id):
-        pass
+    def remove_all_tasks(self):
+        self._task_scheduler.remove_all_tasks()
+
+    def pause_all_tasks(self):
+        self._task_scheduler.pause_all_tasks()
+
+    def restart_all_tasks(self):
+        self._task_scheduler.restart_all_tasks()
+
+    def restart_task(self, task_id):
+        self._task_scheduler.restart_task(task_id)
+
+    def pause_task(self, task_id):
+        self._task_scheduler.pause_task(task_id)
+
+    def stop_task(self, task_id):
+        self._task_scheduler.remove_task(task_id)
 
     def set_property(self, property: str, new_value: float, in_time: float = 1.0, at_time: float = 0.0) -> str:
         # define some placeholders
@@ -419,11 +434,13 @@ class ModelEngine:
                         self.models[model_component], attribute)
         return content
 
-    def enable_model_component(self, model_component):
-        self.model[model_component].is_enabled = True
+    def enable_model_component(self, model_component, at_time=0):
+        self.set_property(model_component + ".is_enabled",
+                          True, at_time=at_time)
 
-    def disable_model_component(self, model_component):
-        self.model[model_component].is_enabled = False
+    def disable_model_component(self, model_component, at_time=0):
+        self.set_property(model_component + ".is_enabled",
+                          True, at_time=at_time)
 
     def save_model_state(self, filename):
         # use the binary mode 'wb' to save the model engine in this current state

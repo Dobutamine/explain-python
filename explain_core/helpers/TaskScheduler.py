@@ -3,12 +3,13 @@ import math
 
 class TaskScheduler:
     # local parameters
+    is_enabled = True
     _model = {}
     _t = 0.0005
     _is_initialized = False
 
     _tasks: dict = {}
-    _task_interval: float = 1.0
+    _task_interval: float = 0.015
     _task_interval_counter: float = 0.0
 
     def __init__(self, model):
@@ -70,6 +71,18 @@ class TaskScheduler:
 
         return False
 
+    def remove_all_tasks(self):
+        self._tasks = []
+
+    def get_all_tasks(self):
+        return self._tasks
+
+    def pause_all_tasks(self):
+        self.is_enabled = False
+
+    def restart_all_tasks(self):
+        self.is_enabled = True
+
     def run_tasks(self, model_time_total):
         if self._task_interval_counter > self._task_interval:
             finished_tasks = []
@@ -106,7 +119,8 @@ class TaskScheduler:
             for ft in finished_tasks:
                 del self._tasks[ft]
 
-        self._task_interval_counter += self._t
+        if self.is_enabled:
+            self._task_interval_counter += self._t
 
     def _set_value(self, task):
         if task['prop2'] is None:
