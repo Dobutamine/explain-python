@@ -117,8 +117,6 @@ class TaskScheduler:
                         self.configure_task(task)
                         # get the task running
                         task['running'] = True
-                        print("started task id:", id)
-
                 else:
                     # decrease the time at
                     task['at_time'] -= self._task_interval
@@ -136,7 +134,6 @@ class TaskScheduler:
                         self._set_value(task)
 
             for ft in finished_tasks:
-                print("deleted tasl: ", ft)
                 del self._tasks[ft]
 
         if self.is_enabled:
