@@ -329,7 +329,23 @@ class ModelEngine:
         if interval > 0.0005:
             self._datacollector.set_sample_interval(interval)
 
-    def set_property(self, property: str, new_value: float, in_time: float = 1.0, at_time: float = 0.0) -> bool:
+    def add_task(self, properties: str, new_value: float, in_time: float = 1.0, at_time: float = 0.0):
+        # make sure the properties are of a list type
+        if isinstance(properties, str):
+            properties = [properties]
+
+        # add the task to the task scheduler
+        for p in properties:
+            self.set_property(p, new_value=new_value,
+                              in_time=in_time, at_time=at_time)
+
+    def stop_task(self, task_id):
+        pass
+
+    def delete_task(self, task_id):
+        pass
+
+    def set_property(self, property: str, new_value: float, in_time: float = 1.0, at_time: float = 0.0) -> str:
         # define some placeholders
         task_id: int = random.randint(0, 1000)
         m: BaseModel = None
@@ -364,7 +380,8 @@ class ModelEngine:
         # pass the task to the scheduler
         self._task_scheduler.add_task(task)
 
-        return True
+        # return the task id
+        return task_id
 
     def get_property(self, property: str):
         # declare an object to hold the values
