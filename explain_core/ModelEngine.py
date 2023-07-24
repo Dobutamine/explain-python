@@ -228,7 +228,7 @@ class ModelEngine:
 
         # declare the realtime counter
         self._rt_clock = multitimer.RepeatingTimer(
-            rt_interval, self.calculate_rt)
+            rt_interval, self._calculate_rt)
 
         # start the realtime clock
         self._rt_clock.start()
@@ -245,7 +245,7 @@ class ModelEngine:
         except:
             pass
 
-    def calculate_rt(self):
+    def _calculate_rt(self):
         # this performance optimized routine will quickly calculate a model run
         # but does not use the datacollector module record any data
         # so only instantaneous data is available by explicit request
@@ -492,7 +492,7 @@ class ModelEngine:
         else:
             self.initialized = self.init_model(filename)
 
-    def calc_bloodgas(self, component) -> object:
+    def get_bloodgas(self, component) -> object:
         # define a dictionary which is going to hold the bloodgas
         bg = {}
 
