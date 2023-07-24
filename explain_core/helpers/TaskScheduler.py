@@ -26,9 +26,23 @@ class TaskScheduler:
         id = 'task_' + str(new_task['id'])
         del new_task['id']
         new_task['stepsize'] = 0.0
-        new_task['running'] = True
+        new_task['running'] = False
         new_task['completed'] = False
 
+        current_value = getattr(new_task['model'], new_task['prop1'])
+        if new_task['prop2'] is not None:
+            current_value = current_value.get(new_task['prop2'])
+        new_task['current_value'] = current_value
+
+        if isinstance(current_value, float) or isinstance(current_value, int):
+            new_task['type'] = 0
+
+        if isinstance(current_value, bool) or isinstance(current_value, str):
+            new_task['type'] = 1
+
+        self._tasks[id] = new_task
+
+    def configure_task(self, new_task):
         # get the current value
         current_value = getattr(new_task['model'], new_task['prop1'])
         if new_task['prop2'] is not None:
@@ -36,19 +50,18 @@ class TaskScheduler:
         new_task['current_value'] = current_value
 
         # get the type of the current value
-        if isinstance(current_value, float) or isinstance(current_value, int):
-            new_task['type'] = 0
+        if new_task['type'] < 1:
             # calculate the stepsize
             if new_task['in_time'] > 0:
                 new_task['stepsize'] = (
-                    new_task['new_value'] - current_value) / new_task['in_time']
-            self._tasks[id] = new_task
+                    new_task['new_value'] - current_value) / (new_task['in_time'] / self._task_interval)
+            else:
+                new_task['type'] = 1
+                new_task['stepsize'] = 0.0
 
-        if isinstance(current_value, bool) or isinstance(current_value, str):
-            new_task['type'] = 1
+        if new_task['type'] > 0:
             # calculate the stepsize
             new_task['stepsize'] = 0.0
-            self._tasks[id] = new_task
 
     def pause_task(self, task_id) -> bool:
         if task_id in self._tasks.keys():
@@ -91,32 +104,39 @@ class TaskScheduler:
             # run the tasks
             for id, task in self._tasks.items():
                 # check if the task should be executed
-                if task['running']:
-                    if task['at_time'] < self._task_interval:
-                        task['at_time'] = 0
-                        if task['type'] > 0:
-                            task['current_value'] = task['new_value']
-                            self._set_value(task)
-                            task['completed'] = True
-                            finished_tasks.append(id)
-                            task['running'] = False
+                if task['at_time'] < self._task_interval and not task['running']:
+                    task['at_time'] = 0
+                    # only do this for types which can not slowly change like booleans or strings
+                    if task['type'] > 0:
+                        task['current_value'] = task['new_value']
+                        self._set_value(task)
+                        task['completed'] = True
+                        finished_tasks.append(id)
                     else:
-                        task['at_time'] -= self._task_interval
+                        # calculate the stepsize and determine current value
+                        self.configure_task(task)
+                        # get the task running
+                        task['running'] = True
+                        print("started task id:", id)
 
-                    # check whether the new value is already at the target value
-                    if task['type'] < 1:
-                        if abs(task['current_value'] - task['new_value']) < abs(task['stepsize']):
-                            task['current_value'] = task['new_value']
-                            self._set_value(task)
-                            task['stepsize'] = 0
-                            task['completed'] = True
-                            finished_tasks.append(id)
-                            task['running'] = False
-                        else:
-                            task['current_value'] += task['stepsize']
-                            self._set_value(task)
+                else:
+                    # decrease the time at
+                    task['at_time'] -= self._task_interval
+
+                # check whether the new value is already at the target value
+                if task['type'] < 1 and task['running']:
+                    if abs(task['current_value'] - task['new_value']) < abs(task['stepsize']):
+                        task['current_value'] = task['new_value']
+                        self._set_value(task)
+                        task['stepsize'] = 0
+                        task['completed'] = True
+                        finished_tasks.append(id)
+                    else:
+                        task['current_value'] += task['stepsize']
+                        self._set_value(task)
 
             for ft in finished_tasks:
+                print("deleted tasl: ", ft)
                 del self._tasks[ft]
 
         if self.is_enabled:

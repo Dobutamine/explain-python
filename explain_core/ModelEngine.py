@@ -214,7 +214,6 @@ class ModelEngine:
         if len(self.status['error_log']) > 5:
             self.status['error_log'].pop(0)
 
-    # realtime model routines without data collection
     def start(self, rt_interval=0.015):
         # set the realtime interval
         self._rt_interval = rt_interval
@@ -313,6 +312,10 @@ class ModelEngine:
         # store a reference to the collected data in model_data and return it
         self.model_data = self._datacollector.collected_data
         return self.model_data
+
+    def clear_data(self):
+        self.model_data = []
+        self._datacollector.clear_data()
 
     def clear_watchlist(self):
         self._datacollector.clear_watchlist()
