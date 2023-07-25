@@ -72,11 +72,13 @@ class Ventilator(BaseModel):
             self._model.models['MOUTH_DS'].no_flow = True
             self._model.models['MOUTH_DS'].is_enabled = False
             self._ettube_ds.no_flow = False
+            self._model.update_log("Ventilator on.")
         else:
             self._model.models['Breathing'].breathing_enabled = True
             self._model.models['MOUTH_DS'].no_flow = False
             self._model.models['MOUTH_DS'].is_enabled = True
             self._ettube_ds.no_flow = True
+            self._model.update_log("Ventilator off.")
 
     def calc_model(self):
         # calculate the expiration time

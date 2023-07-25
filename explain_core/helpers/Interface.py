@@ -64,6 +64,10 @@ class Interface:
         self.xy = False
         self.x_prop = ""
 
+    def switch_ventilator(self, state=True):
+        self.model.call_function(
+            self.model.models['Ventilator'].switch_ventilator, state=state)
+
   # realtime plotters
     def build_rt_graph(self, y_min=0.0, y_max=100.0):
         # get the number of parameters to show in the graph

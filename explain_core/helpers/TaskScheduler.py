@@ -63,20 +63,6 @@ class TaskScheduler:
             # calculate the stepsize
             new_task['stepsize'] = 0.0
 
-    def pause_task(self, task_id) -> bool:
-        if task_id in self._tasks.keys():
-            self._tasks[task_id]['running'] = False
-            return True
-
-        return False
-
-    def restart_task(self, task_id) -> bool:
-        if task_id in self._tasks.keys():
-            self._tasks[task_id]['running'] = True
-            return True
-
-        return False
-
     def remove_task(self, task_id) -> bool:
         if task_id in self._tasks.keys():
             del self._tasks[task_id]
