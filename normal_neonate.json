@@ -882,6 +882,27 @@
         "BR": 0.453
       }
     },
+    "Mob": {
+      "name": "Mob",
+      "description": "Myocardial oxygen balance model",
+      "model_type": "Mob",
+      "is_enabled": false,
+      "dependencies": []
+    },
+    "Ecls": {
+      "name": "Ecls",
+      "description": "Extracorporeal life support model",
+      "model_type": "Ecls",
+      "is_enabled": false,
+      "dependencies": []
+    },
+    "Placenta": {
+      "name": "Placenta",
+      "description": "Placenta model",
+      "model_type": "Placenta",
+      "is_enabled": false,
+      "dependencies": []
+    },
     "DuctusArteriosus": {
       "name": "DA",
       "description": "ductus arteriosus model",
