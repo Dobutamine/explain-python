@@ -692,8 +692,8 @@
       "is_enabled": true,
       "fixed_composition": false,
       "vol": 0.05,
-      "u_vol": 0.0425,
-      "el_base": 400.0,
+      "u_vol": 0.04625,
+      "el_base": 800.0,
       "el_k": 0
     },
     "ALR": {
@@ -703,8 +703,8 @@
       "is_enabled": true,
       "fixed_composition": false,
       "vol": 0.05,
-      "u_vol": 0.0425,
-      "el_base": 400.0,
+      "u_vol": 0.04625,
+      "el_base": 800.0,
       "el_k": 0
     },
     "MOUTH_DS": {
@@ -853,7 +853,7 @@
       "dependencies": ["THORAX"],
       "breathing_enabled": true,
       "resp_rate": 40.0,
-      "target_minute_volume": 0.4,
+      "target_minute_volume": 0.6,
       "target_tidal_volume": 0.015,
       "vt_rr_ratio": 0.00035,
       "resp_muscle_pressure": 0.0,
@@ -868,7 +868,7 @@
       "model_type": "Metabolism",
       "is_enabled": true,
       "dependencies": [],
-      "vo2": 8.5,
+      "vo2": 8.0,
       "resp_q": 0.6,
       "body_temp": 37,
       "metabolic_active_models": {
