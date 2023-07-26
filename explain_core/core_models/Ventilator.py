@@ -29,6 +29,8 @@ class Ventilator(BaseModel):
     pip_max: float = 20.0
     peep: float = 2.9
     tidal_volume: float = 0.015
+    exp_tidal_volume: float = 0.0
+    insp_tidal_volume: float = 0.0
 
     # dependent parameters
     vent_flow: float = 0.0
@@ -57,6 +59,8 @@ class Ventilator(BaseModel):
     _exp_counter: float = 0.0
     _inspiration: bool = True
     _expiration: bool = False
+    _exp_volume_counter: float = 0.0
+    _insp_volume_counter: float = 0.0
     _peep_reached = False
 
     def init_model(self, model: object) -> bool:
@@ -90,6 +94,9 @@ class Ventilator(BaseModel):
             self._expiration = True
             self._exp_counter = 0
             self._insp_counter = 0
+            # report the inspiratory volume
+            self.insp_tidal_volume = self._insp_volume_counter
+            self._insp_volume_counter = 0.0
 
         if self._exp_counter > self.exp_time:
             self._expiration = False
@@ -97,6 +104,12 @@ class Ventilator(BaseModel):
             self._insp_counter = 0
             self._exp_counter = 0
             self.etco2 = self._ettube.co2
+            # report the inspiratory volume
+            self.exp_tidal_volume = self._exp_volume_counter
+            self._exp_volume_counter = 0.0
+            # if PRVC check volume
+            if self.vent_mode == "PRVC":
+                self.pressure_regulated_volume_control()
 
         # increase the timers
         if self._inspiration:
@@ -106,7 +119,8 @@ class Ventilator(BaseModel):
             self._exp_counter += self._t
 
         # select the ventilator mode
-        self.pressure_control()
+        if (self.vent_mode == "PC" or self.vent_mode == "PRVC"):
+            self.pressure_control()
 
         # calculate the models
         for mp in self._vent_parts:
@@ -117,11 +131,25 @@ class Ventilator(BaseModel):
         self.vent_vol += self._ettube_ds.flow * self._t
         self.co2 = self._ettube.pco2
 
+    def synchronize(self):
+        pass
+
+    def pressure_regulated_volume_control(self):
+        if self.exp_tidal_volume < self.tidal_volume - 0.001:
+            self.pip += 0.74
+            if (self.pip > self.pip_max):
+                self.pip = self.pip_max
+
+        if self.exp_tidal_volume > self.tidal_volume + 0.001:
+            self.pip -= 0.74
+            if (self.pip < self.peep + 1.5):
+                self.pip = self.peep + 1.5
+
     def pressure_control(self):
         if self._inspiration:
             # open the inspiration valve and calculate the inspiratory valve position depending on the desired flow
             self._insp_valve.no_flow = False
-            self._insp_valve.r_for = (400.0 / (self.insp_flow / 60.0)) - 100.0
+            self._insp_valve.r_for = (400.0 / (self.insp_flow / 60.0)) - 200.0
             self._insp_valve.no_back_flow = True
 
             # # guard the inspiration pressures as this is pressure control
@@ -131,7 +159,13 @@ class Ventilator(BaseModel):
             # close the expiration valve
             self._exp_valve.no_flow = True
 
+            # increase the inspiratory volume
+            self._insp_volume_counter += self._tubingin_ettube.flow * self._t
+
         if self._expiration:
+            # increase the expiratory volume
+            self._exp_volume_counter += self._ettube_tubingout.flow * self._t
+
             # close the inspiratory valve
             self._insp_valve.no_flow = True
 

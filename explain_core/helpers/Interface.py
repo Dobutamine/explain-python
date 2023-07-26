@@ -446,7 +446,7 @@ class Interface:
         self.analyze(properties, time_to_calculate, sampleinterval=0.0005)
 
     def get_bloodgas(self, component='AA'):
-        bg = self.model.calc_bloodgas(component)
+        bg = self.model.get_bloodgas(component)
         return bg
 
     def get_blood_pressures(self, time_to_calculate=10):

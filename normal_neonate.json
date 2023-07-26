@@ -869,7 +869,7 @@
       "is_enabled": true,
       "dependencies": [],
       "vo2": 8.5,
-      "resp_q": 0.8,
+      "resp_q": 0.6,
       "body_temp": 37,
       "metabolic_active_models": {
         "RLB": 0.15,
@@ -879,7 +879,8 @@
         "RUB": 0.1,
         "AA": 0.005,
         "AD": 0.01,
-        "BR": 0.453
+        "BR": 0.453,
+        "COR": 0.03
       }
     },
     "Mob": {
@@ -912,7 +913,7 @@
       "comp_from": "AAR",
       "comp_to": "PA",
       "length": 10.0,
-      "diameter": 2.0,
+      "diameter": 0.1,
       "non_lin_factor": 0.0,
       "no_flow": true,
       "no_back_flow": false
@@ -966,17 +967,17 @@
       "tubing_volume": 0.13,
       "ettube_diameter": 0.0035,
       "ettube_length": 0.11,
-      "vent_mode": "PC",
+      "vent_mode": "PRVC",
       "vent_rate": 40.0,
       "vent_sync": true,
       "vent_trigger": 0.001,
       "insp_time": 0.5,
       "insp_flow": 10.0,
       "exp_flow": 3.0,
-      "pip": 14.3,
+      "pip": 10.3,
       "pip_max": 20.0,
-      "peep": 2.9,
-      "tidal_volume": 0.015
+      "peep": 3.6,
+      "tidal_volume": 0.0165
     }
   }
 }
