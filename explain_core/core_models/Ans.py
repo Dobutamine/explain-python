@@ -42,7 +42,7 @@ class Ans(BaseModel):
 
     def calc_model(self) -> None:
         # get the baroreflex input
-        _baro_pres: float = self._baroreceptor.mean
+        _baro_pres: float = self._baroreceptor.pres
 
         # for the chemoreflex we need the acidbase and oxygenation of the location of the chemoreceptor
         # calculate the po2 and pco2 in the blood compartments
