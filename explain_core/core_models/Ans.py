@@ -20,6 +20,10 @@ class Ans(BaseModel):
     _a_pco2: float = 0.0
 
     _d_map_hp: float = 0.0
+    _d_po2_hp: float = 0.0
+    _d_pco2_hp: float = 0.0
+    _d_ph_hp: float = 0.0
+
     _d_po2_ve: float = 0.0
     _d_pco2_ve: float = 0.0
     _d_ph_ve: float = 0.0
@@ -64,19 +68,45 @@ class Ans(BaseModel):
         self._a_map = activation_function(
             _baro_pres, self.max_baro, self.set_baro, self.min_baro)
 
-        # # calculate the activation functions of the chemoreceptors
-        # self._a_po2 = activation_function(
-        #     _po2, self.max_po2, self.set_po2, self.min_po2)
+        # calculate the activation functions of the chemoreceptors
+        self._a_po2 = activation_function(
+            _po2, self.max_po2, self.set_po2, self.min_po2)
 
-        # self._a_pco2 = activation_function(
-        #     _pco2, self.max_pco2, self.set_pco2, self.min_pco2)
+        self._a_pco2 = activation_function(
+            _pco2, self.max_pco2, self.set_pco2, self.min_pco2)
 
-        # self._a_ph = activation_function(
-        #     _ph, self.max_ph, self.set_ph, self.min_ph)
+        self._a_ph = activation_function(
+            _ph, self.max_ph, self.set_ph, self.min_ph)
 
         # calculate the effectors and use the time constant
         self._d_map_hp = self._t * \
             ((1 / self.tc_map_hp) * (-self._d_map_hp + self._a_map)) + self._d_map_hp
 
+        self._d_po2_hp = self._t * \
+            ((1 / self.tc_po2_hp) * (-self._d_po2_hp + self._a_po2)) + self._d_po2_hp
+
+        self._d_pco2_hp = self._t * \
+            ((1 / self.tc_pco2_hp) * (-self._d_pco2_hp + self._a_pco2)) + self._d_pco2_hp
+
+        self._d_ph_hp = self._t * \
+            ((1 / self.tc_ph_hp) * (-self._d_ph_hp + self._a_ph)) + self._d_ph_hp
+
+        self._d_po2_ve = self._t * \
+            ((1 / self.tc_po2_ve) * (-self._d_po2_ve + self._a_po2)) + self._d_po2_ve
+
+        self._d_pco2_ve = self._t * \
+            ((1 / self.tc_pco2_ve) * (-self._d_pco2_ve + self._a_pco2)) + self._d_pco2_ve
+
+        self._d_ph_ve = self._t * \
+            ((1 / self.tc_ph_ve) * (-self._d_ph_ve + self._a_ph)) + self._d_ph_ve
+
         # apply the effects using the gain
-        self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hp
+        self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hp + self.g_po2_hp * \
+            self._d_po2_hp + self.g_pco2_hp * self._d_pco2_hp + self.g_ph_hp * self._d_ph_hp
+
+        target_mv = self.minute_volume_ref + self.g_po2_ve * self._d_po2_ve + \
+            self.g_pco2_ve * self._d_pco2_ve + self.g_ph_ve * self._d_ph_ve
+        if (target_mv < 0.01):
+            target_mv = 0.01
+
+        self._breathing.target_minute_volume = target_mv

@@ -683,9 +683,6 @@ class Interface:
         # calculate the model steps
         collected_data = self.model.calculate(time_to_calculate)
 
-        # print status message
-        print("Preparing data plot.")
-
         # plot the properties
         self.draw_time_graph(collected_data, properties, sharey, combined, ylabel, autoscale,
                              ylowerlim, yupperlim, fill, fill_between, zeroline)
