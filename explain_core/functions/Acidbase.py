@@ -36,8 +36,14 @@ def calc_acidbase_from_tco2(comp) -> object:
     # get the total co2 concentration in mmol/l
     tco2 = comp.aboxy['tco2']
 
+    # calculate the apparent SID
+    sid = comp.solutes['na'] + comp.solutes['k'] + 2 * comp.solutes['ca'] + \
+        2 * comp.solutes['mg'] - comp.solutes['cl'] - comp.solutes['lact']
+
+    # 𝑆𝐼𝐷𝑎𝑝𝑝=[𝑁𝑎+]+[𝐾+]+2[𝐶𝑎2+]+2[𝑀𝑔2+]−[𝐶𝑙−]−[𝐿𝑎−]
+
     # store the apparent SID
-    sid = comp.aboxy['sid']
+    # sid = comp.aboxy['sid']
 
     # get the albumin concentration in g/l
     albumin = comp.aboxy['albumin']

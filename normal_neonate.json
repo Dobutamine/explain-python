@@ -825,7 +825,14 @@
       "description": "blood model",
       "model_type": "Blood",
       "is_enabled": true,
-      "solutes": {},
+      "solutes": {
+        "na": 138.0,
+        "k": 3.5,
+        "ca": 1.0,
+        "cl": 108.0,
+        "lact": 1.0,
+        "mg": 0.75
+      },
       "aboxy": {
         "comps": [],
         "tco2": 27.18,
