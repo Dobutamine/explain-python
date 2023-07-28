@@ -41,6 +41,7 @@ class Ventilator(BaseModel):
     etco2: float = 0.0
     exp_time: float = 0.15
     compliance: float = 0.0
+    compliance_converted: float = 0.0
 
     # ventilator parts
     _vent_parts: list = []
@@ -110,6 +111,7 @@ class Ventilator(BaseModel):
             self.exp_tidal_volume = self._exp_volume_counter
             self._exp_volume_counter = 0.0
             self.compliance = self.exp_tidal_volume / (self.pip - self.peep)
+            self.compliance_converted = self.compliance * 1000 * 0.73555
             # if PRVC check volume
             if self.vent_mode == "PRVC":
                 self.pressure_regulated_volume_control()
@@ -157,7 +159,7 @@ class Ventilator(BaseModel):
             # open the inspiration valve and calculate the inspiratory valve position depending on the desired flow
             self._insp_valve.no_flow = False
             self._insp_valve.r_for = (
-                (self._ventin.pres - 760) / (self.insp_flow / 60.0))
+                (self._ventin.pres - 760) / (self.insp_flow / 60.0)) + 500
             self.ivr = self._insp_valve.r_for
             # self._insp_valve.r_for = self.ivr
             self._insp_valve.no_back_flow = True
