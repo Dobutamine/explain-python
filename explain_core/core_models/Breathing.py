@@ -79,6 +79,7 @@ class Breathing(BaseModel):
             self._exp_running = False
             self._temp_insp_volume = 0.0
             self.exp_tidal_volume = self._temp_exp_volume
+
             self.minute_volume = self.exp_tidal_volume * self.resp_rate
 
         # increase the timers
