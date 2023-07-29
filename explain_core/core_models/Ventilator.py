@@ -38,6 +38,10 @@ class Ventilator(BaseModel):
     hfo_amplitude = 15      # 29.422  # = 40 cmH2O
     hfo_time = 0.0          # = time in seconds
     hfo_pres = 0.0
+    hfo_tv_insp = 0.0
+    hfo_tv_exp = 0.0
+    hfo_tv = 0.0
+    hfo_dco2 = 0.0
 
     # dependent parameters
     vent_flow: float = 0.0
@@ -75,6 +79,8 @@ class Ventilator(BaseModel):
     _expiration: bool = False
     _exp_volume_counter: float = 0.0
     _insp_volume_counter: float = 0.0
+    _hfo_tv_counter_insp: float = 0.0
+    _hfo_tv_counter_exp: float = 0.0
     _peep_reached = False
 
     def init_model(self, model: object) -> bool:
@@ -100,9 +106,17 @@ class Ventilator(BaseModel):
 
     def calc_model(self):
         if self.vent_mode == "HFO":
+            # switch on the HFO module
+            self._hfo_module.is_enabled = True
+            self._hfo_valve.no_flow = False
+
             self.high_frequency_oscillation()
 
         if (self.vent_mode == "PC" or self.vent_mode == "PRVC"):
+            # switch off the HFO module
+            self._hfo_module.is_enabled = False
+            self._hfo_valve.no_flow = True
+
             self.pressure_control()
             # calculate the expiration time
             self.exp_time = (60.0 / self.vent_rate) - self.insp_time
@@ -151,7 +165,7 @@ class Ventilator(BaseModel):
         if (self._inspiration):
             self.vent_flow = self._tubingin_ettube.flow * 60.0
         if (self._expiration):
-            self.vent_flow = -self._ettube_tubingout.flow * 60.0
+            self.vent_flow = self._ettube_tubingout.flow * 60.0
 
         self.vent_vol += self._ettube_ds.flow * self._t
         self.co2 = self._model.models['DS'].pco2
@@ -161,6 +175,7 @@ class Ventilator(BaseModel):
 
     def high_frequency_oscillation(self):
         # APPLY THE BIAS FLOW WHICH iS ESSENTIAL
+
         # open the inspiration valve and calculate the inspiratory valve position depending on the desired flow
         self._insp_valve.no_flow = False
         self._insp_valve.r_for = (
@@ -173,7 +188,7 @@ class Ventilator(BaseModel):
         self._ventout.vol = (
             (self.hfo_map - 2.0) / self._ventout.el_base) + self._ventout.u_vol
 
-        # apply an oscillating pressure on the circuit where the pressure swings take volume from and of the oscillator
+        # apply an oscillating pressure on the hfo module where the pressure swings cause the displacement of volume to and from the hfo module
         self.hfo_pres = self.hfo_amplitude / 2 * \
             math.sin(2.0 * math.pi * self.hfo_freq * self.hfo_time)
         self._hfo_module.vol = (
@@ -183,7 +198,38 @@ class Ventilator(BaseModel):
         self._hfo_valve.r_for = 15
         self._hfo_valve.r_back = 15
 
+        # backflow is essential here
+        self._hfo_valve.r_back = 15
+        # increase the hfo cycle time
         self.hfo_time += self._t
+        # one sinusoid is f * 2 * pi
+        duration: float = 1.0 / self.hfo_freq
+        if (self.hfo_time >= duration):
+            self.hfo_time = 0.0
+
+        # calculate the insp and exp phase
+        if self.hfo_time < duration / 2.0:
+            if not self._inspiration:
+                self.hfo_tv_insp = self._hfo_tv_counter_insp
+                self._hfo_tv_counter_insp = 0.0
+
+            self._inspiration = True
+            self._expiration = False
+            self._hfo_tv_counter_insp += self._tubingin_ettube.flow * self._t
+
+        if self.hfo_time >= duration / 2.0:
+            if not self._expiration:
+                self.hfo_tv_exp = self._hfo_tv_counter_exp
+                self._hfo_tv_counter_exp = 0.0
+
+            self._expiration = True
+            self._inspiration = False
+            self._hfo_tv_counter_exp += self._ettube_tubingout.flow * self._t
+
+        self.hfo_tv = (self.hfo_tv_insp - self.hfo_tv_exp) / 2
+        self.hfo_dco2 = math.pow(self.hfo_tv * 1000, 2) * self.hfo_freq
+
+        # DCO2 = HFO_TIDAL_VOL * HFO_TIDAL_VOL * SETTING_Frequency
 
     def pressure_regulated_volume_control(self):
         if self.exp_tidal_volume < self.tidal_volume - 0.001:
