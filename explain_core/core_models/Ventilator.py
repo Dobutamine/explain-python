@@ -32,16 +32,6 @@ class Ventilator(BaseModel):
     exp_tidal_volume: float = 0.0
     insp_tidal_volume: float = 0.0
     ivr: float = 2200
-    hfo_map = 8.8           # = 12 cmH2O
-    hfo_bias_flow = 3.0          # = l/min
-    hfo_freq = 12.0         # = frequency in Hz
-    hfo_amplitude = 15      # 29.422  # = 40 cmH2O
-    hfo_time = 0.0          # = time in seconds
-    hfo_pres = 0.0
-    hfo_tv_insp = 0.0
-    hfo_tv_exp = 0.0
-    hfo_tv = 0.0
-    hfo_dco2 = 0.0
 
     # dependent parameters
     vent_flow: float = 0.0
@@ -51,25 +41,20 @@ class Ventilator(BaseModel):
     etco2: float = 0.0
     exp_time: float = 0.15
     compliance: float = 0.0
-    resistance: float = 0.0
     compliance_converted: float = 0.0
-    resistance_converted: float = 0.0
 
     # ventilator parts
     _vent_parts: list = []
     _ventin: GasCapacitance = {}
-    _hfo_module: GasCapacitance = {}
     _tubingin: GasCapacitance = {}
     _ettube: GasCapacitance = {}
     _tubingout: GasCapacitance = {}
     _ventout: GasCapacitance = {}
-    _hfo_valve: GasResistor = {}
     _insp_valve: GasResistor = {}
     _tubingin_ettube: GasResistor = {}
     _ettube_ds: GasResistor = {}
     _ettube_tubingout: GasResistor = {}
     _exp_valve: GasResistor = {}
-    _hfo_valve: GasResistor = {}
 
     # local parameters
     _gas_constant: float = 62.36367
@@ -79,8 +64,6 @@ class Ventilator(BaseModel):
     _expiration: bool = False
     _exp_volume_counter: float = 0.0
     _insp_volume_counter: float = 0.0
-    _hfo_tv_counter_insp: float = 0.0
-    _hfo_tv_counter_exp: float = 0.0
     _peep_reached = False
 
     def init_model(self, model: object) -> bool:
@@ -105,57 +88,9 @@ class Ventilator(BaseModel):
             self._model.update_log("Ventilator off.")
 
     def calc_model(self):
-        if self.vent_mode == "HFO":
-            # switch on the HFO module
-            self._hfo_module.is_enabled = True
-            self._hfo_valve.no_flow = False
-
-            self.high_frequency_oscillation()
-
+        # select the ventilator mode
         if (self.vent_mode == "PC" or self.vent_mode == "PRVC"):
-            # switch off the HFO module
-            self._hfo_module.is_enabled = False
-            self._hfo_valve.no_flow = True
-
-            self.pressure_control()
-            # calculate the expiration time
-            self.exp_time = (60.0 / self.vent_rate) - self.insp_time
-
-            # do the time cycling
-            if self._insp_counter > self.insp_time:
-                self._inspiration = False
-                self._expiration = True
-                self._exp_counter = 0
-                self._insp_counter = 0
-                # report the inspiratory volume
-                self.insp_tidal_volume = self._insp_volume_counter
-                self._insp_volume_counter = 0.0
-
-            if self._exp_counter > self.exp_time:
-                self._expiration = False
-                self._inspiration = True
-                self._insp_counter = 0
-                self._exp_counter = 0
-                self.etco2 = self._ettube.co2
-                # report the inspiratory volume
-                self.exp_tidal_volume = self._exp_volume_counter
-                self._exp_volume_counter = 0.0
-                self.compliance = self.exp_tidal_volume / \
-                    (self.pip - self.peep)
-                self.compliance_converted = self.compliance * 1000 * 0.73555
-                self.resistance = (self.pip - self.peep) / \
-                    self.exp_tidal_volume / self.exp_time
-                self.resistance_converted = self.resistance * 0.73555
-                # if PRVC check volume
-                if self.vent_mode == "PRVC":
-                    self.pressure_regulated_volume_control()
-
-            # increase the timers
-            if self._inspiration:
-                self._insp_counter += self._t
-
-            if self._expiration:
-                self._exp_counter += self._t
+            self.conventional_ventilation()
 
         # calculate the models
         for mp in self._vent_parts:
@@ -165,7 +100,7 @@ class Ventilator(BaseModel):
         if (self._inspiration):
             self.vent_flow = self._tubingin_ettube.flow * 60.0
         if (self._expiration):
-            self.vent_flow = self._ettube_tubingout.flow * 60.0
+            self.vent_flow = -self._ettube_tubingout.flow * 60.0
 
         self.vent_vol += self._ettube_ds.flow * self._t
         self.co2 = self._model.models['DS'].pco2
@@ -173,63 +108,43 @@ class Ventilator(BaseModel):
     def synchronize(self):
         pass
 
-    def high_frequency_oscillation(self):
-        # APPLY THE BIAS FLOW WHICH iS ESSENTIAL
-
-        # open the inspiration valve and calculate the inspiratory valve position depending on the desired flow
-        self._insp_valve.no_flow = False
-        self._insp_valve.r_for = (
-            (self._ventin.pres - (self.hfo_map - 2.0 + 760)) / (self.hfo_bias_flow / 60.0)) - 65.0
-
-        # open expiration valve
-        self._exp_valve.no_flow = False
-        self._exp_valve.r_for = 15.0
-        # set the mean airway pressure minus the pressure drop over the circuit
-        self._ventout.vol = (
-            (self.hfo_map - 2.0) / self._ventout.el_base) + self._ventout.u_vol
-
-        # apply an oscillating pressure on the hfo module where the pressure swings cause the displacement of volume to and from the hfo module
-        self.hfo_pres = self.hfo_amplitude / 2 * \
-            math.sin(2.0 * math.pi * self.hfo_freq * self.hfo_time)
-        self._hfo_module.vol = (
-            (self.hfo_map + self.hfo_pres) / self._hfo_module.el_base) + self._hfo_module.u_vol
-        self._hfo_valve.no_flow = False
-        self._hfo_valve.no_back_flow = False
-        self._hfo_valve.r_for = 15
-        self._hfo_valve.r_back = 15
-
-        # backflow is essential here
-        self._hfo_valve.r_back = 15
-        # increase the hfo cycle time
-        self.hfo_time += self._t
-        # one sinusoid is f * 2 * pi
-        duration: float = 1.0 / self.hfo_freq
-        if (self.hfo_time >= duration):
-            self.hfo_time = 0.0
-
-        # calculate the insp and exp phase
-        if self.hfo_time < duration / 2.0:
-            if not self._inspiration:
-                self.hfo_tv_insp = self._hfo_tv_counter_insp
-                self._hfo_tv_counter_insp = 0.0
-
-            self._inspiration = True
-            self._expiration = False
-            self._hfo_tv_counter_insp += self._tubingin_ettube.flow * self._t
-
-        if self.hfo_time >= duration / 2.0:
-            if not self._expiration:
-                self.hfo_tv_exp = self._hfo_tv_counter_exp
-                self._hfo_tv_counter_exp = 0.0
-
-            self._expiration = True
+    def conventional_ventilation(self):
+        # calculate the expiration time
+        self.exp_time = (60.0 / self.vent_rate) - self.insp_time
+        # do the time cycling
+        if self._insp_counter > self.insp_time:
             self._inspiration = False
-            self._hfo_tv_counter_exp += self._ettube_tubingout.flow * self._t
+            self._expiration = True
+            self._exp_counter = 0
+            self._insp_counter = 0
+            # report the inspiratory volume
+            self.insp_tidal_volume = self._insp_volume_counter
+            self._insp_volume_counter = 0.0
 
-        self.hfo_tv = (self.hfo_tv_insp - self.hfo_tv_exp) / 2
-        self.hfo_dco2 = math.pow(self.hfo_tv * 1000, 2) * self.hfo_freq
+        if self._exp_counter > self.exp_time:
+            self._expiration = False
+            self._inspiration = True
+            self._insp_counter = 0
+            self._exp_counter = 0
+            self.etco2 = self._ettube.co2
+            # report the inspiratory volume
+            self.exp_tidal_volume = self._exp_volume_counter
+            self._exp_volume_counter = 0.0
+            self.compliance = self.exp_tidal_volume / \
+                (self.pip - self.peep)
+            self.compliance_converted = self.compliance * 1000 * 0.73555
+            # if PRVC check volume
+            if self.vent_mode == "PRVC":
+                self.pressure_regulated_volume_control()
 
-        # DCO2 = HFO_TIDAL_VOL * HFO_TIDAL_VOL * SETTING_Frequency
+        # increase the timers
+        if self._inspiration:
+            self._insp_counter += self._t
+
+        if self._expiration:
+            self._exp_counter += self._t
+
+        self.pressure_control()
 
     def pressure_regulated_volume_control(self):
         if self.exp_tidal_volume < self.tidal_volume - 0.001:
@@ -306,26 +221,6 @@ class Ventilator(BaseModel):
         self.set_air_composition(
             self._ventin, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._ventin)
-
-        # build the mechanical ventilator using the gas capacitance model
-        self._hfo_module = GasCapacitance(**{
-            "name": "HFOMOD",
-            "description": "hfo oscillator module",
-            "model_type": "GasCapacitance",
-            "is_enabled": True,
-            "dependencies": [],
-            "fixed_composition": False,
-            "vol": 5.0,
-            "u_vol": 5.0,
-            "el_base": 1000.0,
-            "el_k": 0,
-            "pres_atm": self.p_atm
-        })
-        self._hfo_module.init_model(model)
-        self._hfo_module.calc_model()
-        self.set_air_composition(
-            self._hfo_module, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
-        self._vent_parts.append(self._hfo_module)
 
         self._tubingin = GasCapacitance(**{
             "name": "TUBINGIN",
@@ -484,23 +379,6 @@ class Ventilator(BaseModel):
         })
         self._exp_valve.init_model(model)
         self._vent_parts.append(self._exp_valve)
-
-        self._hfo_valve = GasResistor(**{
-            "name": "HFOVALVE",
-            "description": "HFO valve of the mechanical ventilator",
-            "model_type": "GasResistor",
-            "is_enabled": True,
-            "dependencies": [],
-            "no_flow": False,
-            "no_back_flow": False,
-            "comp_from": self._hfo_module,
-            "comp_to": self._tubingin,
-            "r_for": 300000,
-            "r_back": 300000,
-            "r_k": 0,
-        })
-        self._hfo_valve.init_model(model)
-        self._vent_parts.append(self._hfo_valve)
 
     def set_air_composition(self, comp, fo2_dry, fco2_dry, fn2_dry, fother_dry, temp, humidity):
         comp.temp = temp

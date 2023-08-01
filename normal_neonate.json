@@ -994,7 +994,7 @@
       "tubing_volume": 0.13,
       "ettube_diameter": 0.0035,
       "ettube_length": 0.11,
-      "vent_mode": "HFO",
+      "vent_mode": "PRVC",
       "vent_rate": 40.0,
       "vent_sync": true,
       "vent_trigger": 0.001,

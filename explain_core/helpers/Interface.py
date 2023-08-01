@@ -407,7 +407,7 @@ class Interface:
                              time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey, sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     def plot_hfo_curves(self, time=5, combined=False, sharey=False, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=True):
-        self.plot_time_graph(["Ventilator.vent_pres", "Ventilator.vent_flow", "Ventilator.vent_vol", "Ventilator.hfo_pres"],
+        self.plot_time_graph(["Ventilator.vent_pres", "Ventilator.vent_flow", "Ventilator.hfo_pres"],
                              time_to_calculate=time, autoscale=True, combined=combined, sharey=sharey, sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     # getters
