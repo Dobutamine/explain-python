@@ -32,6 +32,9 @@ class Ventilator(BaseModel):
     exp_tidal_volume: float = 0.0
     insp_tidal_volume: float = 0.0
     ivr: float = 2200
+    hfo_map: float = 10.0
+    hfo_freq: float = 10.0
+    hfo_amplitude: float = 10.0
 
     # dependent parameters
     vent_flow: float = 0.0
@@ -87,25 +90,57 @@ class Ventilator(BaseModel):
             self._ettube_ds.no_flow = True
             self._model.update_log("Ventilator off.")
 
+    def set_ventilator_pc(self, pip=14.0, peep=4.0, rate=40.0, t_in=0.4, insp_flow=10.0):
+        self.switch_ventilator(True)
+        self.vent_mode = "PC"
+        self.pip_max = pip * 0.735559
+        self.pip = pip * 0.735559
+        self.peep = peep * 0.735559
+        self.vent_rate = rate
+        self.insp_time = t_in
+        self.insp_flow = insp_flow
+
+    def set_ventilator_prvc(self, pip_max=18.0, peep=4.0, rate=40.0, tv=15.0, t_in=0.4, insp_flow=10.0):
+        self.switch_ventilator(True)
+        self.vent_mode = "PRVC"
+        self.pip_max = pip_max * 0.735559
+        self.pip = pip_max * 0.735559
+        self.peep = peep * 0.735559
+        self.vent_rate = rate
+        self.tidal_volume = tv / 1000.0
+        self.insp_time = t_in
+        self.insp_flow = insp_flow
+
+    def set_ventilator_hfo(self, map=10.0, freq=10.0, amplitude=10.0, base_flow=7.0):
+        self.switch_ventilator(True)
+        self.vent_mode = "HFO"
+        self.hfo_map = map * 0.735559
+        self.hfo_freq = freq
+        self.hfo_amplitude = amplitude
+        self.hfo_base_flow = base_flow
+
     def calc_model(self):
         # select the ventilator mode
         if (self.vent_mode == "PC" or self.vent_mode == "PRVC"):
             self.conventional_ventilation()
 
+        if (self.vent_mode == "HFOV"):
+            self.high_frequency_oscillation()
+
         # calculate the models
         for mp in self._vent_parts:
             mp.calc_model()
 
-        self.vent_pres = self._ettube.pres
+        self.vent_pres = (self._ettube.pres - 760) * 1.35951
         if (self._inspiration):
             self.vent_flow = self._tubingin_ettube.flow * 60.0
         if (self._expiration):
             self.vent_flow = -self._ettube_tubingout.flow * 60.0
 
-        self.vent_vol += self._ettube_ds.flow * self._t
+        self.vent_vol += self._ettube_ds.flow * self._t * 1000.0
         self.co2 = self._model.models['DS'].pco2
 
-    def synchronize(self):
+    def high_frequency_oscillation(self):
         pass
 
     def conventional_ventilation(self):
