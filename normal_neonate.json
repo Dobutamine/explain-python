@@ -620,7 +620,7 @@
       "contained_components": ["ALR"],
       "vol": 0.05,
       "u_vol": 0.0425,
-      "el_base": 200.0,
+      "el_base": 400.0,
       "el_k": 0
     },
     "THORAX": {

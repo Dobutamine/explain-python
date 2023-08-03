@@ -7,8 +7,8 @@ import pandas as pd
 
 from pathlib import Path
 
-import warnings
-warnings.filterwarnings("ignore")
+# import warnings
+# warnings.filterwarnings("ignore")
 
 
 class Interface:
@@ -64,9 +64,17 @@ class Interface:
         self.xy = False
         self.x_prop = ""
 
-    def switch_ventilator(self, state=True):
-        self.model.call_function(
-            self.model.models['Ventilator'].switch_ventilator, state=state)
+    def switch_ventilator_pc(self, pip=14.0, peep=4.0, rate=40.0, t_in=0.4, insp_flow=10.0):
+        self.model.call_function(self.model.models['Ventilator'].set_ventilator_pc,
+                                 pip=pip, peep=peep, rate=rate, t_in=t_in, insp_flow=insp_flow)
+
+    def switch_ventilator_prvc(self, pip_max=18.0, peep=4.0, rate=40.0, tv=15.0, t_in=0.4, insp_flow=10.0):
+        self.model.call_function(self.model.models['Ventilator'].set_ventilator_prvc,
+                                 pip_max=pip_max, peep=peep, rate=rate, tv=tv, t_in=t_in, insp_flow=insp_flow)
+
+    def switch_ventilator_hfo(self, _map=10.0, freq=10.0, amplitude=10.0, base_flow=7.0):
+        self.model.call_function(self.model.models['Ventilator'].set_ventilator_hfo,
+                                 _map=_map, freq=freq, amplitude=amplitude, base_flow=base_flow)
 
   # realtime plotters
     def build_rt_graph(self, y_min=0.0, y_max=100.0):
@@ -618,7 +626,7 @@ class Interface:
                 min = round(np.amin(data) * 1000, 5)
 
                 print(
-                    "{:<16}: max {:10}, min {:10} ml/kg". format(parameter, max, min))
+                    "{:<16}: max {:10}, min {:10} ml". format(parameter, max, min))
                 continue
 
             if prop_category[1] == "ncc_ventricular":
@@ -656,7 +664,7 @@ class Interface:
                         f"Stroke volume calculation might be inaccurate. Try using a sampleinterval of {self.model.modeling_stepsize}")
                     bpm = self.model.models['Heart'].heart_rate
                 sv = round(flow / bpm, 5)
-                print("{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min, stroke volume: {:10} ml/kg, ". format(
+                print("{:16}: net {:10}, forward {:10}, backward {:10} ml/min, stroke volume: {:10} ml, ". format(
                     parameter, flow, flow_forward, flow_backward, sv))
 
                 continue
