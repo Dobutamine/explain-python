@@ -2,7 +2,7 @@ import math
 from explain_core.functions.BrentRootFinding import brent_root_finding
 
 # set the brent root finding properties
-brent_accuracy = 1e-8
+brent_accuracy = 1e-6
 max_iterations = 100.0
 
 

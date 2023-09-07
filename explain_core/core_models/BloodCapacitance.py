@@ -14,37 +14,10 @@ class BloodCapacitance(Capacitance):
     acidbase: dict[str, float] = {}
     oxy: dict[str, float] = {}
 
-    # local variables
-    _temp_max_pres: float = -1000.0
-    _temp_min_pres: float = 1000.0
-    _temp_max_vol: float = -1000.0
-    _temp_min_vol: float = 1000.0
-
     # override the calc_model method as the blood capacitance has some specific actions
     def calc_model(self) -> None:
         # do the cap actions
         super().calc_model()
-
-        # determine systole and diastole
-        self._temp_max_pres = max(self.pres, self._temp_max_pres)
-        self._temp_min_pres = min(self.pres, self._temp_min_pres)
-
-        self._temp_max_vol = max(self.vol, self._temp_max_vol)
-        self._temp_min_vol = min(self.vol, self._temp_min_vol)
-
-        # store diastole and systole
-        if self._model.models['Heart'].ncc_ventricular == 0:
-            self.systole = self._temp_max_pres
-            self.diastole = self._temp_min_pres
-            self.mean = self.diastole + 1/3 * (self.systole - self.diastole)
-            self._temp_min_pres = 1000.0
-            self._temp_max_pres = -1000.0
-
-            self.vol_max = self._temp_max_vol
-            self.vol_min = self._temp_min_vol
-            self.stroke_volume = self.vol_max - self.vol_min
-            self._temp_max_vol = -1000
-            self._temp_min_vol = 1000
 
     # override the volume_in method as all the blood solutes have to be changed to
     def volume_in(self, dvol: float, model_from: Capacitance) -> None:
