@@ -834,7 +834,6 @@
         "mg": 0.75
       },
       "aboxy": {
-        "comps": [],
         "tco2": 27.18,
         "to2": 7.0,
         "ph": 7.4,
@@ -924,13 +923,6 @@
       "is_enabled": false,
       "dependencies": []
     },
-    "Placenta": {
-      "name": "Placenta",
-      "description": "Placenta model",
-      "model_type": "Placenta",
-      "is_enabled": false,
-      "dependencies": []
-    },
     "DuctusArteriosus": {
       "name": "DA",
       "description": "ductus arteriosus model",
@@ -1004,7 +996,10 @@
       "pip": 10.3,
       "pip_max": 20.0,
       "peep": 3.65,
-      "tidal_volume": 0.0165
+      "tidal_volume": 0.0165,
+      "hfo_map": 10.0,
+      "hfo_freq": 25.0,
+      "hfo_amplitude":  25.0
     }
   }
 }

@@ -4,6 +4,7 @@ def brent_root_finding(f, x0, x1, max_iter, tolerance) -> float:
 
     if (fx0 * fx1) > 0:
         return -1
+    
     if abs(fx0) < abs(fx1):
         x0, x1 = x1, x0
         fx0, fx1 = fx1, fx0

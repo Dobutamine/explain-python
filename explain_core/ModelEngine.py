@@ -9,8 +9,8 @@ import random
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.base_models.BaseModel import BaseModel
-from explain_core.functions.Acidbase import calc_acidbase_from_tco2
-from explain_core.functions.Oxygenation import calc_oxygenation_from_to2
+from explain_core.functions.BloodComposition import set_blood_composition
+
 
 # import the perfomance counter module to measure the model performance
 from time import perf_counter
@@ -503,16 +503,15 @@ class ModelEngine:
         # check whether the desired component is of an appropriate type and contains blood.
         if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
             # calculate the acidbase and oxygenation
-            result_ab = calc_acidbase_from_tco2(self.models[component])
-            result_oxy = calc_oxygenation_from_to2(self.models[component])
+            set_blood_composition(self.models[component])
 
             # build the bloodgas dictionnary
-            bg['ph'] = result_ab['ph']
-            bg['po2'] = result_oxy['po2']
-            bg['pco2'] = result_ab['pco2']
-            bg['hco3'] = result_ab['hco3']
-            bg['be'] = result_ab['be']
-            bg['so2'] = result_oxy['so2']
+            bg['ph'] = self.models[component].aboxy['ph']
+            bg['po2'] = self.models[component].aboxy['po2']
+            bg['pco2'] = self.models[component].aboxy['pco2']
+            bg['hco3'] = self.models[component].aboxy['hco3']
+            bg['be'] = self.models[component].aboxy['be']
+            bg['so2'] = self.models[component].aboxy['so2']
 
         return bg
 

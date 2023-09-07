@@ -1,4 +1,4 @@
-from explain_core.base_models.TimeVaryingElastance import TimeVaryingElastance
+from explain_core.core_models.TimeVaryingElastance import TimeVaryingElastance
 from explain_core.base_models.Capacitance import Capacitance
 
 

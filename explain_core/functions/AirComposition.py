@@ -7,6 +7,28 @@ fco2_dry = 0.000392
 fn2_dry = 0.794608
 fother_dry = 0.0
 
+def set_air_composition(gc: GasCapacitance, fio2: float, temp: float, humidity: float):
+    result = calc_air_composition(gc, fio2, temp, humidity)
+
+    # process the result
+    gc.po2 = result["po2"]
+    gc.pco2 = result["pco2"]
+    gc.pn2 = result["pn2"]
+    gc.ph2o = result["ph2o"]
+    gc.pother = result["pother"]
+
+    gc.fo2 = result["fo2"]
+    gc.fco2 = result["fco2"]
+    gc.fn2 = result["fn2"]
+    gc.fh2o = result["fh2o"]
+    gc.fother = result["fother"]
+
+    gc.co2 = result["co2"]
+    gc.cco2 = result["cco2"]
+    gc.cn2 = result["cn2"]
+    gc.ch2o = result["ch2o"]
+    gc.cother = result["cother"]
+
 
 def calc_air_composition(gascomp, fio2=0.205, temp=None, humidity=None) -> object:
     # check that the gascomp is a gas capacitance

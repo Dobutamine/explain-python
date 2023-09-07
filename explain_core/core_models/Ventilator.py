@@ -310,8 +310,7 @@ class Ventilator(BaseModel):
         if self._inspiration:
             # open the inspiration valve and calculate the inspiratory valve position depending on the desired flow
             self._insp_valve.no_flow = False
-            self._insp_valve.r_for = (
-                (self._ventin.pres - 760) / (self.insp_flow / 60.0)) + 500
+            self._insp_valve.r_for = ((self._ventin.pres - 760) / (self.insp_flow / 60.0)) + 500
             self.ivr = self._insp_valve.r_for
             # self._insp_valve.r_for = self.ivr
             self._insp_valve.no_back_flow = True

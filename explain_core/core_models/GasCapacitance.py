@@ -156,8 +156,7 @@ class GasCapacitance(Capacitance):
         # as the water vapour also takes volume this is added to the compliance
         if self.pres != 0 and not self.fixed_composition:
             # as dH2O is in mmol/l we have convert it as the gas constant is in mol
-            self.vol += ((self._gas_constant * (273.15 + self.temp)
-                          ) / self.pres) * (dH2O / 1000.0)
+            self.vol += ((self._gas_constant * (273.15 + self.temp)) / self.pres) * (dH2O / 1000.0)
 
     def add_heat(self) -> None:
         # calculate a temperature change depending on the target temperature and the current temperature
@@ -167,8 +166,7 @@ class GasCapacitance(Capacitance):
         # change the volume as the temperature changes
         if self.pres != 0 and not self.fixed_composition:
             # as Ctotal is in mmol/l we have convert it as the gas constant is in mol
-            dV: float = (self.ctotal * self.vol *
-                         self._gas_constant * dT) / self.pres
+            dV: float = (self.ctotal * self.vol * self._gas_constant * dT) / self.pres
             self.vol += dV / 1000.0
 
         # guard against negative volumes

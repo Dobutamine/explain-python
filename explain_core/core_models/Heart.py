@@ -1,6 +1,6 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
-from explain_core.base_models.TimeVaryingElastance import TimeVaryingElastance
+from explain_core.core_models.TimeVaryingElastance import TimeVaryingElastance
 
 
 class Heart(BaseModel):

@@ -52,10 +52,10 @@ class Resistor(BaseModel):
             self.flow = 0.0
         elif _p1 > _p2:  # forward flow
             self.flow = (_p1 - _p2) / (self.r_for * self.r_for_factor) - \
-                self.r_k * self.r_k_factor * self.no_flow**2
+                self.r_k * self.r_k_factor * self.flow**2
         else:  # back flow
             self.flow = (_p1 - _p2) / (self.r_back * self.r_back_factor) + \
-                self.r_k * self.r_k_factor * self.no_flow**2
+                self.r_k * self.r_k_factor * self.flow**2
 
         # update the volume
         self.update_volumes()

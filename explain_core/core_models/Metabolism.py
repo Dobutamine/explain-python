@@ -9,8 +9,7 @@ class Metabolism(BaseModel):
         super().calc_model()
 
         # translate the VO2 in ml/kg/min to VO2 in mmol for this stepsize (assumption is 37 degrees and atmospheric pressure)
-        vo2_step: float = (
-            (0.039 * self.vo2 * self.vo2_factor * self._model.weight) / 60.0) * self._t
+        vo2_step: float = ((0.039 * self.vo2 * self.vo2_factor * self._model.weight) / 60.0) * self._t
 
         for model, fvo2 in self.metabolic_active_models.items():
             # get the vol, tco2 and to2 from the blood compartment
@@ -22,8 +21,7 @@ class Metabolism(BaseModel):
             dto2: float = vo2_step * fvo2
 
             # calculate the new oxygen concentration in blood
-            new_to2: float = (
-                to2 * vol - dto2) / vol
+            new_to2: float = (to2 * vol - dto2) / vol
             # guard against negative values
             if new_to2 < 0:
                 new_to2 = 0
@@ -32,8 +30,7 @@ class Metabolism(BaseModel):
             dtco2 = vo2_step * fvo2 * self.resp_q
 
             # calculate the new co2 concentration in blood
-            new_tco2: float = (
-                tco2 * vol + dtco2) / vol
+            new_tco2: float = (tco2 * vol + dtco2) / vol
             # guard against negative values
             if new_tco2 < 0:
                 new_tco2 = 0

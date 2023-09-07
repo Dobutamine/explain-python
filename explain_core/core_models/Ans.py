@@ -4,8 +4,7 @@ from explain_core.core_models.BloodCapacitance import BloodCapacitance
 from explain_core.core_models.Heart import Heart
 from explain_core.core_models.Breathing import Breathing
 from explain_core.functions.ActivationFunction import activation_function
-from explain_core.functions.Acidbase import calc_acidbase_from_tco2
-from explain_core.functions.Oxygenation import calc_oxygenation_from_to2
+from explain_core.functions.BloodComposition import set_blood_composition
 
 
 class Ans(BaseModel):
@@ -46,18 +45,7 @@ class Ans(BaseModel):
 
         # for the chemoreflex we need the acidbase and oxygenation of the location of the chemoreceptor
         # calculate the po2 and pco2 in the blood compartments
-        result = calc_acidbase_from_tco2(self._chemoreceptor)
-        if result is not None:
-            self._chemoreceptor.aboxy['ph'] = result['ph']
-            self._chemoreceptor.aboxy['pco2'] = result['pco2']
-            self._chemoreceptor.aboxy['hco3'] = result['hco3']
-            self._chemoreceptor.aboxy['be'] = result['be']
-            self._chemoreceptor.aboxy['sid_app'] = result['sid_app']
-
-        result_oxy = calc_oxygenation_from_to2(self._chemoreceptor)
-        if result_oxy is not None:
-            self._chemoreceptor.aboxy['po2'] = result_oxy['po2']
-            self._chemoreceptor.aboxy['so2'] = result_oxy['so2']
+        set_blood_composition(self._chemoreceptor)
 
         # get the chemoreflex inputs
         _po2 = self._chemoreceptor.aboxy['po2']

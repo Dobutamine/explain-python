@@ -11,8 +11,7 @@ class Shunt(Resistor):
 
     def init_model(self, model: object) -> bool:
         # calculate the current resistance of the shunt
-        self.r_for = calc_resistance_tube(
-            self.diameter, self.length, self.viscosity)
+        self.r_for = calc_resistance_tube(self.diameter, self.length, self.viscosity)
         self.r_back = self.r_for
         self.r_k = self.non_lin_factor
 
