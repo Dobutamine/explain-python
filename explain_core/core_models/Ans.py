@@ -26,6 +26,8 @@ class Ans(BaseModel):
     _d_po2_ve: float = 0.0
     _d_pco2_ve: float = 0.0
     _d_ph_ve: float = 0.0
+    _update_window: float = 0.015
+    _update_counter: float = 0.0
 
     def init_model(self, model: object) -> bool:
         # initialize the basemodel parent class
@@ -40,61 +42,70 @@ class Ans(BaseModel):
         return self._is_initialized
 
     def calc_model(self) -> None:
-        # get the baroreflex input
-        _baro_pres: float = self._baroreceptor.pres
 
-        # for the chemoreflex we need the acidbase and oxygenation of the location of the chemoreceptor
-        # calculate the po2 and pco2 in the blood compartments
-        set_blood_composition(self._chemoreceptor)
+        if self._update_counter > self._update_window:
+            # get the baroreflex input
+            _baro_pres: float = self._baroreceptor.pres
 
-        # get the chemoreflex inputs
-        _po2 = self._chemoreceptor.aboxy['po2']
-        _pco2 = self._chemoreceptor.aboxy['pco2']
-        _ph = self._chemoreceptor.aboxy['ph']
+            # for the chemoreflex we need the acidbase and oxygenation of the location of the chemoreceptor
+            # calculate the po2 and pco2 in the blood compartments
+            set_blood_composition(self._chemoreceptor)
 
-        # calculate the activation function of the baroreceptor
-        self._a_map = activation_function(
-            _baro_pres, self.max_baro, self.set_baro, self.min_baro)
+            # get the chemoreflex inputs
+            _po2 = self._chemoreceptor.aboxy['po2']
+            _pco2 = self._chemoreceptor.aboxy['pco2']
+            _ph = self._chemoreceptor.aboxy['ph']
 
-        # calculate the activation functions of the chemoreceptors
-        self._a_po2 = activation_function(
-            _po2, self.max_po2, self.set_po2, self.min_po2)
+            # calculate the activation function of the baroreceptor
+            self._a_map = activation_function(
+                _baro_pres, self.max_baro, self.set_baro, self.min_baro)
 
-        self._a_pco2 = activation_function(
-            _pco2, self.max_pco2, self.set_pco2, self.min_pco2)
+            # calculate the activation functions of the chemoreceptors
+            self._a_po2 = activation_function(
+                _po2, self.max_po2, self.set_po2, self.min_po2)
 
-        self._a_ph = activation_function(
-            _ph, self.max_ph, self.set_ph, self.min_ph)
+            self._a_pco2 = activation_function(
+                _pco2, self.max_pco2, self.set_pco2, self.min_pco2)
 
-        # calculate the effectors and use the time constant
-        self._d_map_hp = self._t * \
-            ((1 / self.tc_map_hp) * (-self._d_map_hp + self._a_map)) + self._d_map_hp
+            self._a_ph = activation_function(
+                _ph, self.max_ph, self.set_ph, self.min_ph)
 
-        self._d_po2_hp = self._t * \
-            ((1 / self.tc_po2_hp) * (-self._d_po2_hp + self._a_po2)) + self._d_po2_hp
+            # calculate the effectors and use the time constant
+            self._d_map_hp = self._update_window * \
+                ((1 / self.tc_map_hp) * (-self._d_map_hp + self._a_map)) + self._d_map_hp
 
-        self._d_pco2_hp = self._t * \
-            ((1 / self.tc_pco2_hp) * (-self._d_pco2_hp + self._a_pco2)) + self._d_pco2_hp
+            self._d_po2_hp = self._update_window * \
+                ((1 / self.tc_po2_hp) * (-self._d_po2_hp + self._a_po2)) + self._d_po2_hp
 
-        self._d_ph_hp = self._t * \
-            ((1 / self.tc_ph_hp) * (-self._d_ph_hp + self._a_ph)) + self._d_ph_hp
+            self._d_pco2_hp = self._update_window * \
+                ((1 / self.tc_pco2_hp) * (-self._d_pco2_hp + self._a_pco2)) + self._d_pco2_hp
 
-        self._d_po2_ve = self._t * \
-            ((1 / self.tc_po2_ve) * (-self._d_po2_ve + self._a_po2)) + self._d_po2_ve
+            self._d_ph_hp = self._update_window * \
+                ((1 / self.tc_ph_hp) * (-self._d_ph_hp + self._a_ph)) + self._d_ph_hp
 
-        self._d_pco2_ve = self._t * \
-            ((1 / self.tc_pco2_ve) * (-self._d_pco2_ve + self._a_pco2)) + self._d_pco2_ve
+            self._d_po2_ve = self._update_window * \
+                ((1 / self.tc_po2_ve) * (-self._d_po2_ve + self._a_po2)) + self._d_po2_ve
 
-        self._d_ph_ve = self._t * \
-            ((1 / self.tc_ph_ve) * (-self._d_ph_ve + self._a_ph)) + self._d_ph_ve
+            self._d_pco2_ve = self._update_window * \
+                ((1 / self.tc_pco2_ve) * (-self._d_pco2_ve + self._a_pco2)) + self._d_pco2_ve
 
-        # apply the effects using the gain
-        self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hp + self.g_po2_hp * \
-            self._d_po2_hp + self.g_pco2_hp * self._d_pco2_hp + self.g_ph_hp * self._d_ph_hp
+            self._d_ph_ve = self._update_window * \
+                ((1 / self.tc_ph_ve) * (-self._d_ph_ve + self._a_ph)) + self._d_ph_ve
 
-        target_mv = self.minute_volume_ref + self.g_po2_ve * self._d_po2_ve + \
-            self.g_pco2_ve * self._d_pco2_ve + self.g_ph_ve * self._d_ph_ve
-        if (target_mv < 0.01):
-            target_mv = 0.01
+            # apply the effects using the gain
+            self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hp + self.g_po2_hp * \
+                self._d_po2_hp + self.g_pco2_hp * self._d_pco2_hp + self.g_ph_hp * self._d_ph_hp
 
-        self._breathing.target_minute_volume = target_mv
+            target_mv = self.minute_volume_ref + self.g_po2_ve * self._d_po2_ve + \
+                self.g_pco2_ve * self._d_pco2_ve + self.g_ph_ve * self._d_ph_ve
+            if (target_mv < 0.01):
+                target_mv = 0.01
+
+            self._breathing.target_minute_volume = target_mv
+
+            # reset the update counter
+            self._update_counter = 0.0
+
+        self._update_counter += self._t
+
+

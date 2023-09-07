@@ -3,7 +3,6 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
-import pandas as pd
 
 from pathlib import Path
 
@@ -720,24 +719,24 @@ class Interface:
 
         self.draw_xy_graph(collected_data, property_x, property_y)
 
-    def write_to_excel(self, properties, filename='data', time_to_calculate=10, sampleinterval=0.005, calculate=True):
-        self.analyze(properties, time_to_calculate=time_to_calculate,
-                     sampleinterval=sampleinterval, calculate=calculate)
-        # build a parameter list
-        parameters = ['time']
-        for p in properties:
-            parameters.append(p)
+    # def write_to_excel(self, properties, filename='data', time_to_calculate=10, sampleinterval=0.005, calculate=True):
+    #     self.analyze(properties, time_to_calculate=time_to_calculate,
+    #                  sampleinterval=sampleinterval, calculate=calculate)
+    #     # build a parameter list
+    #     parameters = ['time']
+    #     for p in properties:
+    #         parameters.append(p)
 
-        data = []
-        for index, t in enumerate(self.model.model_data):
-            dataline = []
-            for idx, parameter in enumerate(parameters):
-                dataline.append(t[parameter])
-            data.append(dataline)
+    #     data = []
+    #     for index, t in enumerate(self.model.model_data):
+    #         dataline = []
+    #         for idx, parameter in enumerate(parameters):
+    #             dataline.append(t[parameter])
+    #         data.append(dataline)
 
-        df = pd.DataFrame(data, columns=parameters)
-        path = self.output_path + filename + '.xlsx'
-        df.to_excel(path)
+    #     df = pd.DataFrame(data, columns=parameters)
+    #     path = self.output_path + filename + '.xlsx'
+    #     df.to_excel(path)
 
     def draw_xy_graph(self, collected_data, property_x, property_y):
         no_dp = len(collected_data)
