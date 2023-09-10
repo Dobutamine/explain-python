@@ -459,6 +459,19 @@ class Interface:
     def get_bloodgas(self, component='AA'):
         bg = self.model.get_bloodgas(component)
         return bg
+    
+    def get_bloodgas_exp(self, component='AA'):
+        bg = self.model.get_bloodgas_exp(component)
+        print(bg.valid_ab)
+        print(bg.valid_o2)
+        print(bg.ph)
+        print(bg.po2)
+        print(bg.pco2)
+        print(bg.hco3)
+        print(bg.be)
+        print(bg.so2)
+
+        print(self.model.models[component].aboxy)
 
     def get_blood_pressures(self, time_to_calculate=10):
         self.model._datacollector.clear_watchlist()

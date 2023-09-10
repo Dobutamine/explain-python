@@ -13,11 +13,12 @@ def brent_root_finding(f, x0, x1, max_iter, tolerance) -> float:
 
     mflag = True
     steps_taken = 0
+    d = 0
+    fnew = 0
 
     while steps_taken < max_iter:
         if abs(fx0) < abs(fx1):
             x0, x1 = x1, x0
-            fx0, fx1 = fx1, fx0
 
         fx0 = f(x0)
         fx1 = f(x1)

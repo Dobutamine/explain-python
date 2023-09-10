@@ -6,6 +6,7 @@ import copy
 import multitimer
 import math
 import random
+from explain_core.modules._blood_composition.lib import GetBloodComposition
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.base_models.BaseModel import BaseModel
@@ -512,6 +513,44 @@ class ModelEngine:
             bg['hco3'] = self.models[component].aboxy['hco3']
             bg['be'] = self.models[component].aboxy['be']
             bg['so2'] = self.models[component].aboxy['so2']
+
+        return bg
+    
+    def get_bloodgas_exp(self, component) -> object:
+        # define a dictionary which is going to hold the bloodgas
+        bg = {}
+
+        # find the component type as we only can calculate the bloodgas in a blood or time-varying elastance component
+        component_type = self.models[component].model_type
+
+        # #  double _to2,
+        #             double _tco2,
+        #             double _sid,
+        #             double _albumin,
+        #             double _phosphates,
+        #             double _uma,
+        #             double _hemoglobin,
+        #             double _dpg,
+        #             double _temp) {
+
+
+        # check whether the desired component is of an appropriate type and contains blood.
+        if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
+            # calculate the acidbase and oxygenation
+            aboxy = self.models[component].aboxy
+            sol = self.models[component].solutes
+            # calculate the apparent SID
+            sid = sol['na'] + sol['k'] + 2 * sol['ca'] + 2 * sol['mg'] - sol['cl'] - sol['lact']
+
+            bg = GetBloodComposition(aboxy["to2"], 
+                                     aboxy["tco2"], 
+                                     sid, 
+                                     aboxy["albumin"], 
+                                     aboxy["phosphates"], 
+                                     aboxy["uma"], 
+                                     aboxy["hemoglobin"], 
+                                     aboxy["dpg"],
+                                    aboxy["temp"]); 
 
         return bg
 
