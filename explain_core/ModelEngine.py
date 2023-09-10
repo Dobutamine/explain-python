@@ -1,20 +1,18 @@
 import json
-import time
 import pickle
 import importlib
 import copy
 import multitimer
 import math
 import random
-from explain_core.modules._blood_composition.lib import GetBloodComposition
+import os
+from time import perf_counter
+from cffi import FFI
+
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.functions.BloodComposition import set_blood_composition
-
-
-# import the perfomance counter module to measure the model performance
-from time import perf_counter
 
 
 class ModelEngine:
@@ -76,6 +74,9 @@ class ModelEngine:
 
         # store the current model definition filename
         self.model_definition_filename = model_definition_filename
+
+        # compile the c modules
+        self.build_c_modules()
 
     def init_model(self, model_definition_filename: str):
         # set the error counter = 0
@@ -182,6 +183,47 @@ class ModelEngine:
             self.initialized = False
 
         self.status['initialized'] = self.initialized
+
+    def build_c_modules(self):
+        # instantiate the ffi engine
+        ffibuilder = FFI()
+        
+        # get current working directory
+        cwd = os.getcwd()
+
+        # get the filepaths to the c and h files
+        filepath_c_module = os.path.join(cwd, "explain_core", "modules", "blood_composition.c")
+        filepath_h_module = os.path.join(cwd, "explain_core", "modules", "blood_composition.h")
+
+        # read the header file and inject it into the ffibuilder
+        with open(filepath_h_module, 'r') as f:
+            header = f.read()
+        ffibuilder.cdef(header)
+
+        # read the source file and inject it into the ffibuilder
+        with open(filepath_c_module, 'r') as f:
+            source = f.read()
+        ffibuilder.set_source("_blood_composition", source)
+
+        # set the working directory to make sure the c compiler can find the files
+        os.chdir(cwd + "/explain_core/modules")
+
+        # build the module
+        output_filename = ffibuilder.compile(verbose=False)
+
+        # remove the intermediate c and h files
+        output_filename = output_filename.split('.')[0]
+        intermediate_c_file = output_filename + ".c"
+        intermediate_h_file = output_filename + ".h"
+
+        if os.path.exists(intermediate_c_file):
+            os.remove(intermediate_c_file)
+        if os.path.exists(intermediate_h_file):
+            os.remove(intermediate_h_file)
+
+        # Change back the current working directory
+        os.chdir(cwd)
+
 
     def check_dependencies(self) -> int:
         dep_errors = 0
@@ -535,3 +577,5 @@ class ModelEngine:
                     return {'label': prop, 'model': self.models[t[0]], 'prop1': t[1], 'prop2': t[2]}
 
         return None
+
+
