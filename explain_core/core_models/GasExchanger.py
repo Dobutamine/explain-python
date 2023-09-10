@@ -26,7 +26,7 @@ class GasExchanger(BaseModel):
     def calc_model(self) -> None:
         super().calc_model()
 
-        # calculate the po2 and pco2 in the blood compartments
+        # set the blood composition
         set_blood_composition(self._blood)
 
         # get the partial pressures and gas concentrations from the components

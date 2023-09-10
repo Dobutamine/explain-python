@@ -6,7 +6,6 @@ from explain_core.core_models.Breathing import Breathing
 from explain_core.functions.ActivationFunction import activation_function
 from explain_core.functions.BloodComposition import set_blood_composition
 
-
 class Ans(BaseModel):
     # local variables
     _baroreceptor: BloodCapacitance = {}

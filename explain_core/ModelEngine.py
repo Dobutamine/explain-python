@@ -516,44 +516,6 @@ class ModelEngine:
 
         return bg
     
-    def get_bloodgas_exp(self, component) -> object:
-        # define a dictionary which is going to hold the bloodgas
-        bg = {}
-
-        # find the component type as we only can calculate the bloodgas in a blood or time-varying elastance component
-        component_type = self.models[component].model_type
-
-        # #  double _to2,
-        #             double _tco2,
-        #             double _sid,
-        #             double _albumin,
-        #             double _phosphates,
-        #             double _uma,
-        #             double _hemoglobin,
-        #             double _dpg,
-        #             double _temp) {
-
-
-        # check whether the desired component is of an appropriate type and contains blood.
-        if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
-            # calculate the acidbase and oxygenation
-            aboxy = self.models[component].aboxy
-            sol = self.models[component].solutes
-            # calculate the apparent SID
-            sid = sol['na'] + sol['k'] + 2 * sol['ca'] + 2 * sol['mg'] - sol['cl'] - sol['lact']
-
-            bg = GetBloodComposition(aboxy["to2"], 
-                                     aboxy["tco2"], 
-                                     sid, 
-                                     aboxy["albumin"], 
-                                     aboxy["phosphates"], 
-                                     aboxy["uma"], 
-                                     aboxy["hemoglobin"], 
-                                     aboxy["dpg"],
-                                    aboxy["temp"]); 
-
-        return bg
-
     def _find_model_prop(self, prop):
         # split the model from the prop
         t = prop.split(sep=".")
