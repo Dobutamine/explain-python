@@ -1,6 +1,4 @@
 __pycache__
 .vscode
-*.ipynb*
 *.o
 *.so
-test.ipynb
