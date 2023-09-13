@@ -3,7 +3,7 @@ from explain_core.core_models.BloodCapacitance import BloodCapacitance
 from explain_core.core_models.BloodResistor import BloodResistor
 
 
-class Pump(BloodCapacitance):
+class BloodPump(BloodCapacitance):
     # independent parameters
     pump_mode: int = 0              # 0 = centrifugal, 1 = roller pump
     pump_pressure: float = 0.0

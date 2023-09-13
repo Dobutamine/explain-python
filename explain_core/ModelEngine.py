@@ -125,7 +125,7 @@ class ModelEngine:
                 try:
                     # try to import the module holding the model class from the custom models folder
                     model_module = importlib.import_module(
-                        'explain_core.custom_models.' + model_type)
+                        'custom_models.' + model_type)
                 except:
                     self.update_log(
                         f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}", "error")

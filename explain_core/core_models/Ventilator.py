@@ -366,7 +366,7 @@ class Ventilator(BaseModel):
         })
         self._ventin.init_model(model)
         self._ventin.calc_model()
-        self.set_air_composition(
+        self.set_gas_composition(
             self._ventin, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._ventin)
 
@@ -384,7 +384,7 @@ class Ventilator(BaseModel):
         })
         self._tubingin.init_model(model)
         self._tubingin.calc_model()
-        self.set_air_composition(
+        self.set_gas_composition(
             self._tubingin, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._tubingin)
 
@@ -402,7 +402,7 @@ class Ventilator(BaseModel):
         })
         self._tubingout.init_model(model)
         self._tubingout.calc_model()
-        self.set_air_composition(
+        self.set_gas_composition(
             self._tubingout, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._tubingout)
 
@@ -420,7 +420,7 @@ class Ventilator(BaseModel):
         })
         self._ettube.init_model(model)
         self._ettube.calc_model()
-        self.set_air_composition(
+        self.set_gas_composition(
             self._ettube, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], self.temp, self.humidity)
         self._vent_parts.append(self._ettube)
 
@@ -438,7 +438,7 @@ class Ventilator(BaseModel):
         })
         self._ventout.init_model(model)
         self._ventout.calc_model()
-        self.set_air_composition(
+        self.set_gas_composition(
             self._ventout, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], 0, 0)
         self._vent_parts.append(self._ventout)
 
@@ -456,7 +456,7 @@ class Ventilator(BaseModel):
         })
         self._hfo_module.init_model(model)
         self._hfo_module.calc_model()
-        self.set_air_composition(
+        self.set_gas_composition(
             self._hfo_module, self.vent_air_dry['fo2'],  self.vent_air_dry['fco2'],  self.vent_air_dry['fn2'],  self.vent_air_dry['fother'], 0, 0)
         self._vent_parts.append(self._hfo_module)
 
@@ -563,7 +563,7 @@ class Ventilator(BaseModel):
         self._hfo_valve.init_model(model)
         self._vent_parts.append(self._hfo_valve)
 
-    def set_air_composition(self, comp, fo2_dry, fco2_dry, fn2_dry, fother_dry, temp, humidity):
+    def set_gas_composition(self, comp, fo2_dry, fco2_dry, fn2_dry, fother_dry, temp, humidity):
         comp.temp = temp
         comp.target_temp = temp
         comp.humidity = humidity
