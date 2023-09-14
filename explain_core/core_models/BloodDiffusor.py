@@ -2,7 +2,7 @@ from explain_core.base_models.BaseModel import BaseModel
 from explain_core.base_models.Capacitance import Capacitance
 from explain_core.functions.BloodComposition import set_blood_composition
 
-class Diffusor(BaseModel):
+class BloodDiffusor(BaseModel):
     # independent variables
     dif_o2: float = 0.01
     dif_o2_factor: float = 1.0

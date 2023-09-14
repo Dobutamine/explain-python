@@ -44,4 +44,9 @@ class Ecls(BaseModel):
     _oxy_tubing_in = {}             # gas resistor between oxy_in and oxy
     _oxy_tubing_out = {}            # gas resistor between oxy and oxy_gas_out
 
-    pass
+    def init_model(self, model: object) -> bool:
+        super().init_model(model)
+        
+
+    def calc_model(self) -> None:
+        pass
