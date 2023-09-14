@@ -871,6 +871,12 @@
         "ALR": 37.0
       }
     },
+    "Lymph": {
+      "name": "Lymph",
+      "description": "lymph model",
+      "model_type": "Lymph",
+      "is_enabled": true
+    },
     "Breathing": {
       "name": "Breathing",
       "description": "breathing model",
@@ -920,6 +926,48 @@
       "name": "Ecls",
       "description": "Extracorporeal life support model",
       "model_type": "Ecls",
+      "is_enabled": false,
+      "dependencies": []
+    },
+    "Placenta": {
+      "name": "Placenta",
+      "description": "Placenta model",
+      "model_type": "Placenta",
+      "is_enabled": false,
+      "dependencies": []
+    },
+    "ArtificialWhomb": {
+      "name": "ArtificialWhomb",
+      "description": "ArtificialWhomb model",
+      "model_type": "ArtificialWhomb",
+      "is_enabled": false,
+      "dependencies": []
+    },
+    "Drugs": {
+      "name": "Drugs",
+      "description": "drug model",
+      "model_type": "Drugs",
+      "is_enabled": false,
+      "dependencies": []
+    },
+    "Fluids": {
+      "name": "Fluids",
+      "description": "Fluids model",
+      "model_type": "Fluids",
+      "is_enabled": false,
+      "dependencies": []
+    },
+    "IntrathoracicPressure": {
+      "name": "IntrathoracicPressure",
+      "description": "IntrathoracicPressure model",
+      "model_type": "IntrathoracicPressure",
+      "is_enabled": false,
+      "dependencies": []
+    },
+    "Resuscitation": {
+      "name": "Resuscitation",
+      "description": "Resuscitation model",
+      "model_type": "Resuscitation",
       "is_enabled": false,
       "dependencies": []
     },
