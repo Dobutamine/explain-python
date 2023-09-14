@@ -961,8 +961,8 @@
       "name": "IntrathoracicPressure",
       "description": "IntrathoracicPressure model",
       "model_type": "IntrathoracicPressure",
-      "is_enabled": false,
-      "dependencies": []
+      "is_enabled": true,
+      "dependencies": ["THORAX"]
     },
     "Resuscitation": {
       "name": "Resuscitation",
@@ -975,7 +975,7 @@
       "name": "DA",
       "description": "ductus arteriosus model",
       "model_type": "Shunt",
-      "is_enabled": true,
+      "is_enabled": false,
       "dependencies": ["AAR", "PA"],
       "comp_from": "AAR",
       "comp_to": "PA",
@@ -989,7 +989,7 @@
       "name": "FO",
       "description": "foramen ovale model",
       "model_type": "Shunt",
-      "is_enabled": true,
+      "is_enabled": false,
       "dependencies": ["LA", "RA"],
       "comp_from": "LA",
       "comp_to": "RA",
@@ -1003,7 +1003,7 @@
       "name": "VSD",
       "description": "ventricular septal defect",
       "model_type": "Shunt",
-      "is_enabled": true,
+      "is_enabled": false,
       "dependencies": ["LV", "RV"],
       "comp_from": "LV",
       "comp_to": "RV",
