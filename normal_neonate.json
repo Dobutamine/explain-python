@@ -12,7 +12,7 @@
       "is_enabled": true,
       "dependencies": [],
       "u_vol": 0.0,
-      "vol": 0.00276665414213919,
+      "vol": 0.007824975926284438,
       "el_min": 900,
       "el_max": 1500,
       "el_k": 0
@@ -23,7 +23,7 @@
       "model_type": "BloodTimeVaryingElastance",
       "is_enabled": true,
       "dependencies": [],
-      "vol": 0.00276665414213919,
+      "vol": 0.007824975926284438,
       "u_vol": 0.0,
       "el_min": 700,
       "el_max": 1500,
@@ -36,7 +36,7 @@
       "is_enabled": true,
       "dependencies": [],
       "u_vol": 0.002,
-      "vol": 0.011550631290386972,
+      "vol": 0.0055155539340687116,
       "el_min": 500,
       "el_max": 17000,
       "el_k": 0
@@ -47,7 +47,7 @@
       "model_type": "BloodTimeVaryingElastance",
       "is_enabled": true,
       "dependencies": [],
-      "vol": 0.011550631290386972,
+      "vol": 0.004032886510701252,
       "u_vol": 0.002,
       "el_min": 500,
       "el_max": 17000,
@@ -58,7 +58,7 @@
       "description": "coronary arteries",
       "model_type": "BloodTimeVaryingElastance",
       "is_enabled": true,
-      "vol": 0.000396,
+      "vol": 0.0002839998270970974,
       "u_vol": 0.0002574,
       "el_min": 324675,
       "el_max": 700000,
@@ -69,7 +69,7 @@
       "description": "left lung",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.005654058574009633,
+      "vol": 0.005891222448225904,
       "u_vol": 0.00113603,
       "el_base": 4398,
       "el_k": 0
@@ -79,7 +79,7 @@
       "description": "right lung",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.005654058574009633,
+      "vol": 0.005891222448225904,
       "u_vol": 0.00113603,
       "el_base": 4398,
       "el_k": 0
@@ -89,7 +89,7 @@
       "description": "pulmonary veins",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.007152031736221479,
+      "vol": 0.0074488276998929785,
       "u_vol": 0.00514553,
       "el_base": 4535,
       "el_k": 0
@@ -100,7 +100,7 @@
       "model_type": "BloodCapacitance",
       "is_enabled": true,
       "dependencies": [],
-      "vol": 0.00598044851676989,
+      "vol": 0.00831584954979605,
       "u_vol": 0.0020523,
       "el_base": 5000,
       "el_k": 0
@@ -112,7 +112,7 @@
       "is_enabled": true,
       "dependencies": [],
       "u_vol": 0.003,
-      "vol": 0.005,
+      "vol": 0.005418979322013113,
       "el_base": 23000,
       "el_k": 0
     },
@@ -122,7 +122,7 @@
       "model_type": "BloodCapacitance",
       "is_enabled": true,
       "u_vol": 0.0032,
-      "vol": 0.0048,
+      "vol": 0.005181676546383383,
       "el_base": 28000,
       "el_k": 0
     },
@@ -131,7 +131,7 @@
       "description": "descending aorta",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.02935564265441993,
+      "vol": 0.023549350074616185,
       "u_vol": 0.018,
       "el_base": 10000,
       "el_k": 0
@@ -141,7 +141,7 @@
       "description": "lower body",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.0033,
+      "vol": 0.0023919613297645878,
       "u_vol": 0.001,
       "el_base": 25124,
       "el_k": 0
@@ -151,7 +151,7 @@
       "description": "liver and spleen",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.0033,
+      "vol": 0.0023504141963445416,
       "u_vol": 0.001,
       "el_base": 25124,
       "el_k": 0
@@ -161,7 +161,7 @@
       "description": "kidneys",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.0033,
+      "vol": 0.0023523322347697613,
       "u_vol": 0.001,
       "el_base": 25124,
       "el_k": 0
@@ -171,7 +171,7 @@
       "description": "intestines",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.0033,
+      "vol": 0.002375062774801314,
       "u_vol": 0.001,
       "el_base": 25124,
       "el_k": 0
@@ -181,7 +181,7 @@
       "description": "upper body",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.00135,
+      "vol": 0.0018452305838192616,
       "u_vol": 0.00105,
       "el_base": 25124,
       "el_k": 0
@@ -191,7 +191,7 @@
       "description": "brain",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.00135,
+      "vol": 0.0024175913091419527,
       "u_vol": 0.00105,
       "el_base": 25124,
       "el_k": 0
@@ -201,7 +201,7 @@
       "description": "vena cava inferior intrathoracic",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.016176288666482266,
+      "vol": 0.019070371077951544,
       "u_vol": 0.0109824,
       "el_base": 780,
       "el_k": 0
@@ -211,7 +211,7 @@
       "description": "vena cava inferior extrathoracic ",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.08424209047211135,
+      "vol": 0.08051258955283728,
       "u_vol": 0.05710848,
       "el_base": 146,
       "el_k": 0
@@ -221,7 +221,7 @@
       "description": "superior vena cava",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.0758415645326887,
+      "vol": 0.06333875298887778,
       "u_vol": 0.03624192,
       "el_base": 230,
       "el_k": 0
@@ -596,32 +596,10 @@
       "model_type": "Container",
       "is_enabled": true,
       "contained_components": ["RA", "RV", "LA", "LV"],
-      "vol": 0.0,
+      "vol": 0.025,
       "u_vol": 0.0,
       "el_base": 10,
-      "el_k": 0
-    },
-    "CHEST_L": {
-      "name": "CHEST_L",
-      "description": "pleural space left",
-      "model_type": "Container",
-      "is_enabled": true,
-      "contained_components": ["ALL"],
-      "vol": 0.05,
-      "u_vol": 0.0425,
-      "el_base": 400.0,
-      "el_k": 0
-    },
-    "CHEST_R": {
-      "name": "CHEST_R",
-      "description": "pleural space right",
-      "model_type": "Container",
-      "is_enabled": true,
-      "contained_components": ["ALR"],
-      "vol": 0.05,
-      "u_vol": 0.0425,
-      "el_base": 400.0,
-      "el_k": 0
+      "el_k": 1.0
     },
     "THORAX": {
       "name": "THORAX",
@@ -630,15 +608,15 @@
       "is_enabled": true,
       "dependencies": [],
       "contained_components": [
-        "CHEST_L",
-        "CHEST_R",
+        "ALL",
+        "ALR",
         "DS",
         "IVCI",
         "SVC",
-        "RA",
-        "RV",
         "LA",
+        "RA",
         "LV",
+        "RV",
         "AA",
         "AAR",
         "PA",
@@ -649,8 +627,8 @@
       "vol": 0.246,
       "vol_ext": 0,
       "u_vol": 0.27,
-      "el_base": 80,
-      "el_k": 0
+      "el_base": 80.0,
+      "el_k": 1.0
     },
     "OUT": {
       "name": "OUT",
@@ -682,7 +660,7 @@
       "fixed_composition": false,
       "vol": 0.005,
       "u_vol": 0.005,
-      "el_base": 40000,
+      "el_base": 5500,
       "el_k": 0
     },
     "ALL": {
@@ -691,10 +669,10 @@
       "model_type": "GasCapacitance",
       "is_enabled": true,
       "fixed_composition": false,
-      "vol": 0.05,
-      "u_vol": 0.04625,
-      "el_base": 800.0,
-      "el_k": 0
+      "vol": 0.047,
+      "u_vol": 0.028,
+      "el_base": 120.0,
+      "el_k": 100
     },
     "ALR": {
       "name": "ALR",
@@ -702,10 +680,10 @@
       "model_type": "GasCapacitance",
       "is_enabled": true,
       "fixed_composition": false,
-      "vol": 0.05,
-      "u_vol": 0.04625,
-      "el_base": 800.0,
-      "el_k": 0
+      "vol": 0.047,
+      "u_vol": 0.028,
+      "el_base": 120.0,
+      "el_k": 100
     },
     "MOUTH_DS": {
       "name": "MOUTH_DS",
@@ -716,8 +694,8 @@
       "no_back_flow": false,
       "comp_from": "MOUTH",
       "comp_to": "DS",
-      "r_for": 25,
-      "r_back": 25,
+      "r_for": 10,
+      "r_back": 10,
       "r_k": 0
     },
     "DS_ALL": {
@@ -729,8 +707,8 @@
       "no_back_flow": false,
       "comp_from": "DS",
       "comp_to": "ALL",
-      "r_for": 75,
-      "r_back": 75,
+      "r_for": 30,
+      "r_back": 30,
       "r_k": 0
     },
     "DS_ALR": {
@@ -742,8 +720,8 @@
       "no_back_flow": false,
       "comp_from": "DS",
       "comp_to": "ALR",
-      "r_for": 75,
-      "r_back": 75,
+      "r_for": 30,
+      "r_back": 30,
       "r_k": 0
     },
     "GASEX_LL": {
@@ -778,7 +756,8 @@
       "right_atrium": "RA",
       "left_ventricle": "LV",
       "right_ventricle": "RV",
-      "heart_rate": 120.0,
+      "coronaries": "COR",
+      "heart_rate": 135.0,
       "pq_time": 0.1,
       "qrs_time": 0.075,
       "qt_time": 0.4
@@ -791,10 +770,10 @@
       "dependencies": ["AA", "BR"],
       "baroreceptor_location": "AA",
       "chemoreceptor_location": "AA",
-      "heart_rate_ref": 120,
+      "heart_rate_ref": 135,
       "minute_volume_ref": 0.66,
       "set_baro": 53.0,
-      "max_baro": 76.0,
+      "max_baro": 90.0,
       "min_baro": 30.0,
       "g_map_hp": -3.4,
       "tc_map_hp": 10.0,
@@ -900,8 +879,8 @@
       "model_type": "Metabolism",
       "is_enabled": true,
       "dependencies": [],
-      "vo2": 7.0,
-      "resp_q": 0.6,
+      "vo2": 9.5,
+      "resp_q": 0.8,
       "body_temp": 37,
       "metabolic_active_models": {
         "RLB": 0.15,
@@ -980,9 +959,9 @@
       "comp_from": "AAR",
       "comp_to": "PA",
       "length": 10.0,
-      "diameter": 0.1,
+      "diameter": 1,
       "non_lin_factor": 0.0,
-      "no_flow": true,
+      "no_flow": false,
       "no_back_flow": false
     },
     "ForamenOvale": {
@@ -996,7 +975,7 @@
       "length": 1.0,
       "diameter": 2.0,
       "non_lin_factor": 0.0,
-      "no_flow": true,
+      "no_flow": false,
       "no_back_flow": false
     },
     "VentricularSeptalDefect": {

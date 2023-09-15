@@ -594,6 +594,7 @@ class Interface:
         print("")
 
         no_dp = len(self.model.model_data)
+        print(no_dp)
         x = np.zeros(no_dp)
         y = []
         heartbeats = 0

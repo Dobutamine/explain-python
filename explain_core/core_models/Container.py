@@ -1,9 +1,12 @@
+import math
 from explain_core.base_models.Capacitance import Capacitance
 
 
 class Container(Capacitance):
     # independent variables
     vol_extra: float = 0.0
+    el: float = 0.0
+    act_factor: float = 1.0
 
     # override the calc_model method as the blood capacitance has some specific actions
     def calc_model(self) -> None:
@@ -13,9 +16,20 @@ class Container(Capacitance):
         for c in self.contained_components:
             self.vol += self._model.models[c].vol
 
+        # calculate the elastance
+        self.el = self.el_base * self.el_base_factor + self.act_factor
+
         # do the capacitans actions -> calculate pressure
-        super().calc_model()
+        self.pres = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + \
+            self.el * \
+            (self.vol - (self.u_vol * self.u_vol_factor)) + \
+            self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
+
+        # reset the pressure which are recalculated every model iterattion
+        self.pres_ext = 0.0
+        self.pres_cc = 0.0
+        self.pres_mus = 0.0
 
         # transfer the pressures to the models the container contains
         for c in self.contained_components:
-            self._model.models[c].pres_ext = self.pres
+            self._model.models[c].pres_ext += self.pres

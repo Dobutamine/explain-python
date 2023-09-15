@@ -108,7 +108,7 @@ class Breathing(BaseModel):
 
         # transfer the respiratory muscle pressure to the targets
         for target in self.targets:
-            self._model.models[target].pres_mus = self.resp_muscle_pressure
+            self._model.models[target].act_factor = self.resp_muscle_pressure * 100.0
 
     def calc_resp_muscle_pressure(self) -> float:
         mp: float = 0.0

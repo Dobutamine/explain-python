@@ -22,6 +22,8 @@ class Heart(BaseModel):
     _lv: TimeVaryingElastance = {}
     _ra: TimeVaryingElastance = {}
     _rv: TimeVaryingElastance = {}
+    _cor: TimeVaryingElastance = {}
+
     _sa_node_interval: float = 0.0
     _sa_node_timer: float = 0.0
     _pq_running: bool = False
@@ -34,14 +36,16 @@ class Heart(BaseModel):
     _kn: float = 0.579
 
     def init_model(self, model: object) -> bool:
+       
         # init the parent class
-        super().init_model(model)
-
+        result = super().init_model(model)
+        
         # get a reference to the heart models
         self._la = self._model.models[self.left_atrium]
         self._ra = self._model.models[self.right_atrium]
         self._lv = self._model.models[self.left_ventricle]
         self._rv = self._model.models[self.right_ventricle]
+        self._cor = self._model.models[self.coronaries]
 
     def calc_model(self) -> None:
         # calculate the qtc time depending on the heartrate
@@ -130,6 +134,7 @@ class Heart(BaseModel):
         self._ra.act_factor = self.aaf
         self._lv.act_factor = self.vaf
         self._rv.act_factor = self.vaf
+        self._cor.act_factor = self.vaf
 
     def calc_qtc(self, hr: float) -> float:
         if hr > 10:
