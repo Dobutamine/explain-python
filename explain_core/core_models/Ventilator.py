@@ -28,7 +28,7 @@ class Ventilator(BaseModel):
     exp_flow: float = 3.0
     pip: float = 14.3
     pip_max: float = 20.0
-    peep: float = 2.9
+    peep: float = 0.0
     tidal_volume: float = 0.015
     exp_tidal_volume: float = 0.0
     insp_tidal_volume: float = 0.0
@@ -176,11 +176,13 @@ class Ventilator(BaseModel):
 
         if (self._inspiration):
             self.vent_flow = self._tubingin_ettube.flow * 60.0
+            self.vent_vol += self._tubingin_ettube.flow * self._t * 1000.0
 
         if (self._expiration):
             self.vent_flow = -self._ettube_tubingout.flow * 60.0
+            self.vent_vol += -self._ettube_tubingout.flow * self._t * 1000.0
 
-        self.vent_vol += self._ettube_tubingout.flow * self._t * 1000.0
+        
 
         self.co2 = self._model.models['DS'].pco2
 
@@ -505,8 +507,8 @@ class Ventilator(BaseModel):
             "no_back_flow": False,
             "comp_from": self._ettube,
             "comp_to": self._model.models['DS'],
-            "r_for": 50,
-            "r_back": 50,
+            "r_for": 25,
+            "r_back": 25,
             "r_k": 0,
         })
         self._ettube_ds.init_model(model)

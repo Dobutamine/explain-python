@@ -24,6 +24,7 @@ class TimeVaryingElastance(Capacitance):
     pres_ed: float = 0.0
     pres_ms: float = 0.0
     pres_ext: float = 0.0
+    pres_tm: float = 0.0
 
     # implement the calc_model method
     def calc_model(self) -> None:
@@ -39,31 +40,11 @@ class TimeVaryingElastance(Capacitance):
             (self.pres_ms - self.pres_ed) + self.pres_ed + \
             self.pres_cc + self.pres_atm + self.pres_mus
         
-        #self.pres = self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
+         # calculate the transmural pressure
+        self.pres_tm = self.pres - 2 * (self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus)
 
         # reset the pressure which are recalculated every model iterattion
         self.pres_ext = 0.0
         self.pres_cc = 0.0
         self.pres_mus = 0.0
 
-
-#   // calculate the end diastolic pressure
-#     this.PresEd =
-#       this.ElMin *
-#       this.ElMinFactor *
-#       (1.0 +
-#         this.ElK * this.ElKFactor * (this.Vol - this.UVol * this.UVolFactor)) *
-#       (this.Vol - this.UVol * this.UVolFactor);
-
-#     // calculate the end systolic pressure
-#     this.PresEs =
-#       this.ElMax * this.ElMaxFactor * (this.Vol - this.UVol * this.UVolFactor);
-
-#     // calculate the pressure depending on the elastance
-#     this.Pres =
-#       this.ActFactor * (this.PresEs - this.PresEd) +
-#       this.PresEd +
-#       this.Pres0 +
-#       this.PresExt +
-#       this.PresCc +
-#       this.PresMus;

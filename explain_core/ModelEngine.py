@@ -263,6 +263,48 @@ class ModelEngine:
             # Increase the model clock
             model_time_total += modeling_stepsize
 
+    def fastforward(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
+
+        # no datacollecting or task scheduler
+
+        # Cache the attributes for faster access during the model loop
+        collect_data = self._datacollector.collect_data
+        run_tasks = self._task_scheduler.run_tasks
+        model_time_total = self.model_time_total
+        modeling_stepsize = self.modeling_stepsize
+
+        # Calculate the number of steps of the model
+        no_of_steps: int = int(time_to_calculate / modeling_stepsize)
+
+        # reset the data collector
+        self._datacollector.clear_data()
+
+        # Start the performance counter
+        if performance:
+            perf_start = perf_counter()
+
+        # Do all model steps
+        for _ in range(no_of_steps):
+            # Execute the model step method of all models
+            for model in self.models.values():
+                model.step_model()
+
+            # Increase the model clock
+            model_time_total += modeling_stepsize
+
+        # Stop the performance counter
+        if performance:
+            # stop the performance counter
+            perf_stop = perf_counter()
+
+            # Store the performance metrics
+            self.run_duration = perf_stop - perf_start
+            self.step_duration = (self.run_duration / no_of_steps) * 1000
+
+        # store a reference to the collected data in model_data and return it
+        self.model_data = self._datacollector.collected_data
+        return self.model_data
+
     def calculate(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
 
         # Cache the attributes for faster access during the model loop

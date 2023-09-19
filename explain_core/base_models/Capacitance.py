@@ -20,6 +20,7 @@ class Capacitance(BaseModel):
     pres_cc: float = 0.0
     pres_atm: float = 0.0
     pres_mus: float = 0.0
+    pres_tm: float = 0.0
 
     # implement the calc_model method
     def calc_model(self) -> None:
@@ -30,6 +31,9 @@ class Capacitance(BaseModel):
             (self.vol - (self.u_vol * self.u_vol_factor)) + \
             self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
 
+        # calculate the transmural pressure
+        self.pres_tm = self.pres - 2 * (self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus)
+        
         # reset the pressure which are recalculated every model iterattion
         self.pres_ext = 0.0
         self.pres_cc = 0.0

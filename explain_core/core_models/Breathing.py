@@ -15,7 +15,7 @@ class Breathing(BaseModel):
     resp_rate: float = 40.0
     resp_signal: float = 0.0
     minute_volume: float = 0.0
-    target_tidal_volume: float = 17.0
+    target_tidal_volume: float = 16.0
     exp_tidal_volume: float = 0.0
     insp_tidal_volume: float = 0.0
     resp_muscle_pressure = 0.0
@@ -39,16 +39,6 @@ class Breathing(BaseModel):
     def calc_model(self) -> None:
         # calculate the respiratory rate and target tidal volume from the target minute volume
         self.vt_rr_controller()
-
-        # calculate the rmp gain
-        if self.exp_tidal_volume < self.target_tidal_volume:
-            self._rmp_gain += 0.0001
-        if self.exp_tidal_volume > self.target_tidal_volume:
-            self._rmp_gain -= 0.0001
-        if self._rmp_gain < 0:
-            self._rmp_gain = 0
-        if self._rmp_gain > self.rmp_gain_max:
-            self._rmp_gain = self.rmp_gain_max
 
         # calculate the inspiratory and expiratory time
         self._breath_interval = 60.0
@@ -78,7 +68,17 @@ class Breathing(BaseModel):
             self._exp_timer = 0.0
             self._exp_running = False
             self._temp_insp_volume = 0.0
-            self.exp_tidal_volume = self._temp_exp_volume
+            self.exp_tidal_volume = -self._temp_exp_volume
+             # calculate the rmp gain
+            if self.breathing_enabled:
+                if abs(self.exp_tidal_volume) < self.target_tidal_volume:
+                    self._rmp_gain += 0.1
+                if abs(self.exp_tidal_volume) > self.target_tidal_volume:
+                    self._rmp_gain -= 0.1
+                if self._rmp_gain < 0:
+                    self._rmp_gain = 0
+                if self._rmp_gain > self.rmp_gain_max:
+                    self._rmp_gain = self.rmp_gain_max
 
             self.minute_volume = self.exp_tidal_volume * self.resp_rate
 
@@ -88,12 +88,14 @@ class Breathing(BaseModel):
         if self._insp_running:
             self._insp_timer += self._t
             self._ncc_insp += 1
-            self._temp_insp_volume += self._model.models['MOUTH_DS'].flow * self._t
+            if self._model.models['MOUTH_DS'].flow > 0:
+                self._temp_insp_volume += self._model.models['MOUTH_DS'].flow * self._t
 
         if self._exp_running:
             self._exp_timer += self._t
             self._ncc_exp += 1
-            self._temp_exp_volume += self._model.models['MOUTH_DS'].flow * self._t
+            if self._model.models['MOUTH_DS'].flow < 0:
+                self._temp_exp_volume += self._model.models['MOUTH_DS'].flow * self._t
 
         # reset the respiratory muscle pressure
         self.resp_muscle_pressure = 0.0
@@ -109,6 +111,7 @@ class Breathing(BaseModel):
         # transfer the respiratory muscle pressure to the targets
         for target in self.targets:
             self._model.models[target].act_factor = self.resp_muscle_pressure * 100.0
+            #self._model.models[target].pres_ext = -self.resp_muscle_pressure
 
     def calc_resp_muscle_pressure(self) -> float:
         mp: float = 0.0

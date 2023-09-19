@@ -25,10 +25,14 @@ class Container(Capacitance):
             (self.vol - (self.u_vol * self.u_vol_factor)) + \
             self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
 
+        # calculate the transmural pressure
+        self.pres_tm = self.pres - 2 * (self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus)
+
         # reset the pressure which are recalculated every model iterattion
         self.pres_ext = 0.0
         self.pres_cc = 0.0
         self.pres_mus = 0.0
+        self.act_factor = 0.0
 
         # transfer the pressures to the models the container contains
         for c in self.contained_components:
