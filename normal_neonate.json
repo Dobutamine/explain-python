@@ -780,7 +780,7 @@
       "g_po2_ve": -0.005,
       "tc_po2_hp": 12.0,
       "tc_po2_ve": 12.0,
-      "set_pco2": 40.0,
+      "set_pco2": 35.0,
       "max_pco2": 75.0,
       "min_pco2": 15.0,
       "g_pco2_hp": 0.0,
@@ -834,14 +834,14 @@
       "pres_atm": 760,
       "fio2": 0.21,
       "humidity_settings": {
-        "MOUTH": 1.0,
+        "MOUTH": 0.5,
         "DS": 1.0,
         "ALL": 1.0,
         "ALR": 1.0
       },
       "temp_settings": {
-        "MOUTH": 37.0,
-        "DS": 37.0,
+        "MOUTH": 20.0,
+        "DS": 32.0,
         "ALL": 37.0,
         "ALR": 37.0
       }
@@ -875,8 +875,8 @@
       "model_type": "Metabolism",
       "is_enabled": true,
       "dependencies": [],
-      "vo2": 9.5,
-      "resp_q": 0.8,
+      "vo2": 8.5,
+      "resp_q": 0.7,
       "body_temp": 37,
       "metabolic_active_models": {
         "RLB": 0.15,
