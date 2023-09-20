@@ -622,7 +622,8 @@ class Interface:
 
                 print("{:<16}: max {:10}, min {:10} mmHg". format(
                     parameter, max, min))
-                result[parameter] = { "max": max, "min": min}
+                result[parameter + ".max"] = max
+                result[parameter + ".min"] = min
                 continue
 
             if prop_category[1] == "vol":
@@ -632,7 +633,8 @@ class Interface:
 
                 print(
                     "{:<16}: max {:10}, min {:10} ml". format(parameter, max, min))
-                result[parameter] = { "max": max, "min": min}
+                result[parameter + ".max"] = max
+                result[parameter + ".min"] = min
                 continue
 
             if prop_category[1] == "ncc_ventricular":
@@ -677,7 +679,10 @@ class Interface:
                 print("{:16}: net {:10}, forward {:10}, backward {:10} ml/min, stroke volume: {:10} ml/heartbeat, ". format(
                     parameter, flow, flow_forward, flow_backward, sv))
                 
-                result[parameter] = { "flow": flow, "flow_forward": flow_forward, "flow_backward": flow_backward, "sv": sv}
+                result[parameter + ".net"] = flow
+                result[parameter + ".forward"] = flow_forward
+                result[parameter + ".backward"] = flow_backward
+                result[parameter + ".sv"] = sv
 
                 continue
 
