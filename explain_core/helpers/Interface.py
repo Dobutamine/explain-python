@@ -415,14 +415,16 @@ class Interface:
 
     # getters
     def get_vitals(self, time_to_calculate=10):
+        result = self.analyze(["AA.pres", "PA.pres", "IVCI.pres"])
+
         vitals = {
             "heartrate": self.model.models['Heart'].heart_rate,
             "spo2_pre": self.model.models['AA'].aboxy['so2'],
-            "abp_systole": self.model.models['AA'].systole,
-            "abp_diastole": self.model.models['AA'].diastole,
-            "pap_systole": self.model.models['PA'].systole,
-            "pap_diastole": self.model.models['PA'].diastole,
-            "cvp": self.model.models['RA'].mean,
+            "abp_systole": result["AA.pres"]["max"],
+            "abp_diastole": result["AA.pres"]["min"],
+            "pap_systole": result["PA.pres"]["max"],
+            "pap_diastole": result["PA.pres"]["min"],
+            "cvp": result["IVCI.pres"]["min"] + 0.3333 * (result["IVCI.pres"]["max"] - result["IVCI.pres"]["min"]),
             "resp_rate": self.model.models['Breathing'].resp_rate
         }
 
@@ -568,6 +570,12 @@ class Interface:
         self.analyze(properties, time_to_calculate)
 
     def analyze(self, properties, time_to_calculate=10, sampleinterval=0.005, calculate=True):
+        # define a result object
+        result = {}
+
+        # add the ncc ventricular
+        properties.insert(0, "Heart.ncc_ventricular")
+
         # make sure properties is a list
         if (isinstance(properties, str)):
             properties = [properties]
@@ -603,6 +611,7 @@ class Interface:
             for idx, parameter in enumerate(properties):
                 y[idx][index] = t[parameter]
 
+        sv_message = False
         for idx, parameter in enumerate(properties):
             prop_category = parameter.split(sep=".")
 
@@ -613,6 +622,7 @@ class Interface:
 
                 print("{:<16}: max {:10}, min {:10} mmHg". format(
                     parameter, max, min))
+                result[parameter] = { "max": max, "min": min}
                 continue
 
             if prop_category[1] == "vol":
@@ -622,6 +632,7 @@ class Interface:
 
                 print(
                     "{:<16}: max {:10}, min {:10} ml". format(parameter, max, min))
+                result[parameter] = { "max": max, "min": min}
                 continue
 
             if prop_category[1] == "ncc_ventricular":
@@ -641,7 +652,7 @@ class Interface:
                 sum_forward = np.sum(data_forward)
                 sum_backward = np.sum(data_backward)
 
-                flow = (sum * sampleinterval / (t_end - t_start))
+                flow = (sum * sampleinterval / (t_end - t_start)) * 60.0
                 flow = round(flow * 1000, 5)
                 flow_forward = 0
                 flow_backward = 0
@@ -653,14 +664,20 @@ class Interface:
                     flow_backward = (sum_backward / sum) * flow
                     flow_backward = round(flow_backward, 5)
 
-                bpm = (heartbeats / (t_end - t_start)) * 60
-                if (sampleinterval != self.model.modeling_stepsize):
-                    print(
-                        f"Stroke volume calculation might be inaccurate. Try using a sampleinterval of {self.model.modeling_stepsize}")
+                if (sampleinterval == self.model.modeling_stepsize):
+                    # use the no of heartbeats
+                    bpm = (heartbeats / (t_end - t_start)) * 60
+                else:
+                    if not sv_message:
+                        print(f"Stroke volume calculation might be inaccurate. Try using a sampleinterval of {self.model.modeling_stepsize}")
+                        sv_message = True
                     bpm = self.model.models['Heart'].heart_rate
+
                 sv = round(flow / bpm, 5)
-                print("{:16}: net {:10}, forward {:10}, backward {:10} ml/min, stroke volume: {:10} ml, ". format(
+                print("{:16}: net {:10}, forward {:10}, backward {:10} ml/min, stroke volume: {:10} ml/heartbeat, ". format(
                     parameter, flow, flow_forward, flow_backward, sv))
+                
+                result[parameter] = { "flow": flow, "flow_forward": flow_forward, "flow_backward": flow_backward, "sv": sv}
 
                 continue
 
@@ -671,6 +688,8 @@ class Interface:
             max = round(np.amax(data), 5)
             min = round(np.amin(data), 5)
             print("{:<16}: max {:10} min {:10}". format(parameter, max, min))
+
+        return result
 
     def plot_time_graph(self, properties, time_to_calculate=10,  combined=True, sharey=True, ylabel='',  autoscale=True, ylowerlim=0, yupperlim=100, fill=True, fill_between=False, zeroline=False, sampleinterval=0.005, analyze=True):
         # first clear the watchllist and this also clears all data

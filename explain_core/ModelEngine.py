@@ -367,7 +367,7 @@ class ModelEngine:
         self._datacollector.add_to_watchlist(properties)
 
     def set_sample_interval(self, interval: float = 0.005):
-        if interval > 0.0005:
+        if interval >= 0.0005:
             self._datacollector.set_sample_interval(interval)
 
     def call_function(self, f, **kwargs):
