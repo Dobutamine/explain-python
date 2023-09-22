@@ -413,7 +413,13 @@ class Interface:
             "pap_systole": result["PA.pres.max"],
             "pap_diastole": result["PA.pres.min"],
             "cvp": result["IVCI.pres.min"] + 0.3333 * (result["IVCI.pres.max"] - result["IVCI.pres.min"]),
-            "resp_rate": self.model.models['Breathing'].resp_rate
+            "resp_rate": self.model.models['Breathing'].resp_rate,
+            "pH": self.model.models['AA'].aboxy['ph'],
+            "po2": self.model.models['AA'].aboxy['po2'],
+            "pco2": self.model.models['AA'].aboxy['pco2'],
+            "hco3": self.model.models['AA'].aboxy['hco3'],
+            "be": self.model.models['AA'].aboxy['be'],
+
         }
 
         return vitals
