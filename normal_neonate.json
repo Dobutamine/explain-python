@@ -642,7 +642,7 @@
       "fixed_composition": false,
       "vol": 0.04955,
       "u_vol": 0.03955,
-      "el_base": 300,
+      "el_base": 250,
       "el_k": 0.0
     },
     "ALR": {
@@ -653,7 +653,37 @@
       "fixed_composition": false,
       "vol": 0.04955,
       "u_vol": 0.03955,
-      "el_base": 300,
+      "el_base": 250,
+      "el_k": 0.0
+    },
+    "CHEST_L": {
+      "name": "CHEST_L",
+      "description": "thorax",
+      "model_type": "Container",
+      "is_enabled": true,
+      "dependencies": [],
+      "contained_components": [
+        "ALL"
+      ],
+      "vol": 0.04955,
+      "vol_ext": 0.0,
+      "u_vol": 0.04955,
+      "el_base": 50.0,
+      "el_k": 0.0
+    },
+    "CHEST_R": {
+      "name": "CHEST_R",
+      "description": "thorax",
+      "model_type": "Container",
+      "is_enabled": true,
+      "dependencies": [],
+      "contained_components": [
+        "ALR"
+      ],
+      "vol": 0.04955,
+      "vol_ext": 0.0,
+      "u_vol": 0.04955,
+      "el_base": 50.0,
       "el_k": 0.0
     },
     "THORAX": {
@@ -662,10 +692,22 @@
       "model_type": "Container",
       "is_enabled": true,
       "dependencies": [],
-      "contained_components": ["ALL", "ALR"],
-      "vol": 0.1,
+      "contained_components": [
+        "CHEST_L", 
+        "CHEST_R",
+        "IVCI",
+        "SVC",
+        "PC",
+        "AA",
+        "AAR",
+        "PA",
+        "PV",
+        "LL",
+        "RL"
+      ],
+      "vol": 0.250,
       "vol_ext": 0.0,
-      "u_vol": 0.130,
+      "u_vol": 0.280,
       "el_base": 100,
       "el_k": 0.0
     },
