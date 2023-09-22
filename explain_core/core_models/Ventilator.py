@@ -18,9 +18,9 @@ class Ventilator(BaseModel):
     insp_time: float = 0.4
     insp_flow: float = 10.0
     exp_flow: float = 3.0
-    pip: float = 10.3
-    pip_max: float = 20.0
-    peep: float = 3.65
+    pip_cmh2o: float = 10.3
+    pip_cmh2o_max: float = 20.0
+    peep_cmh2o: float = 3.65
     tidal_volume: float = 0.0165
 
     # dependent parameters
@@ -56,6 +56,9 @@ class Ventilator(BaseModel):
     _tube_resistance: float = 25.0
     _max_flow: float = 0.0
     _pres_reached: bool = False
+    _pip: float = 0.0
+    _pip_max:float = 0.0
+    _peep: float = 0.0
 
     def init_model(self, model: object) -> bool:
         # initialize the base model
@@ -85,6 +88,11 @@ class Ventilator(BaseModel):
         pass
 
     def calc_model(self):
+        # convert settings to from cmH2o
+        self._pip = self.pip_cmh2o / 1.35951
+        self._pip_max = self.pip_cmh2o_max / 1.35951
+        self._peep = self.peep_cmh2o / 1.35951
+
         # calculate the expiration time
         self.exp_time = (60.0 / self.vent_rate) - self.insp_time
 
@@ -104,8 +112,8 @@ class Ventilator(BaseModel):
             # reset the volume counters
             self.exp_tidal_volume = -self._exp_tidal_volume_counter
             if self.exp_tidal_volume > 0:
-                self.elastance = (self.pip - self.peep) / self.exp_tidal_volume
-                self.compliance = 1 / self.elastance
+                self.elastance = (self._pip - self._peep) / self.exp_tidal_volume     # in mmHg/l
+                self.compliance = 1 / (((self._pip - self._peep) * 1.35951) / (self.exp_tidal_volume * 1000.0)) # in ml/cmH2O
             self._exp_tidal_volume_counter = 0.0
         
         # inspiration
@@ -120,10 +128,10 @@ class Ventilator(BaseModel):
             self.pressure_control()
 
         # store the values
-        self.pres = self._ventcircuit.pres - self.p_atm
-        self.flow = self._ettube.flow * 60.0
-        self.vol += -self._ettube.flow * 1000 * self._t
-        self.co2 = self._model.models["DS"].pco2
+        self.pres = (self._ventcircuit.pres - self.p_atm) * 1.35951     # in cmH2O
+        self.flow = self._ettube.flow * 60.0                            # in l/min
+        self.vol += -self._ettube.flow * 1000 * self._t                 # in ml
+        self.co2 = self._model.models["DS"].pco2                        # in mmHg
 
         for item in self._vent_parts:
             item.step_model()
@@ -139,10 +147,10 @@ class Ventilator(BaseModel):
             self._insp_valve.no_back_flow = True
 
             # set the resistance of the inspiration valve
-            self._insp_valve.r_for = (self._ventin.pres + self.pip - self.p_atm - self.peep) / (self.insp_flow / 60.0)
+            self._insp_valve.r_for = (self._ventin.pres + self._pip - self.p_atm - self._peep) / (self.insp_flow / 60.0)
 
             # guard the inspiratory pressure
-            if self._ventcircuit.pres > self.pip + self.p_atm:
+            if self._ventcircuit.pres > self._pip + self.p_atm:
                 self._insp_valve.no_flow = True   
                 self._insp_valve.r_for_factor = 1.0 
                 if self._insp_valve.flow > 0 and not self._pres_reached:
@@ -159,7 +167,7 @@ class Ventilator(BaseModel):
 
             # set the resistance of the expiration valve to and calculate the pressure in the expiration block
             self._exp_valve.r_for = 10
-            self._ventout.vol = (self.peep / self._ventout.el_base + self._ventout.u_vol)
+            self._ventout.vol = (self._peep / self._ventout.el_base + self._ventout.u_vol)
 
             # calculate the expiratory tidal volume
             if (self._ettube.flow < 0):
