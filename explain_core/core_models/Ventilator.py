@@ -22,6 +22,7 @@ class Ventilator(BaseModel):
     pip_cmh2o_max: float = 20.0
     peep_cmh2o: float = 3.65
     tidal_volume: float = 0.0165
+    trigger_volume_perc: float = 6
 
     # dependent parameters
     pres: float = 0.0
@@ -36,6 +37,8 @@ class Ventilator(BaseModel):
     insp_tidal_volume: float = 0.0
     exp_tidal_volume: float = 0.0
     minute_volume: float = 0.0
+    trigger_volume: float = 0.0
+
 
     # ventilator parts
     _vent_parts = []
@@ -53,6 +56,7 @@ class Ventilator(BaseModel):
     _expiration: bool = False
     _insp_tidal_volume_counter: float = 0.0
     _exp_tidal_volume_counter: float = 0.0
+    _trigger_volume_counter: float = 0.0
     _tube_resistance: float = 25.0
     _max_flow: float = 0.0
     _pres_reached: bool = False
@@ -60,6 +64,7 @@ class Ventilator(BaseModel):
     _pip_max:float = 0.0
     _peep: float = 0.0
     _tv_tolerance: float = 0.0005       # tidal volume tolerance for volume control in l
+    _triggered_breath: bool = False
 
     def init_model(self, model: object) -> bool:
         # initialize the base model
@@ -75,10 +80,12 @@ class Ventilator(BaseModel):
     def switch_ventilator(self, state):
         if state:
             self._model.models["MOUTH_DS"].no_flow = True
+            self._model.models["Breathing"].is_intubated = True
             self._ettube.no_flow = False
             self.is_enabled = True
         else:
             self._model.models["MOUTH_DS"].no_flow = False
+            self._model.models["Breathing"].is_intubated = False
             self._ettube.no_flow = True
             self.is_enabled = False
 
@@ -89,10 +96,21 @@ class Ventilator(BaseModel):
         pass
 
     def calc_model(self):
+
         # convert settings to from cmH2o
         self._pip = self.pip_cmh2o / 1.35951
         self._pip_max = self.pip_cmh2o_max / 1.35951
         self._peep = self.peep_cmh2o / 1.35951
+
+        # check for triggered breath
+        self.trigger_volume = (self.tidal_volume / 100) * self.trigger_volume_perc
+        if self._trigger_volume_counter > self.trigger_volume and not self._triggered_breath:
+            self._triggered_breath = True
+            # reset the trigger volume counter
+            self._trigger_volume_counter = 0.0
+
+        if not self._triggered_breath and not self._inspiration and self._ettube.flow > 0.0:
+            self._trigger_volume_counter += self._ettube.flow * self._t
 
         # calculate the expiration time
         self.exp_time = (60.0 / self.vent_rate) - self.insp_time
@@ -103,8 +121,8 @@ class Ventilator(BaseModel):
             self._inspiration = False
             self._expiration = True
             self.vol = 0.0
+            self._triggered_breath = False
            
-        
         # has the expiration time elapsed?
         if self._exp_time_counter > self.exp_time:
             self._exp_time_counter = 0.0
@@ -112,6 +130,7 @@ class Ventilator(BaseModel):
             self._expiration = False
             # reset the volume counters
             self.exp_tidal_volume = -self._exp_tidal_volume_counter
+            print(self.exp_tidal_volume)
             if self.exp_tidal_volume > 0:
                 self.elastance = (self._pip - self._peep) / self.exp_tidal_volume     # in mmHg/l
                 self.compliance = 1 / (((self._pip - self._peep) * 1.35951) / (self.exp_tidal_volume * 1000.0)) # in ml/cmH2O
@@ -119,6 +138,7 @@ class Ventilator(BaseModel):
             # check whether the ventilator is in PRVC mode
             if self.vent_mode == "PRVC":
                 self.pressure_regulated_volume_control()
+            
         
         # inspiration
         if self._inspiration:
@@ -188,11 +208,6 @@ class Ventilator(BaseModel):
             self.pip_cmh2o -= 0.5
             if self.pip_cmh2o < self.peep_cmh2o + 2.0:
                 self.pip_cmh2o = self.peep_cmh2o + 2.0
-
-
-
-
-
 
 
     def build_ventilator(self, model):

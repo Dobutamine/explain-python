@@ -10,6 +10,8 @@ class Breathing(BaseModel):
     rmp_gain_max: float = 12.0
     ie_ratio: float = 0.3
     targets: list = []
+    is_intubated: bool = False
+    tv_source: str = "MOUTH_DS"
 
     # dependent variables
     resp_rate: float = 40.0
@@ -36,7 +38,12 @@ class Breathing(BaseModel):
     _ncc_exp: float = 0
     _temp_exp_volume: float = 0.0
 
+
     def calc_model(self) -> None:
+        if self.is_intubated:
+            self.exp_tidal_volume = self._model.models["Ventilator"].exp_tidal_volume
+
+
         # calculate the respiratory rate and target tidal volume from the target minute volume
         self.vt_rr_controller()
 
@@ -68,7 +75,12 @@ class Breathing(BaseModel):
             self._exp_timer = 0.0
             self._exp_running = False
             self._temp_insp_volume = 0.0
-            self.exp_tidal_volume = -self._temp_exp_volume
+            if self.is_intubated:
+                self.exp_tidal_volume = self._model.models["Ventilator"].exp_tidal_volume
+            else:
+                self.exp_tidal_volume = -self._temp_exp_volume
+               
+
              # calculate the rmp gain
             if self.breathing_enabled:
                 if abs(self.exp_tidal_volume) < self.target_tidal_volume:
