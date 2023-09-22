@@ -1037,7 +1037,7 @@
       "fio2": 0.205,
       "ettube_diameter": 3.5,
       "ettube_length": 110.0,
-      "vent_mode": "PC",
+      "vent_mode": "PRVC",
       "vent_rate": 40.0,
       "vent_sync": true,
       "insp_time": 0.4,
@@ -1046,7 +1046,7 @@
       "pip_cmh2o": 10.0,
       "pip_cmh2o_max": 20.0,
       "peep_cmh2o": 3.0,
-      "tidal_volume": 0.0165
+      "tidal_volume": 0.015
     }
   }
 }

@@ -59,6 +59,7 @@ class Ventilator(BaseModel):
     _pip: float = 0.0
     _pip_max:float = 0.0
     _peep: float = 0.0
+    _tv_tolerance: float = 0.0005       # tidal volume tolerance for volume control in l
 
     def init_model(self, model: object) -> bool:
         # initialize the base model
@@ -115,6 +116,9 @@ class Ventilator(BaseModel):
                 self.elastance = (self._pip - self._peep) / self.exp_tidal_volume     # in mmHg/l
                 self.compliance = 1 / (((self._pip - self._peep) * 1.35951) / (self.exp_tidal_volume * 1000.0)) # in ml/cmH2O
             self._exp_tidal_volume_counter = 0.0
+            # check whether the ventilator is in PRVC mode
+            if self.vent_mode == "PRVC":
+                self.pressure_regulated_volume_control()
         
         # inspiration
         if self._inspiration:
@@ -124,8 +128,8 @@ class Ventilator(BaseModel):
             self._exp_time_counter += self._t
 
         # call the correct ventilation mode
-        if self.vent_mode == "PC":
-            self.pressure_control()
+        self.pressure_control()
+        
 
         # store the values
         self.pres = (self._ventcircuit.pres - self.p_atm) * 1.35951     # in cmH2O
@@ -174,8 +178,19 @@ class Ventilator(BaseModel):
                 self._exp_tidal_volume_counter += self._ettube.flow * self._t
 
 
-    def pressure_regulated_volume_control(self):
-        pass
+    def pressure_regulated_volume_control(self) -> None:
+        if self.exp_tidal_volume < self.tidal_volume - self._tv_tolerance:
+            self.pip_cmh2o += 0.5
+            if self.pip_cmh2o > self.pip_cmh2o_max:
+                self.pip_cmh2o = self.pip_cmh2o_max
+        
+        if self.exp_tidal_volume > self.tidal_volume + self._tv_tolerance:
+            self.pip_cmh2o -= 0.5
+            if self.pip_cmh2o < self.peep_cmh2o + 2.0:
+                self.pip_cmh2o = self.peep_cmh2o + 2.0
+
+
+
 
 
 
