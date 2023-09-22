@@ -8,10 +8,10 @@ def calc_resistance_tube(diameter: float, length: float, viscosity: float = 6.0)
     # resistance is in mmHg * s / l
     # L = length in meters from millimeters
     # r = radius in meters from millimeters
-    # n = viscosity in mmHg * s from centiPoise
+    # n = viscosity in centiPoise
 
-    # convert viscosity from centiPoise to mmHg * s
-    n_mmhgs: float = viscosity * 0.001 * 0.00750062
+    # convert viscosity from centiPoise to Pa * s
+    n_pas: float = viscosity / 1000.0
 
     # convert the length to meters
     length_meters: float = length / 1000.0
@@ -19,11 +19,13 @@ def calc_resistance_tube(diameter: float, length: float, viscosity: float = 6.0)
     # calculate radius in meters
     radius_meters = diameter / 2 / 1000.0
 
-    # calculate the resistance
-    res: float = (8.0 * n_mmhgs * length_meters) / (math.pi *
-                                                    math.pow(radius_meters, 4))
+    # calculate the resistance    Pa *  / m3
+    res: float = (8.0 * n_pas * length_meters) / (math.pi * math.pow(radius_meters, 4))
 
-    # convert resistance of mmHg * s / mm^3 to mmHg *s / l
-    res = res / 1000.0
+    # convert resistance of Pa/m3 to mmHg/l 
+    res = res * 0.00000750062
 
     return res
+
+def get_ettube_resistance(diameter: float = 3.5, flow: float = 10.0):
+    return 50.0

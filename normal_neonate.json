@@ -640,9 +640,9 @@
       "model_type": "GasCapacitance",
       "is_enabled": true,
       "fixed_composition": false,
-      "vol": 0.0495,
-      "u_vol": 0.0231,
-      "el_base": 83.58,
+      "vol": 0.04955,
+      "u_vol": 0.03955,
+      "el_base": 300,
       "el_k": 0.0
     },
     "ALR": {
@@ -651,9 +651,9 @@
       "model_type": "GasCapacitance",
       "is_enabled": true,
       "fixed_composition": false,
-      "vol": 0.0495,
-      "u_vol": 0.0231,
-      "el_base": 83.58,
+      "vol": 0.04955,
+      "u_vol": 0.03955,
+      "el_base": 300,
       "el_k": 0.0
     },
     "THORAX": {
@@ -662,23 +662,11 @@
       "model_type": "Container",
       "is_enabled": true,
       "dependencies": [],
-      "contained_components": [
-        "ALL",
-        "ALR",
-        "IVCI",
-        "SVC",
-        "PC",
-        "AA",
-        "AAR",
-        "PA",
-        "PV",
-        "LL",
-        "RL"
-      ],
-      "vol": 0.240,
-      "vol_ext": 0,
-      "u_vol": 0.2796,
-      "el_base": 55.72,
+      "contained_components": ["ALL", "ALR"],
+      "vol": 0.1,
+      "vol_ext": 0.0,
+      "u_vol": 0.130,
+      "el_base": 100,
       "el_k": 0.0
     },
     "MOUTH_DS": {
@@ -690,8 +678,8 @@
       "no_back_flow": false,
       "comp_from": "MOUTH",
       "comp_to": "DS",
-      "r_for": 25,
-      "r_back": 25,
+      "r_for": 20,
+      "r_back": 20,
       "r_k": 0
     },
     "DS_ALL": {
@@ -703,8 +691,8 @@
       "no_back_flow": false,
       "comp_from": "DS",
       "comp_to": "ALL",
-      "r_for": 35,
-      "r_back": 35,
+      "r_for": 45,
+      "r_back": 45,
       "r_k": 0
     },
     "DS_ALR": {
@@ -716,8 +704,8 @@
       "no_back_flow": false,
       "comp_from": "DS",
       "comp_to": "ALR",
-      "r_for": 35,
-      "r_back": 35,
+      "r_for": 45,
+      "r_back": 45,
       "r_k": 0
     },
     "GASEX_LL": {
@@ -1004,32 +992,19 @@
       "p_atm": 760.0,
       "temp": 37.0,
       "humidity": 1.0,
-      "vent_air_dry": {
-        "fo2": 0.205,
-        "fco2": 0.000392,
-        "fn2": 0.794608,
-        "fother": 0
-      },
-      "tubing_elastance": 1160.0,
-      "tubing_diameter": 0.0102,
-      "tubing_length": 1.6,
-      "tubing_volume": 0.13,
-      "ettube_diameter": 0.0035,
-      "ettube_length": 0.11,
-      "vent_mode": "PRVC",
+      "fio2": 0.205,
+      "ettube_diameter": 3.5,
+      "ettube_length": 110.0,
+      "vent_mode": "PC",
       "vent_rate": 40.0,
       "vent_sync": true,
-      "vent_trigger": 0.001,
       "insp_time": 0.4,
-      "insp_flow": 10.0,
+      "insp_flow": 8.0,
       "exp_flow": 3.0,
-      "pip": 10.3,
+      "pip": 10.0,
       "pip_max": 20.0,
       "peep": 3.65,
-      "tidal_volume": 0.0165,
-      "hfo_map": 10.0,
-      "hfo_freq": 25.0,
-      "hfo_amplitude":  25.0
+      "tidal_volume": 0.0165
     }
   }
 }
