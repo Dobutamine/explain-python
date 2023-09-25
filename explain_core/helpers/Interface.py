@@ -404,10 +404,12 @@ class Interface:
     # getters
     def get_vitals(self, time_to_calculate=10):
         result = self.analyze(["AA.pres", "PA.pres", "IVCI.pres"])
+        self.get_bloodgas("AD")
 
         vitals = {
             "heartrate": self.model.models['Heart'].heart_rate,
             "spo2_pre": self.model.models['AA'].aboxy['so2'],
+            "spo2_post": self.model.models['AD'].aboxy['so2'],
             "abp_systole": result["AA.pres.max"],
             "abp_diastole": result["AA.pres.min"],
             "pap_systole": result["PA.pres.max"],

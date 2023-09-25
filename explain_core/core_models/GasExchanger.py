@@ -20,8 +20,15 @@ class GasExchanger(BaseModel):
         super().init_model(model)
 
         # get a reference to the gas and blood capacitance
-        self._blood = self._model.models[self.comp_blood]
-        self._gas = self._model.models[self.comp_gas]
+        if type(self.comp_blood) is str:
+            self._blood = self._model.models[self.comp_blood]
+        else:
+            self._blood = self.comp_blood
+
+        if type(self.comp_gas) is str:
+            self._gas = self._model.models[self.comp_gas]
+        else:
+            self._gas = self.comp_gas
 
     def calc_model(self) -> None:
         super().calc_model()

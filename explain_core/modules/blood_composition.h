@@ -11,7 +11,7 @@ static double alpha_co2p = 0.03067;
 static double left_hp = 0.000015848931925;
 static double right_hp = 0.000316227766017;
 static double left_o2 = 0.01;
-static double right_o2 = 1000.0;
+static double right_o2 = 750.0;
 
 static double tco2 = 0.0;
 static double pco2 = 0.0;

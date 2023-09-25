@@ -43,9 +43,11 @@ class Ecls(BaseModel):
     pump_elastance: float = 25000
 
     # independent parameters
+    ecls_running: bool = False
     fico2_air: float = 0.000392     # fraction of co2 of the inspirered 
     fico2_gas: float = 0.000392     # fraction of co2 of the inspirered 
-    flow: float = 0                 # resulting or desired (depending on mode) ecls flow in l/min
+    blood_flow: float = 0           # resulting or desired (depending on mode) ecls flow in l/min
+    ven_pres: float = 0.0           # venous inlet pressure
     pre_oxy_pres:float = 0          # pre oxygenator pressure
     post_oxy_pres: float = 0        # post oxygenator pressure
     oxy_flux_o2: float = 0          # o2 flux across the oxygenator
@@ -53,6 +55,7 @@ class Ecls(BaseModel):
     gas_flow:float = 0.0            # monitored gas flow
     tubing_in_volume:float = 0.0    # tubing in volume
     tubing_out_volume:float = 0.0   # tubing out volume
+
 
     # ecls parts
     _ecls_parts = []                # define a list holding all ecls system parts
@@ -85,14 +88,13 @@ class Ecls(BaseModel):
         # build the ecls system
         self.build_ecls(model)
 
-        # print(self._ecls_parts)
-
         # signal that the ventilator model is initialized and return it
         self._is_initialized = True
         return self._is_initialized
 
     def switch_ecls(self, state): 
-        pass
+        self.ecls_running = state
+        
 
     def set_cannula(self, _diameter_drainage, _diameter_return, _length_drainage, _length_return):
         r_drainage:float = self.calc_resistance(_diameter_drainage, _length_drainage)
@@ -129,34 +131,41 @@ class Ecls(BaseModel):
 
 
     def calc_model(self) -> None:
-        # calculate the gas valve controlling the sweep gas
-        co2_ls = (self.co2_flow_gas / 1000.0 / 60.0)    # in l/s    = co2 flow
-        sg_ls: float = (self.sweep_gas / 60.0) + co2_ls # in l/s    = sweep gas flow
-        r:float = (self._oxy_gas_in.pres - self._oxy_gas_out.pres) / (sg_ls + co2_ls)
+        if self.ecls_running:
+            # calculate the gas valve controlling the sweep gas
+            co2_ls = (self.co2_flow_gas / 1000.0 / 60.0)    # in l/s    = co2 flow
+            sg_ls: float = (self.sweep_gas / 60.0) + co2_ls # in l/s    = sweep gas flow
+            r:float = (self._oxy_gas_in.pres - self._oxy_gas_out.pres) / (sg_ls + co2_ls)
 
-        # calculate the fico2 of the sweep gas source assuming dry gas
-        fico2_sg = 0.000392 * (1.0 - self.fio2_gas) / (1.0 - 0.205)
+            # calculate the fico2 of the sweep gas source assuming dry gas
+            fico2_sg = 0.000392 * (1.0 - self.fio2_gas) / (1.0 - 0.205)
+        
+            # calculate the total fico2 of the source gas (so with the co2 flow included)
+            self.fico2_gas = (co2_ls / (sg_ls + co2_ls)) + fico2_sg
 
-        # calculate the total fico2 of the source gas (so with the co2 flow included)
-        self.fico2_gas = (co2_ls / (sg_ls + co2_ls)) + fico2_sg
+            # calculate the gas composition of gas source
+            set_gas_composition(self._oxy_gas_in, self.fio2_gas, self.temp_gas, self.humidity_gas, self.fico2_gas)
 
-        # calculate the gas composition of gas source
-        set_gas_composition(self._oxy_gas_in, self.fio2_gas, self.temp_gas, self.humidity_gas, self.fico2_gas)
+            # set the resistance of the gasflow valve depending of the sweep gas
+            self._oxy_gas_in_valve.r_for = r - 25.0
+            self._oxy_gas_in_valve.no_back_flow = True
 
-        # set the resistance of the gasflow valve depending of the sweep gas
-        self._oxy_gas_in_valve.r_for = r - 25.0
-        self._oxy_gas_in_valve.no_back_flow = True
+            # set the out valve resistance to low
+            self._oxy_gas_out_valve.r_for = 25
+            self._oxy_gas_out_valve.no_back_flow = True
 
-        # set the out valve resistance to low
-        self._oxy_gas_out_valve.r_for = 25
-        self._oxy_gas_out_valve.no_back_flow = True
+            # monitor the sweep gas flow
+            self.gas_flow = self._oxy_gas_in_valve.flow * 60.0
+            self.blood_flow = self._tubing_out_return_site.flow * 60.0
 
-        # monitor the sweep gas flow
-        self.gas_flow = self._oxy_gas_in_valve.flow * 60.0
+            # get the pressures
+            self.ven_pres = self._tubing_in.pres
+            self.pre_oxy_pres = self._pump.pres
+            self.post_oxy_pres = self._tubing_out.pres
 
-        # do the model step calculations of the ecls system
-        for item in self._ecls_parts:
-            item.step_model()
+            # do the model step calculations of the ecls system
+            for item in self._ecls_parts:
+                item.step_model()
 
     def build_ecls(self, model) -> None:
         # clear the ecls system parts
@@ -364,10 +373,10 @@ class Ecls(BaseModel):
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
-            "no_back_flow": True,
+            "no_back_flow": False,
             "comp_from": self._drainage_site,
             "comp_to": self._tubing_in,
-            "r_for": 30000,
+            "r_for": 1000000,
             "r_back": 1000000,
             "r_k": 0,
         })
@@ -381,7 +390,7 @@ class Ecls(BaseModel):
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
-            "no_back_flow": True,
+            "no_back_flow": False,
             "comp_from": self._tubing_in,
             "comp_to": self._pump,
             "r_for": 25,
@@ -398,7 +407,7 @@ class Ecls(BaseModel):
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
-            "no_back_flow": True,
+            "no_back_flow": False,
             "comp_from": self._pump,
             "comp_to": self._oxy,
             "r_for": 25,
@@ -415,11 +424,11 @@ class Ecls(BaseModel):
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
-            "no_back_flow": True,
+            "no_back_flow": False,
             "comp_from": self._oxy,
             "comp_to": self._tubing_out,
-            "r_for": 25,
-            "r_back": 25,
+            "r_for": 1000000,
+            "r_back": 1000000,
             "r_k": 0,
         })
         self._oxy_tubing_out.init_model(model)
@@ -432,7 +441,7 @@ class Ecls(BaseModel):
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
-            "no_back_flow": True,
+            "no_back_flow": False,
             "comp_from": self._tubing_out,
             "comp_to": self._return_site,
             "r_for": 30000,
@@ -442,6 +451,20 @@ class Ecls(BaseModel):
         self._tubing_out_return_site.init_model(model)
         self._ecls_parts.append(self._tubing_out_return_site)
 
+        self._exchanger = GasExchanger(**{
+            "name": "ECLS_GASEX",
+            "description": "gasexchanger",
+            "model_type": "GasExchanger",
+            "is_enabled": True,
+            "dependencies": [],
+            "comp_blood": self._oxy,
+            "comp_gas":self._oxy_gas,
+            "dif_co2": 0.001,
+            "dif_o2": 0.001
+        })
+        self._exchanger.init_model(model)
+        self._ecls_parts.append(self._exchanger)
+
         # calculate the cannula resistances
         self.set_cannula(self.drainage_cannula_diameter, self.return_cannula_diameter, self.drainage_cannula_length, self.return_cannula_length)
 
@@ -449,9 +472,9 @@ class Ecls(BaseModel):
         self.set_tubing(self.tubing_diameter, self.drainage_tubing_length, self.return_tubing_length, self.tubing_elastance)
         
         # initialize the pump component
-        self._pump._inlet_res = self._tubing_in_pump
-        self._pump._outlet_res = self._pump_oxy
         self._pump.init_model(model)
+        # connect the pump
+        self._pump.connect_pump(self._tubing_in_pump, self._pump_oxy)
         # copy the blood composition of the drainage site as starting point
         self._pump.aboxy = self._drainage_site.aboxy.copy()
         self._pump.solutes = self._drainage_site.solutes.copy()
