@@ -23,6 +23,7 @@ class Ventilator(BaseModel):
     peep_cmh2o: float = 3.65
     tidal_volume: float = 0.0165
     trigger_volume_perc: float = 6
+    synchronized: bool = False
 
     # dependent parameters
     pres: float = 0.0
@@ -77,15 +78,18 @@ class Ventilator(BaseModel):
         self._is_initialized = True
         return self._is_initialized
        
-    def switch_ventilator(self, state):
+    def switch_ventilator(self, state, spont_breathing = False, synchronized = True):
         if state:
             self._model.models["MOUTH_DS"].no_flow = True
             self._model.models["Breathing"].is_intubated = True
+            self._model.models["Breathing"].breathing_enabled = spont_breathing
+            self.synchronized = synchronized
             self._ettube.no_flow = False
             self.is_enabled = True
         else:
             self._model.models["MOUTH_DS"].no_flow = False
             self._model.models["Breathing"].is_intubated = False
+            self._model.models["Breathing"].breathing_enabled = True
             self._ettube.no_flow = True
             self.is_enabled = False
 
@@ -124,13 +128,14 @@ class Ventilator(BaseModel):
             self._triggered_breath = False
            
         # has the expiration time elapsed?
-        if self._exp_time_counter > self.exp_time:
+        if self._exp_time_counter > self.exp_time or self._triggered_breath:
+            self._triggered_breath = False
             self._exp_time_counter = 0.0
             self._inspiration = True
             self._expiration = False
             # reset the volume counters
             self.exp_tidal_volume = -self._exp_tidal_volume_counter
-            print(self.exp_tidal_volume)
+
             if self.exp_tidal_volume > 0:
                 self.elastance = (self._pip - self._peep) / self.exp_tidal_volume     # in mmHg/l
                 self.compliance = 1 / (((self._pip - self._peep) * 1.35951) / (self.exp_tidal_volume * 1000.0)) # in ml/cmH2O

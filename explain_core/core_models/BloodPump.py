@@ -8,6 +8,8 @@ class BloodPump(BloodCapacitance):
     pump_mode: int = 0              # 0 = centrifugal, 1 = roller pump
     pump_pressure: float = 0.0
     pump_rpm: float = 0.0
+    inlet: str = ""
+    outlet: str = ""
 
     # dependent parameters
     pres_inlet: float = 0.0

@@ -927,13 +927,6 @@
       "is_enabled": false,
       "dependencies": []
     },
-    "Ecls": {
-      "name": "Ecls",
-      "description": "Extracorporeal life support model",
-      "model_type": "Ecls",
-      "is_enabled": false,
-      "dependencies": []
-    },
     "Placenta": {
       "name": "Placenta",
       "description": "Placenta model",
@@ -1017,6 +1010,13 @@
       "non_lin_factor": 0.0,
       "no_flow": true,
       "no_back_flow": false
+    },
+    "Ecls": {
+      "name": "Ecls",
+      "description": "Extracorporeal life support model",
+      "model_type": "Ecls",
+      "is_enabled": true,
+      "dependencies": []
     },
     "VentilatorExp": {
       "name": "VentilatorExp",
