@@ -23,9 +23,9 @@ class BloodPump(BloodCapacitance):
         # initialize the parent class
         super().init_model(model)
 
-        # find the connected connectors
-        self._inlet_res = self._model.models[self.inlet]
-        self._outlet_res = self._model.models[self.outlet]
+    def connect_pump(self, _in: BloodResistor, _out: BloodResistor):
+        self._inlet_res = _in
+        self._outlet_res = _out
 
     def calc_model(self) -> None:
         # calculate the parent class

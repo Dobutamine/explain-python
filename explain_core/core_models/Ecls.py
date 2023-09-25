@@ -6,7 +6,6 @@ from explain_core.core_models.BloodPump import BloodPump
 from explain_core.core_models.GasExchanger import GasExchanger
 from explain_core.core_models.GasCapacitance import GasCapacitance
 from explain_core.core_models.GasResistor import GasResistor
-from explain_core.functions.TubeResistance import get_ettube_resistance
 from explain_core.functions.GasComposition import set_gas_composition
 
 class Ecls(BaseModel):
@@ -25,7 +24,6 @@ class Ecls(BaseModel):
     gravity = 9.81                  # m * s-2
     viscosity = 5.5                 # cP
 
-    
     drainage_cannula_diameter: float = 0.004
     drainage_cannula_length: float = 0.11
     return_cannula_diameter: float = 0.0033
@@ -95,6 +93,40 @@ class Ecls(BaseModel):
 
     def switch_ecls(self, state): 
         pass
+
+    def set_cannula(self, _diameter_drainage, _diameter_return, _length_drainage, _length_return):
+        r_drainage:float = self.calc_resistance(_diameter_drainage, _length_drainage)
+        r_return:float = self.calc_resistance(_diameter_return, _length_return)
+        
+        self._drainage_site_tubing_in.r_for = r_drainage
+        self._drainage_site_tubing_in.r_back = r_drainage
+        self._drainage_site_tubing_in.no_back_flow = False
+
+        self._tubing_out_return_site.r_for = r_return
+        self._tubing_out_return_site.r_back = r_return
+        self._tubing_out_return_site.no_back_flow = False
+
+
+    def set_tubing(self, _diameter, _tubingin_length, _tubingout_length, _tubing_elastance = 5160):
+        r_tubingin: float = self.calc_resistance(_diameter, _tubingin_length)
+        r_tubingout: float = self.calc_resistance(_diameter, _tubingout_length)
+
+        # set the tubing resistances
+        self._tubing_in_pump.r_for = r_tubingin
+        self._tubing_in_pump.r_back = r_tubingin
+        self._tubing_in.el_base = _tubing_elastance
+
+        # allow backflow in centrifugal mode
+        self._pump_oxy.no_back_flow = False
+        # roller pump mode is an occlusive pump mode so no back flow
+        if self.mode == 1:
+            self._pump_oxy.no_back_flow = True
+
+        self._oxy_tubing_out.r_for = r_tubingout
+        self._oxy_tubing_out.r_back = r_tubingout
+        self._tubing_out.el_base = _tubing_elastance
+
+
 
     def calc_model(self) -> None:
         # calculate the gas valve controlling the sweep gas
@@ -306,13 +338,6 @@ class Ecls(BaseModel):
         # add to the components
         self._ecls_parts.append(self._oxy)
 
-        # drainage cannula resistance
-
-
-        # # return cannula resistance
-
-
-
         # define the blood pump
         self._pump = BloodPump(**{
             "name": "ECLSPUMP",
@@ -328,12 +353,136 @@ class Ecls(BaseModel):
             "pump_rpm": 0,
             "inlet": "",
             "outlet": ""
-
         })
-        # initialize component
+        # we cannot intialized the pump yet as it depends on the other components
+
+        # drainage cannula resistance
+        self._drainage_site_tubing_in = BloodResistor(**{
+            "name": "ECLS_DRAINAGE_TUBINGIN",
+            "description": "drainage cannula resistance",
+            "model_type": "GasResistor",
+            "is_enabled": True,
+            "dependencies": [],
+            "no_flow": False,
+            "no_back_flow": True,
+            "comp_from": self._drainage_site,
+            "comp_to": self._tubing_in,
+            "r_for": 30000,
+            "r_back": 1000000,
+            "r_k": 0,
+        })
+        self._drainage_site_tubing_in.init_model(model)
+        self._ecls_parts.append(self._drainage_site_tubing_in)
+
+        self._tubing_in_pump = BloodResistor(**{
+            "name": "ECLS_TUBINGIN_PUMP",
+            "description": "resistance tubing in and the pump",
+            "model_type": "GasResistor",
+            "is_enabled": True,
+            "dependencies": [],
+            "no_flow": False,
+            "no_back_flow": True,
+            "comp_from": self._tubing_in,
+            "comp_to": self._pump,
+            "r_for": 25,
+            "r_back": 25,
+            "r_k": 0,
+        })
+        self._tubing_in_pump.init_model(model)
+        self._ecls_parts.append(self._tubing_in_pump)
+
+        self._pump_oxy = BloodResistor(**{
+            "name": "ECLS_PUMP_OXY",
+            "description": "resistance between pump and oxygenator",
+            "model_type": "GasResistor",
+            "is_enabled": True,
+            "dependencies": [],
+            "no_flow": False,
+            "no_back_flow": True,
+            "comp_from": self._pump,
+            "comp_to": self._oxy,
+            "r_for": 25,
+            "r_back": 25,
+            "r_k": 0,
+        })
+        self._pump_oxy.init_model(model)
+        self._ecls_parts.append(self._pump_oxy)
+
+        self._oxy_tubing_out = BloodResistor(**{
+            "name": "ECLS_OXY_TUBINGOUT",
+            "description": "resistance between oxygenator and tubing out",
+            "model_type": "GasResistor",
+            "is_enabled": True,
+            "dependencies": [],
+            "no_flow": False,
+            "no_back_flow": True,
+            "comp_from": self._oxy,
+            "comp_to": self._tubing_out,
+            "r_for": 25,
+            "r_back": 25,
+            "r_k": 0,
+        })
+        self._oxy_tubing_out.init_model(model)
+        self._ecls_parts.append(self._oxy_tubing_out)
+
+        self._tubing_out_return_site = BloodResistor(**{
+            "name": "ECLS_TUBINGOUT_RETURN",
+            "description": "return cannula resistance",
+            "model_type": "GasResistor",
+            "is_enabled": True,
+            "dependencies": [],
+            "no_flow": False,
+            "no_back_flow": True,
+            "comp_from": self._tubing_out,
+            "comp_to": self._return_site,
+            "r_for": 30000,
+            "r_back": 1000000,
+            "r_k": 0,
+        })
+        self._tubing_out_return_site.init_model(model)
+        self._ecls_parts.append(self._tubing_out_return_site)
+
+        # calculate the cannula resistances
+        self.set_cannula(self.drainage_cannula_diameter, self.return_cannula_diameter, self.drainage_cannula_length, self.return_cannula_length)
+
+        # calculate the tubing resistances
+        self.set_tubing(self.tubing_diameter, self.drainage_tubing_length, self.return_tubing_length, self.tubing_elastance)
+        
+        # initialize the pump component
+        self._pump._inlet_res = self._tubing_in_pump
+        self._pump._outlet_res = self._pump_oxy
         self._pump.init_model(model)
         # copy the blood composition of the drainage site as starting point
         self._pump.aboxy = self._drainage_site.aboxy.copy()
         self._pump.solutes = self._drainage_site.solutes.copy()
         # add to the components
         self._ecls_parts.append(self._pump)
+
+    def calc_resistance(self, diameter, length):
+        # calculate the resistance of the cannula where the cannula is modeled as a perfect tube with a diameter and a length in meters
+        # the viscosity is in centiPoise
+
+        # resistance is calculated using Poiseuille's Law : R = (8 * n * L) / (PI * r^4)
+
+        # we have to watch the units carefully where we have to make sure that the units in the formula are
+        # resistance is in mmHg * s / l
+        # L = length in meters
+        # r = radius in meters
+        # n = viscosity in mmHg * s from centiPoise
+
+        # define a minimal resistance
+        resistance = 10
+
+        # // calculate the radius
+        radius = diameter / 2.0
+
+        # // convert viscosity from centiPoise to mmHg * s
+        n_mmhgs = self.viscosity * 0.001 * 0.00750062
+
+        # // calculate the resistance using Poiseuille's Law, the resistance is now in mmHg * s/mm^3
+        resistance = (8.0 * n_mmhgs * length) / (math.pi * math.pow(radius, 4))
+
+        # // convert resistance of mmHg * s / mm^3 to mmHg *s / l
+        resistance = resistance / 1000.0
+
+        return resistance
