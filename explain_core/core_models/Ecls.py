@@ -111,9 +111,11 @@ class Ecls(BaseModel):
 
     def set_drainage_site(self, new_drainage_site):
         self._drainage_site = self._model.models[new_drainage_site]
+        self._drainage_site_tubing_in._model_comp_from = self._model.models[new_drainage_site]
 
     def set_return_site(self, new_return_site):
         self._return_site = self._model.models[new_return_site]
+        self._tubing_out_return_site._model_comp_to = self._model.models[new_return_site]
 
     def set_rpm(self, new_rpm):
         self.rpm = new_rpm
