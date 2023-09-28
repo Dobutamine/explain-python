@@ -21,6 +21,11 @@ class BloodCapacitance(Capacitance):
 
     # override the volume_in method as all the blood solutes have to be changed to
     def volume_in(self, dvol: float, model_from: Capacitance) -> None:
+        # if blood capacitance has a fixed composition then return
+        if self.fixed_composition:
+            return
+        
+        # execute the parent class method
         super().volume_in(dvol)
 
         if self.vol <= 0:

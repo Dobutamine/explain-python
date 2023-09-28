@@ -18,6 +18,12 @@ class BaseModel:
         for key, value in args.items():
             setattr(self, key, value)
 
+    def enable(self):
+        self.is_enabled = True
+    
+    def disable(self):
+        self.is_enabled = False
+
     def init_model(self, model: object) -> bool:
         # get a reference to the model
         self._model = model

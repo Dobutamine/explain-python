@@ -889,14 +889,14 @@ class Interface:
             time_to_calculate=time_to_calculate, performance=performance)
 
         print(
-            f'Ready in {self.model.run_duration:.1f} sec. Average model step in {self.model.step_duration:.4f} ms.')
+            f' Ready in {self.model.run_duration:.1f} sec. Average model step in {self.model.step_duration:.4f} ms.')
 
     def fastforward(self, time_to_calculate=30, performance=True):
         t = self.model.fastforward(
             time_to_calculate=time_to_calculate, performance=performance)
 
         print(
-            f'Ready in {self.model.run_duration:.1f} sec. Average model step in {self.model.step_duration:.4f} ms.')
+            f' Ready in {self.model.run_duration:.1f} sec. Average model step in {self.model.step_duration:.4f} ms.')
 
 
 class propChange:

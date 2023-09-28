@@ -105,6 +105,7 @@ class ModelEngine:
 
         except:
             # signal that the json file failed to load
+            print(f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!")
             self.update_log(
                 f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!", "error")
             self.initialized = False
@@ -127,6 +128,7 @@ class ModelEngine:
                     model_module = importlib.import_module(
                         'custom_models.' + model_type)
                 except:
+                    print(f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}")
                     self.update_log(
                         f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}", "error")
                     error_counter += 1
@@ -139,6 +141,7 @@ class ModelEngine:
                 try:
                     self.models[model['name']] = model_class(**model)
                 except Exception as error:
+                    print(f"Instantiation error: {model_type} model failed to instantiate. Error: {error}")
                     # a module holding the desired model class is producing an error while instantiating
                     self.update_log(
                         f"Instantiation error: {model_type} model failed to instantiate. Error: {error}", "error")
@@ -161,6 +164,7 @@ class ModelEngine:
                 try:
                     model.init_model(self)
                 except Exception as error:
+                    print(f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}")
                     # a module holding the desired model class is producing an error while initiallizing
                     self.update_log(
                         f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}", "error")
@@ -169,6 +173,7 @@ class ModelEngine:
             if init_errors > 0 or dep_errors > 0:
                 self.initialized = False
             else:
+                print(f" Model '{self.name}' loaded and initialized correctly.")
                 self.update_log(
                     f" Model '{self.name}' loaded and initialized correctly.")
                 self.initialized = True

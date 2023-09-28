@@ -931,8 +931,23 @@
       "name": "Placenta",
       "description": "Placenta model",
       "model_type": "Placenta",
-      "is_enabled": false,
-      "dependencies": []
+      "is_enabled": true,
+      "dependencies": ["AD","IVCE"],
+      "fetal_umb_art_origin": "AD",
+      "fetal_umb_ven_target": "IVCE",
+      "fetal_pla_resistance": 20000,
+      "fetal_pla_vol": 0.08,
+      "fetal_pla_u_vol":  0.08,
+      "fetal_pla_el_base": 5000.0,
+      "fetal_umb_art_diameter": 4.0,
+      "fetal_umb_art_length": 400.0,
+      "fetal_umb_ven_diameter": 8.0,
+      "fetal_umb_ven_length": 400.0,
+      "mat_pla_flow": 0.65,
+      "mat_to2": 7.0,
+      "mat_tco2": 27.0,
+      "plac_do2": 0.1,
+      "plac_dco2": 0.1
     },
     "ArtificialWhomb": {
       "name": "ArtificialWhomb",
@@ -1016,13 +1031,6 @@
       "description": "Extracorporeal life support model",
       "model_type": "Ecls",
       "is_enabled": true,
-      "dependencies": []
-    },
-    "VentilatorExp": {
-      "name": "VentilatorExp",
-      "description": "VentilatorExp model",
-      "model_type": "VentilatorExp",
-      "is_enabled": false,
       "dependencies": []
     },
     "Ventilator": {

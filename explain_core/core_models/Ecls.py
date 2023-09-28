@@ -84,7 +84,7 @@ class Ecls(BaseModel):
     _oxy_gas_in_valve = {}                  # gas resistor between oxy_in and oxy
     _oxy_gas_out_valve = {}                 # gas resistor between oxy and oxy_gas_out
     _bg_eval_interval: float = 1.0          # interval at which the bloodgas composition is calculated
-    _bg_eval_counter:float = 0.0            # counter for the bloodgas composition
+    _bg_eval_counter:float = 0.0            # counter for the bloodgas composition 
 
     def init_model(self, model: object) -> bool:
         # initialize the base model

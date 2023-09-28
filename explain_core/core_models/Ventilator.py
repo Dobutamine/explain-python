@@ -78,18 +78,15 @@ class Ventilator(BaseModel):
         self._is_initialized = True
         return self._is_initialized
        
-    def switch_ventilator(self, state, spont_breathing = False, synchronized = True):
+    def switch_ventilator(self, state):
         if state:
             self._model.models["MOUTH_DS"].no_flow = True
             self._model.models["Breathing"].is_intubated = True
-            self._model.models["Breathing"].breathing_enabled = spont_breathing
-            self.synchronized = synchronized
             self._ettube.no_flow = False
             self.is_enabled = True
         else:
             self._model.models["MOUTH_DS"].no_flow = False
             self._model.models["Breathing"].is_intubated = False
-            self._model.models["Breathing"].breathing_enabled = True
             self._ettube.no_flow = True
             self.is_enabled = False
 

@@ -19,10 +19,17 @@ class BloodDiffusor(BaseModel):
         super().init_model(model)
 
         # get a reference to the blood capacitances
-        self._comp_blood1 = self._model.models[self.comp_blood1]
-        self._comp_blood2 = self._model.models[self.comp_blood2]
+        if type(self.comp_blood1) is str:
+            self._comp_blood1 = self._model.models[self.comp_blood1]
+        else:
+            self._comp_blood1 = self.comp_blood1
 
-    def calc_mdoel(self) -> None:
+        if type(self.comp_blood2) is str:
+            self._comp_blood2 = self._model.models[self.comp_blood2]
+        else:
+            self._comp_blood2 = self.comp_blood2
+
+    def calc_model(self) -> None:
         super().calc_model()
 
         # we need to po2 and pco2 so we need to calculate the blood composition
@@ -30,15 +37,17 @@ class BloodDiffusor(BaseModel):
         set_blood_composition(self._comp_blood2)
 
         # get the partial pressures and gas concentrations from the components
-        po2_comp_blood1: float = self._comp_blood1['po2']
-        to2_comp_blood1: float = self._comp_blood1['to2']
-        pco2_comp_blood1: float = self._comp_blood1['pco2']
-        tco2_comp_blood1: float = self._comp_blood1['to2']
+        po2_comp_blood1: float = self._comp_blood1.aboxy['po2']
+        to2_comp_blood1: float = self._comp_blood1.aboxy['to2']
 
-        po2_comp_blood2: float = self._comp_blood2['po2']
-        to2_comp_blood2: float = self._comp_blood2['to2']
-        pco2_comp_blood2: float = self._comp_blood2['pco2']
-        tco2_comp_blood2: float = self._comp_blood2['to2']
+        pco2_comp_blood1: float = self._comp_blood1.aboxy['pco2']
+        tco2_comp_blood1: float = self._comp_blood1.aboxy['tco2']
+
+        po2_comp_blood2: float = self._comp_blood2.aboxy['po2']
+        to2_comp_blood2: float = self._comp_blood2.aboxy['to2']
+        
+        pco2_comp_blood2: float = self._comp_blood2.aboxy['pco2']
+        tco2_comp_blood2: float = self._comp_blood2.aboxy['tco2']
 
         # calculate the O2 and CO2 flux
         self._flux_o2 = (po2_comp_blood1 - po2_comp_blood2) * self.dif_o2 * self.dif_o2_factor * self._t
@@ -49,7 +58,7 @@ class BloodDiffusor(BaseModel):
         if new_to2_comp_blood1 < 0:
             new_to2_comp_blood1 = 0
 
-        new_to2_comp_blood2: float = (to2_comp_blood2 * self._comp_blood1.vol + self._flux_o2) / self._comp_blood2.vol
+        new_to2_comp_blood2: float = (to2_comp_blood2 * self._comp_blood2.vol + self._flux_o2) / self._comp_blood2.vol
         if new_to2_comp_blood2 < 0:
             new_to2_comp_blood2 = 0
 
@@ -62,8 +71,8 @@ class BloodDiffusor(BaseModel):
             new_tco2_comp_blood2 = 0
 
         # set the new concentrations
-        self._comp_blood1['to2'] = new_to2_comp_blood1
-        self._comp_blood1['tco2'] = new_tco2_comp_blood1
+        self._comp_blood1.aboxy['to2'] = new_to2_comp_blood1
+        self._comp_blood1.aboxy['tco2'] = new_tco2_comp_blood1
 
-        self._comp_blood2['to2'] = new_to2_comp_blood2
-        self._comp_blood2['tco2'] = new_tco2_comp_blood2
+        self._comp_blood2.aboxy['to2'] = new_to2_comp_blood2
+        self._comp_blood2.aboxy['tco2'] = new_tco2_comp_blood2
