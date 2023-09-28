@@ -1,6 +1,0 @@
-from explain_core.base_models.BaseModel import BaseModel
-
-class Fluids(BaseModel):
-
-    def init_model(self, model: object) -> bool:
-        super().init_model(model)
