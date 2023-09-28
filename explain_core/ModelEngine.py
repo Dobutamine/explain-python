@@ -10,7 +10,6 @@ from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.functions.BloodComposition import set_blood_composition
 
-
 class ModelEngine:
     # define an object holding the entire model and submodels
     models: dict = {}
