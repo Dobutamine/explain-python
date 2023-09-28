@@ -1,7 +1,7 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.core_models.GasCapacitance import GasCapacitance
-from explain_core.core_models.GasResistor import GasResistor
+from explain_core.core_models.Resistor import Resistor
 from explain_core.functions.TubeResistance import get_ettube_resistance
 from explain_core.functions.GasComposition import set_gas_composition
 
@@ -45,10 +45,10 @@ class Ventilator(BaseModel):
     _vent_parts = []
     _ventin: GasCapacitance = {}
     _ventout: GasCapacitance = {}
-    _insp_valve: GasResistor = {}
+    _insp_valve: Resistor = {}
     _ventcircuit: GasCapacitance = {}
-    _exp_valve: GasResistor = {}
-    _ettube: GasResistor = {}
+    _exp_valve: Resistor = {}
+    _ettube: Resistor = {}
 
     # local parameters
     _insp_time_counter: float = 0.0
@@ -290,10 +290,10 @@ class Ventilator(BaseModel):
         self._vent_parts.append(self._ventout)
 
         # connect the parts using the gas resistor models
-        self._insp_valve = GasResistor(**{
+        self._insp_valve = Resistor(**{
             "name": "INSPVALVE",
             "description": "inspiration valve of the mechanical ventilator",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
@@ -310,10 +310,10 @@ class Ventilator(BaseModel):
         # calculate the en tracheal tube resistance
         self._tube_resistance = get_ettube_resistance(self.ettube_diameter, self.insp_flow)
 
-        self._ettube = GasResistor(**{
+        self._ettube = Resistor(**{
             "name": "ETTUBE",
             "description": "endotracheal tube",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": True,
@@ -327,10 +327,10 @@ class Ventilator(BaseModel):
         self._ettube.init_model(model)
         self._vent_parts.append(self._ettube)
 
-        self._exp_valve = GasResistor(**{
+        self._exp_valve = Resistor(**{
             "name": "EXPVALVE",
             "description": "expiration valve of the mechanical ventilator",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,

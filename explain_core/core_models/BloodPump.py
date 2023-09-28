@@ -1,6 +1,6 @@
 import math
 from explain_core.core_models.BloodCapacitance import BloodCapacitance
-from explain_core.core_models.BloodResistor import BloodResistor
+from explain_core.core_models.Resistor import Resistor
 
 
 class BloodPump(BloodCapacitance):
@@ -16,14 +16,10 @@ class BloodPump(BloodCapacitance):
     pres_outlet: float = 0.0
 
     # local parameters
-    _inlet_res: BloodResistor = {}
-    _outlet_res: BloodResistor = {}
+    _inlet_res: Resistor = {}
+    _outlet_res: Resistor = {}
 
-    def init_model(self, model: object) -> bool:
-        # initialize the parent class
-        super().init_model(model)
-
-    def connect_pump(self, _in: BloodResistor, _out: BloodResistor):
+    def connect_pump(self, _in: Resistor, _out: Resistor):
         self._inlet_res = _in
         self._outlet_res = _out
 
@@ -31,13 +27,11 @@ class BloodPump(BloodCapacitance):
         # calculate the parent class
         super().calc_model()
 
-        # do the blood pump specific actions
+        # create a pressure gradient across the pump
         self.pump_pressure = -self.pump_rpm / 25.0
-
-        # determine the inlet and outlet pressures and transfer them to the connected bloodresistors
         if self.pump_mode == 0:
-            self._inlet_res.p1_ext = 0.0
-            self._inlet_res.p2_ext = self.pump_pressure
+            self._inlet_res.set_p1_ext(0.0)
+            self._inlet_res.set_p2_ext(self.pump_pressure)
         else:
-            self._outlet_res.p1_ext = self.pump_pressure
-            self._outlet_res.p2_ext = 0.0
+            self._outlet_res.set_p1_ext(self.pump_pressure)
+            self._outlet_res.set_p2_ext(0.0)

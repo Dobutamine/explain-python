@@ -1,8 +1,7 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.core_models.BloodCapacitance import BloodCapacitance
-from explain_core.core_models.BloodResistor import BloodResistor
-from explain_core.core_models.Shunt import Shunt
+from explain_core.core_models.Resistor import Resistor
 from explain_core.core_models.BloodPump import BloodPump
 from explain_core.core_models.BloodDiffusor import BloodDiffusor
 from explain_core.functions.TubeResistance import calc_resistance_tube
@@ -62,24 +61,50 @@ class Placenta(BaseModel):
 
     # objects
     _plac_parts = []
-
-    _fetal_umb_art: Shunt = {}
-    _fetal_umb_ven: Shunt = {}
+    _fetal_umb_art: Resistor = {}
+    _fetal_umb_ven: Resistor = {}
     _fetal_pla: BloodCapacitance = {}
     _pla_exchanger: BloodDiffusor = {}
-
     _mat_ut_art: BloodCapacitance = {}
     _mat_pla: BloodCapacitance = {}
     _mat_ut_ven: BloodCapacitance = {}
-    
-    _mat_ut_art_pla: BloodResistor = {}
-    _mat_pla_ut_uv: BloodResistor = {}
-
+    _mat_ut_art_pla: Resistor = {}
+    _mat_pla_ut_uv: Resistor = {}
     _mat_ut_art_res: float = 1000.0
     _mat_ut_ven_res:float = 1000.0
 
     def switch_placenta(self, state):
         self.placenta_running = state
+
+    def set_placenta_resistance(self, new_res):
+        self.fetal_pla_resistance = new_res
+        self._fetal_umb_art.set_r_ext(self.fetal_pla_resistance)
+    
+    def set_placenta_elastance(self, new_elastance):
+        self.fetal_pla_el_base = new_elastance
+        self._fetal_pla.el_base = self.fetal_pla_el_base
+
+    def set_umb_arteries_diameter(self, new_diameter):
+        self.fetal_umb_art_diameter = new_diameter
+        self._fetal_umb_art.set_diameter(new_diameter)
+
+    def set_umb_arteries_length(self, new_length):
+        self.fetal_umb_art_length = new_length
+        self._fetal_umb_art.set_length(new_length)
+    
+    def set_umb_arteries_nonlin_factor(self, new_factor):
+        self._fetal_umb_art.set_non_lin_factor(new_factor)
+    
+    def set_umb_vein_nonlin_factor(self, new_factor):
+        self._fetal_umb_ven.set_non_lin_factor(new_factor)
+
+    def set_umb_vein_diameter(self, new_diameter):
+        self.fetal_umb_ven_diameter = new_diameter
+        self._fetal_umb_ven.set_diameter(new_diameter)
+
+    def set_umb_vein_length(self, new_length):
+        self.fetal_umb_ven_length = new_length
+        self._fetal_umb_ven.set_length(new_length)
 
     def init_model(self, model: object) -> bool:
         # initialize the base model
@@ -143,39 +168,43 @@ class Placenta(BaseModel):
         self._plac_parts.append(self._fetal_pla)
    
         # build the connectors
-        self._fetal_umb_art = Shunt(**{
+        self._fetal_umb_art = Resistor(**{
             "name": "FETALUMBART",
             "description": "connector between descending aorta and umbilical arteries",
-            "model_type": "BloodResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "comp_from": self._model.models[self.fetal_umb_art_origin],
             "comp_to": self._fetal_pla,
             "length": self.fetal_umb_art_length,
             "diameter": self.fetal_umb_art_diameter,
-            "non_lin_factor": 0.0,
+            "r_k": 0.0,
             "no_flow": False,
             "no_back_flow": False
         })
         self._fetal_umb_art.init_model(model)
+        # set the placental resistance
+        self._fetal_umb_art.set_r_ext(self.fetal_pla_resistance)
         self._plac_parts.append(self._fetal_umb_art)
 
-        self._fetal_umb_ven = Shunt(**{
+        self._fetal_umb_ven = Resistor(**{
             "name": "FETALUMBVEN",
             "description": "connector between placenta and umbilical veins",
-            "model_type": "BloodResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "comp_from": self._fetal_pla,
             "comp_to": self._model.models[self.fetal_umb_ven_target],
             "length": self.fetal_umb_ven_length,
             "diameter": self.fetal_umb_ven_diameter,
-            "non_lin_factor": 0.0,
+            "r_k": 0.0,
             "no_flow": False,
             "no_back_flow": False
         })
         self._fetal_umb_ven.init_model(model)
         self._plac_parts.append(self._fetal_umb_ven)
+
+
 
         # build the maternal part
         self._mat_ut_art = BloodCapacitance(**{
@@ -239,10 +268,10 @@ class Placenta(BaseModel):
         self._plac_parts.append(self._mat_ut_ven)
 
         # connectors of the maternal part
-        self._mat_ut_art_pla = BloodResistor(**{
+        self._mat_ut_art_pla = Resistor(**{
             "name": "MATUTARTPLA",
             "description": "connector between maternal uterine arteries and placenta",
-            "model_type": "BloodResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
@@ -256,10 +285,10 @@ class Placenta(BaseModel):
         self._mat_ut_art_pla.init_model(model)
         self._plac_parts.append(self._mat_ut_art_pla)
 
-        self._mat_pla_ut_uv = BloodResistor(**{
+        self._mat_pla_ut_uv = Resistor(**{
             "name": "MATPLAUTVEN",
             "description": "connector between maternal placenta and uterine veins",
-            "model_type": "BloodResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,

@@ -1,11 +1,10 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.core_models.BloodCapacitance import BloodCapacitance
-from explain_core.core_models.BloodResistor import BloodResistor
+from explain_core.core_models.Resistor import Resistor
 from explain_core.core_models.BloodPump import BloodPump
 from explain_core.core_models.GasExchanger import GasExchanger
 from explain_core.core_models.GasCapacitance import GasCapacitance
-from explain_core.core_models.GasResistor import GasResistor
 from explain_core.functions.GasComposition import set_gas_composition
 from explain_core.functions.BloodComposition import set_blood_composition
 
@@ -297,10 +296,10 @@ class ArtificialWhomb(BaseModel):
         self._ecls_parts.append(self._oxy_gas_out)
 
         # gas connectors
-        self._oxy_gas_in_valve = GasResistor(**{
+        self._oxy_gas_in_valve = Resistor(**{
             "name": "OXYGASINVALVE",
             "description": "valve between the gas source and the gas capacitance of the oxygenator",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
@@ -314,10 +313,10 @@ class ArtificialWhomb(BaseModel):
         self._oxy_gas_in_valve.init_model(model)
         self._ecls_parts.append(self._oxy_gas_in_valve)
 
-        self._oxy_gas_out_valve = GasResistor(**{
+        self._oxy_gas_out_valve = Resistor(**{
             "name": "OXYGASOUTVALVE",
             "description": "valve between the gas outlet and the gas capacitance of the oxygenator",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
@@ -420,10 +419,10 @@ class ArtificialWhomb(BaseModel):
         # we cannot intialized the pump yet as it depends on the other components
 
         # drainage cannula resistance
-        self._drainage_site_tubing_in = BloodResistor(**{
+        self._drainage_site_tubing_in = Resistor(**{
             "name": "ECLS_DRAINAGE_TUBINGIN",
             "description": "drainage cannula resistance",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
@@ -437,10 +436,10 @@ class ArtificialWhomb(BaseModel):
         self._drainage_site_tubing_in.init_model(model)
         self._ecls_parts.append(self._drainage_site_tubing_in)
 
-        self._tubing_in_pump = BloodResistor(**{
+        self._tubing_in_pump = Resistor(**{
             "name": "ECLS_TUBINGIN_PUMP",
             "description": "resistance tubing in and the pump",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
@@ -454,10 +453,10 @@ class ArtificialWhomb(BaseModel):
         self._tubing_in_pump.init_model(model)
         self._ecls_parts.append(self._tubing_in_pump)
 
-        self._pump_oxy = BloodResistor(**{
+        self._pump_oxy = Resistor(**{
             "name": "ECLS_PUMP_OXY",
             "description": "resistance between pump and oxygenator",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
@@ -471,10 +470,10 @@ class ArtificialWhomb(BaseModel):
         self._pump_oxy.init_model(model)
         self._ecls_parts.append(self._pump_oxy)
 
-        self._oxy_tubing_out = BloodResistor(**{
+        self._oxy_tubing_out = Resistor(**{
             "name": "ECLS_OXY_TUBINGOUT",
             "description": "resistance between oxygenator and tubing out",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
@@ -488,10 +487,10 @@ class ArtificialWhomb(BaseModel):
         self._oxy_tubing_out.init_model(model)
         self._ecls_parts.append(self._oxy_tubing_out)
 
-        self._tubing_out_return_site = BloodResistor(**{
+        self._tubing_out_return_site = Resistor(**{
             "name": "ECLS_TUBINGOUT_RETURN",
             "description": "return cannula resistance",
-            "model_type": "GasResistor",
+            "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,

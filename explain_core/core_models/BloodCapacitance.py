@@ -14,11 +14,6 @@ class BloodCapacitance(Capacitance):
     acidbase: dict[str, float] = {}
     oxy: dict[str, float] = {}
 
-    # override the calc_model method as the blood capacitance has some specific actions
-    def calc_model(self) -> None:
-        # do the cap actions
-        super().calc_model()
-
     # override the volume_in method as all the blood solutes have to be changed to
     def volume_in(self, dvol: float, model_from: Capacitance) -> None:
         # if blood capacitance has a fixed composition then return

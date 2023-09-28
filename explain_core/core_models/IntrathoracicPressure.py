@@ -12,6 +12,3 @@ class IntrathoracicPressure(BaseModel):
 
         # get a reference to the thoracic container
         self.thorax = self._model.models["THORAX"]
-
-    def calc_model(self) -> None:
-        pass
