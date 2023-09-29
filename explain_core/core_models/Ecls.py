@@ -10,27 +10,28 @@ from explain_core.functions.BloodComposition import set_blood_composition
 
 class Ecls(BaseModel):
     # define the independent parameters
-    ecls_running: bool = False              # determines whether the ecls is running or not
+    ecls_running: bool = False                # determines whether the artificial whomb is running or not
     mode: int = 0                           # 0 = centrifugal pump, 1 = roller
     p_atm: float = 760                      # atmospheric pressure
     drainage_site: str = "RA"               # site from where the blood is drained
-    return_site: str = "AAR"                # site to which the blood is returned
-    rpm: float = 0                          # pump no of rotations per minute
+    return_site: str = "AAR"               # site to which the blood is returned
+    pump_rpm: float = 0                     # pump no of rotations per minute
     fico2_air: float = 0.000392             # fraction of co2 of the outside air
-    fio2: float = 0.205                     # fraction of inspired air going into the ecls oxygenator
-    co2_flow: float = 10                    # amount of co2 in ml/min provided to the oxygenator
-    temp_gas: float = 20.0                  # temperature of the gas flow
-    humidity_gas: float = 0.5               # humidity of the gas flow
-    sweep_gas: float = 1.5                  # sweep gas of the oxygenator
+    oxy_fio2: float = 0.205                 # fraction of inspired air going into the ecls oxygenator
+    oxy_co2_flow: float = 10                # amount of co2 in ml/min provided to the oxygenator
+    oxy_temp_gas: float = 20.0              # temperature of the gas flow
+    oxy_humidity_gas: float = 0.5           # humidity of the gas flow
+    oxy_sweep_gas: float = 1.5              # sweep gas of the oxygenator
     blood_viscosity = 5.5                   # viscosity of the blood in cP
-    drainage_cannula_diameter: float = 0.004# diameter of the drainage cannula in meters
-    drainage_cannula_length: float = 0.11   # length of the drainage cannula in meters
-    return_cannula_diameter: float = 0.0033 # diameter of the return cannula in meters
-    return_cannula_length: float = 0.11     # length of the return cannula
-    tubing_diameter: float = 0.00635        # diameter of the ecls tubing in meters
+    drainage_cannula_diameter: float = 4    # diameter of the drainage cannula in mm
+    drainage_cannula_length: float = 10.0   # length of the drainage cannula in mm
+    return_cannula_diameter: float = 3.3    # diameter of the return cannula in mm
+    return_cannula_length: float = 10.0     # length of the return cannula in mm
+
+    tubing_diameter: float = 6.35           # diameter of the ecls tubing in meters
     tubing_elastance: float = 5160          # elastance of the ecls tubing
-    drainage_tubing_length: float = 1       # total length of the ecls drainage tubing in meters
-    return_tubing_length: float = 1         # total length of the ecls return tubing out meters
+    drainage_tubing_length: float = 100     # total length of the ecls drainage tubing in mm
+    return_tubing_length: float = 100       # total length of the ecls return tubing out mm
     oxy_volume: float = 0.081               # volume of the oxygenator in liters
     oxy_elastance:float = 25000             # elastance of the oxygenator mmhg / l
     oxy_do2: float = 0.001                  # diffusion constant for o2 of the oxygenator
@@ -64,24 +65,25 @@ class Ecls(BaseModel):
     hemoglobin:float = 0.0                  # ecls hemoglobin level in mmol/l
 
     # ecls parts
-    _ecls_parts = []                        # define a list holding all ecls system parts
-    _drainage_site = {}                     # reference to the model blood capacitance from where the blood is drained
-    _tubing_in = {}                         # blood containing ecls tubing between drainage site and the pump
-    _oxy = {}                               # blood in the oxygenator
-    _pump = {}                              # ecls pump
-    _tubing_out = {}                        # blood containing ecls tubing between oxygenator and the return site
-    _return_site = {}                       # reference to the model blood capacitance to where the blood is pumped
-    _drainage_site_tubing_in = {}           # resistor connecting the drainage site to the ecls tubing
-    _tubing_in_pump = {}                    # resistor connecting the ecls tubing to the pump
-    _pump_oxy = {}                          # resistor connecting the pump to the oxygenator
-    _oxy_tubing_out = {}                    # resistor connecting the oxygenator to the tubing out
-    _tubing_out_return_site = {}            # resistor connecting the return site to the ecls tubing
-    _exchanger = {}                         # exchanger between gas and blood of the oxygenator
-    _oxy_gas = {}                           # oxygenator gas capacitance
-    _oxy_gas_in = {}                        # gas capacitance holding the air going into the oxygenator
-    _oxy_gas_out = {}                       # gas capacitance where the air is going into after the oxugenator
-    _oxy_gas_in_valve = {}                  # gas resistor between oxy_in and oxy
-    _oxy_gas_out_valve = {}                 # gas resistor between oxy and oxy_gas_out
+    _ecls_parts = []                          # define a list holding all ecls system parts
+    _tubing_in: BloodCapacitance = {}       # blood containing ecls tubing between drainage site and the pump
+    _oxy: BloodCapacitance = {}             # blood in the oxygenator
+    _pump: BloodPump = {}                   # ecls pump
+    _tubing_out: BloodCapacitance = {}      # blood containing ecls tubing between oxygenator and the return site
+
+    _drainage_tubing_in: Resistor = {}            # resistor connecting the umbilical arteries to the ecls tubing
+    _tubing_in_pump: Resistor = {}          # resistor connecting the ecls tubing to the pump
+    _pump_oxy: Resistor = {}                # resistor connecting the pump to the oxygenator
+    _oxy_tubing_out: Resistor = {}          # resistor connecting the oxygenator to the ecls tubing
+    _tubing_out_return: Resistor = {}           # resistor connecting the ecls tubing to the umbilical veins
+    _exchanger: GasExchanger = {}           # exchanger between gas and blood of the oxygenator
+
+    _oxy_gas: GasCapacitance = {}           # oxygenator gas capacitance
+    _oxy_gas_in: GasCapacitance = {}        # gas capacitance holding the air going into the oxygenator
+    _oxy_gas_out: GasCapacitance = {}       # gas capacitance where the air is going into after the oxugenator
+    _oxy_gas_in_valve: Resistor = {}        # gas resistor between oxy_in and oxy
+    _oxy_gas_out_valve: Resistor = {}       # gas resistor between oxy and oxy_gas_out
+
     _bg_eval_interval: float = 1.0          # interval at which the bloodgas composition is calculated
     _bg_eval_counter:float = 0.0            # counter for the bloodgas composition 
 
@@ -96,83 +98,43 @@ class Ecls(BaseModel):
         self._is_initialized = True
         return self._is_initialized
 
-    def switch_ecls(self, state): 
+    def switch_aw(self, state): 
         self.ecls_running = state
 
     def set_fio2(self, new_fio2):
-        self.fio2 = new_fio2
+        self.oxy_fio2 = new_fio2
 
     def set_sweepgas(self, new_sweep):
-        self.sweep_gas = new_sweep
+        self.oxy_sweep_gas = new_sweep
     
     def set_co2_flow(self, new_co2_flow):
-        self.co2_flow = new_co2_flow
+        self.oxy_co2_flow = new_co2_flow
 
-    def set_drainage_site(self, new_drainage_site):
-        self._drainage_site = self._model.models[new_drainage_site]
-        self._drainage_site_tubing_in._model_comp_from = self._model.models[new_drainage_site]
-
-    def set_return_site(self, new_return_site):
-        self._return_site = self._model.models[new_return_site]
-        self._tubing_out_return_site._model_comp_to = self._model.models[new_return_site]
-
-    def set_rpm(self, new_rpm):
-        self.rpm = new_rpm
-
-    def set_cannula(self, _diameter_drainage, _diameter_return, _length_drainage, _length_return):
-        r_drainage:float = self.calc_resistance(_diameter_drainage, _length_drainage)
-        r_return:float = self.calc_resistance(_diameter_return, _length_return)
-        
-        self._drainage_site_tubing_in.r_for = r_drainage
-        self._drainage_site_tubing_in.r_back = r_drainage
-        self._drainage_site_tubing_in.no_back_flow = False
-
-        self._tubing_out_return_site.r_for = r_return
-        self._tubing_out_return_site.r_back = r_return
-        self._tubing_out_return_site.no_back_flow = False
-
-
-    def set_tubing(self, _diameter, _tubingin_length, _tubingout_length, _tubing_elastance = 5160):
-        r_tubingin: float = self.calc_resistance(_diameter, _tubingin_length)
-        r_tubingout: float = self.calc_resistance(_diameter, _tubingout_length)
-
-        # set the tubing resistances
-        self._tubing_in_pump.r_for = r_tubingin
-        self._tubing_in_pump.r_back = r_tubingin
-        self._tubing_in.el_base = _tubing_elastance
-
-        # allow backflow in centrifugal mode
-        self._pump_oxy.no_back_flow = False
-        # roller pump mode is an occlusive pump mode so no back flow
-        if self.mode == 1:
-            self._pump_oxy.no_back_flow = True
-
-        self._oxy_tubing_out.r_for = r_tubingout
-        self._oxy_tubing_out.r_back = r_tubingout
-        self._tubing_out.el_base = _tubing_elastance
+    def set_pump_rpm(self, new_rpm):
+        self.pump_rpm = new_rpm
 
     def calc_model(self) -> None:
         if self.ecls_running:
             # calculate the gas valve controlling the sweep gas
-            co2_ls = (self.co2_flow / 1000.0 / 60.0)    # in l/s    = co2 flow
-            sg_ls: float = (self.sweep_gas / 60.0) + co2_ls # in l/s    = sweep gas flow
+            co2_ls = (self.oxy_co2_flow / 1000.0 / 60.0)    # in l/s    = co2 flow
+            sg_ls: float = (self.oxy_sweep_gas / 60.0) + co2_ls # in l/s    = sweep gas flow
             r:float = (self._oxy_gas_in.pres - self._oxy_gas_out.pres) / (sg_ls + co2_ls)
 
             # calculate the fico2 of the sweep gas source assuming dry gas
-            fico2_sg = 0.000392 * (1.0 - self.fio2) / (1.0 - 0.205)
+            fico2_sg = 0.000392 * (1.0 - self.oxy_fio2) / (1.0 - 0.205)
         
             # calculate the total fico2 of the source gas (so with the co2 flow included)
             self.fico2_gas = (co2_ls / (sg_ls + co2_ls)) + fico2_sg
 
             # calculate the gas composition of gas source
-            set_gas_composition(self._oxy_gas_in, self.fio2, self.temp_gas, self.humidity_gas, self.fico2_gas)
+            set_gas_composition(self._oxy_gas_in, self.oxy_fio2, self.oxy_temp_gas, self.oxy_humidity_gas, self.fico2_gas)
 
             # set the resistance of the gasflow valve depending of the sweep gas
             self._oxy_gas_in_valve.r_for = r - 25.0
             self._oxy_gas_in_valve.no_back_flow = True
 
             # set the rpm
-            self._pump.pump_rpm = self.rpm
+            self._pump.pump_rpm = self.pump_rpm
 
             # set the out valve resistance to low
             self._oxy_gas_out_valve.r_for = 25
@@ -180,7 +142,7 @@ class Ecls(BaseModel):
 
             # monitor the sweep gas flow
             self.gas_flow = self._oxy_gas_in_valve.flow * 60.0
-            self.blood_flow = self._tubing_out_return_site.flow * 60.0
+            self.blood_flow = self._tubing_out_return.flow * 60.0
 
             # get the pressures
             self.ven_pres = self._tubing_in.pres
@@ -245,7 +207,7 @@ class Ecls(BaseModel):
         # calculate the pressure 
         self._oxy_gas_in.calc_model()
         # set the gas composition of the reservoir
-        set_gas_composition(self._oxy_gas_in, self.fio2, self.temp_gas, self.humidity_gas, self.fico2_gas)
+        set_gas_composition(self._oxy_gas_in, self.oxy_fio2, self.oxy_temp_gas, self.oxy_humidity_gas, self.fico2_gas)
         # # add a reference the the ecls_parts object
         self._ecls_parts.append(self._oxy_gas_in)
 
@@ -268,7 +230,7 @@ class Ecls(BaseModel):
         # calculate the pressure 
         self._oxy_gas.calc_model()
         # set the gas composition of the gas part of the oxygenator
-        set_gas_composition(self._oxy_gas, self.fio2, self.temp_gas, self.humidity_gas, self.fico2_gas)
+        set_gas_composition(self._oxy_gas, self.oxy_fio2, self.oxy_temp_gas, self.oxy_humidity_gas, self.fico2_gas)
         # add a reference the the ecls_parts object
         self._ecls_parts.append(self._oxy_gas)
 
@@ -291,7 +253,7 @@ class Ecls(BaseModel):
         # calculate the pressure 
         self._oxy_gas_out.calc_model()
         # set the gas composition of the gas out
-        set_gas_composition(self._oxy_gas_out, self.fio2, self.temp_gas, self.humidity_gas, self.fico2_air)
+        set_gas_composition(self._oxy_gas_out, self.oxy_fio2, self.oxy_temp_gas, self.oxy_humidity_gas, self.fico2_air)
         # add a reference the the ecls_parts object
         self._ecls_parts.append(self._oxy_gas_out)
 
@@ -331,18 +293,16 @@ class Ecls(BaseModel):
         self._ecls_parts.append(self._oxy_gas_out_valve)
 
         # get a reference to the drainage site (= already initialized though main model)
-        self._drainage_site = model.models[self.drainage_site]
-        self._ecls_parts.append(self._drainage_site)
+        _drainage_site = model.models[self.drainage_site]
         
         # get a reference to the return site (= already initialized through main model)
-        self._return_site = model.models[self.return_site]
-        self._ecls_parts.append(self._return_site)
+        _return_site = model.models[self.return_site]
 
         # define the tubing in blood capacitance
         self.tubing_in_volume = math.pi * math.pow(self.tubing_diameter / 2, 2) * self.drainage_tubing_length * 1000
         self._tubing_in = BloodCapacitance(**{
-            "name": "ECLSTUBINGIN",
-            "description": "ecls tubing between drainage site and pump",
+            "name": "ECLS_TUBINGIN",
+            "description": "ecls tubing in",
             "model_type": "BloodCapacitance",
             "is_enabled": True,
             "dependencies": [],
@@ -354,16 +314,16 @@ class Ecls(BaseModel):
         # initialize component
         self._tubing_in.init_model(model)
         # copy the blood composition of the drainage site as starting point
-        self._tubing_in.aboxy = self._drainage_site.aboxy.copy()
-        self._tubing_in.solutes = self._drainage_site.solutes.copy()
+        self._tubing_in.aboxy = _drainage_site.aboxy.copy()
+        self._tubing_in.solutes = _drainage_site.solutes.copy()
         # add to the components
         self._ecls_parts.append(self._tubing_in)
 
         # define the tubing out blood capacitance
         self.tubing_out_volume = math.pi * math.pow(self.tubing_diameter / 2, 2) * self.return_tubing_length * 1000
         self._tubing_out = BloodCapacitance(**{
-            "name": "ECLSTUBINGOUT",
-            "description": "ecls tubing between return site and oxygenator",
+            "name": "ECLS_TUBINGOUT",
+            "description": "ecls tubing out",
             "model_type": "BloodCapacitance",
             "is_enabled": True,
             "dependencies": [],
@@ -375,15 +335,15 @@ class Ecls(BaseModel):
         # initialize component
         self._tubing_out.init_model(model)
         # copy the blood composition of the drainage site as starting point
-        self._tubing_out.aboxy = self._drainage_site.aboxy.copy()
-        self._tubing_out.solutes = self._drainage_site.solutes.copy()
+        self._tubing_out.aboxy = _drainage_site.aboxy.copy()
+        self._tubing_out.solutes = _drainage_site.solutes.copy()
         # add to the components
         self._ecls_parts.append(self._tubing_out)
 
         # define the oxygenator
         self._oxy = BloodCapacitance(**{
-            "name": "ECLSOXY",
-            "description": "ecls oxygenator",
+            "name": "ECLS_OXY_BLOOD",
+            "description": "ecls blood oxygenator",
             "model_type": "BloodCapacitance",
             "is_enabled": True,
             "dependencies": [],
@@ -395,15 +355,15 @@ class Ecls(BaseModel):
         # initialize component
         self._oxy.init_model(model)
         # copy the blood composition of the drainage site as starting point
-        self._oxy.aboxy = self._drainage_site.aboxy.copy()
-        self._oxy.solutes = self._drainage_site.solutes.copy()
+        self._oxy.aboxy = _drainage_site.aboxy.copy()
+        self._oxy.solutes = _drainage_site.solutes.copy()
         # add to the components
         self._ecls_parts.append(self._oxy)
 
         # define the blood pump
         self._pump = BloodPump(**{
-            "name": "ECLSPUMP",
-            "description": "ecls pump",
+            "name": "ECLS_PUMP",
+            "description": "ecls blood pump",
             "model_type": "BloodPump",
             "is_enabled": True,
             "dependencies": [],
@@ -417,28 +377,28 @@ class Ecls(BaseModel):
             "outlet": ""
         })
         # we cannot intialized the pump yet as it depends on the other components
-
+    
         # drainage cannula resistance
-        self._drainage_site_tubing_in = Resistor(**{
+        self._ua_tubing_in = Resistor(**{
             "name": "ECLS_DRAINAGE_TUBINGIN",
-            "description": "drainage cannula resistance",
+            "description": "connector between drainage site and tubing in",
             "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
             "no_back_flow": False,
-            "comp_from": self._drainage_site,
+            "comp_from": _drainage_site,
             "comp_to": self._tubing_in,
-            "r_for": 1000000,
-            "r_back": 1000000,
+            "diameter": self.drainage_cannula_diameter,
+            "length": self.drainage_cannula_length,
             "r_k": 0,
         })
-        self._drainage_site_tubing_in.init_model(model)
-        self._ecls_parts.append(self._drainage_site_tubing_in)
+        self._ua_tubing_in.init_model(model)
+        self._ecls_parts.append(self._ua_tubing_in)
 
         self._tubing_in_pump = Resistor(**{
             "name": "ECLS_TUBINGIN_PUMP",
-            "description": "resistance tubing in and the pump",
+            "description": "connector tubing in and the pump",
             "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
@@ -446,8 +406,8 @@ class Ecls(BaseModel):
             "no_back_flow": False,
             "comp_from": self._tubing_in,
             "comp_to": self._pump,
-            "r_for": 15,
-            "r_back": 15,
+            "diameter":self.tubing_diameter,
+            "length":self.drainage_tubing_length,
             "r_k": 0,
         })
         self._tubing_in_pump.init_model(model)
@@ -455,7 +415,7 @@ class Ecls(BaseModel):
 
         self._pump_oxy = Resistor(**{
             "name": "ECLS_PUMP_OXY",
-            "description": "resistance between pump and oxygenator",
+            "description": "connector between pump and oxygenator",
             "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
@@ -472,7 +432,7 @@ class Ecls(BaseModel):
 
         self._oxy_tubing_out = Resistor(**{
             "name": "ECLS_OXY_TUBINGOUT",
-            "description": "resistance between oxygenator and tubing out",
+            "description": "connector between oxygenator and tubing out",
             "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
@@ -480,29 +440,30 @@ class Ecls(BaseModel):
             "no_back_flow": False,
             "comp_from": self._oxy,
             "comp_to": self._tubing_out,
-            "r_for": 1000000,
-            "r_back": 1000000,
+            "diameter": self.tubing_diameter,
+            "length": self.return_tubing_length,
             "r_k": 0,
         })
         self._oxy_tubing_out.init_model(model)
         self._ecls_parts.append(self._oxy_tubing_out)
 
-        self._tubing_out_return_site = Resistor(**{
+        self._tubing_out_return = Resistor(**{
             "name": "ECLS_TUBINGOUT_RETURN",
-            "description": "return cannula resistance",
+            "description": "connector between tubing out and return site",
             "model_type": "Resistor",
             "is_enabled": True,
             "dependencies": [],
             "no_flow": False,
             "no_back_flow": False,
             "comp_from": self._tubing_out,
-            "comp_to": self._return_site,
-            "r_for": 30000,
-            "r_back": 1000000,
+            "comp_to": _return_site,
+            "diameter": self.return_cannula_diameter,
+            "length": self.return_cannula_length,
             "r_k": 0,
         })
-        self._tubing_out_return_site.init_model(model)
-        self._ecls_parts.append(self._tubing_out_return_site)
+        self._tubing_out_return.init_model(model)
+        self._ecls_parts.append(self._tubing_out_return)
+
 
         self._exchanger = GasExchanger(**{
             "name": "ECLS_GASEX",
@@ -518,47 +479,12 @@ class Ecls(BaseModel):
         self._exchanger.init_model(model)
         self._ecls_parts.append(self._exchanger)
 
-        # calculate the cannula resistances
-        self.set_cannula(self.drainage_cannula_diameter, self.return_cannula_diameter, self.drainage_cannula_length, self.return_cannula_length)
-
-        # calculate the tubing resistances
-        self.set_tubing(self.tubing_diameter, self.drainage_tubing_length, self.return_tubing_length, self.tubing_elastance)
-        
         # initialize the pump component
         self._pump.init_model(model)
         # connect the pump
         self._pump.connect_pump(self._tubing_in_pump, self._pump_oxy)
         # copy the blood composition of the drainage site as starting point
-        self._pump.aboxy = self._drainage_site.aboxy.copy()
-        self._pump.solutes = self._drainage_site.solutes.copy()
+        self._pump.aboxy = _drainage_site.aboxy.copy()
+        self._pump.solutes = _drainage_site.solutes.copy()
         # add to the components
         self._ecls_parts.append(self._pump)
-
-    def calc_resistance(self, diameter, length):
-        # calculate the resistance of the cannula where the cannula is modeled as a perfect tube with a diameter and a length in meters
-        # the viscosity is in centiPoise
-
-        # resistance is calculated using Poiseuille's Law : R = (8 * n * L) / (PI * r^4)
-
-        # we have to watch the units carefully where we have to make sure that the units in the formula are
-        # resistance is in mmHg * s / l
-        # L = length in meters
-        # r = radius in meters
-        # n = viscosity in mmHg * s from centiPoise
-
-        # define a minimal resistance
-        resistance = 10
-
-        # // calculate the radius
-        radius = diameter / 2.0
-
-        # // convert viscosity from centiPoise to mmHg * s
-        n_mmhgs = self.blood_viscosity * 0.001 * 0.00750062
-
-        # // calculate the resistance using Poiseuille's Law, the resistance is now in mmHg * s/mm^3
-        resistance = (8.0 * n_mmhgs * length) / (math.pi * math.pow(radius, 4))
-
-        # // convert resistance of mmHg * s / mm^3 to mmHg *s / l
-        resistance = resistance / 1000.0
-
-        return resistance

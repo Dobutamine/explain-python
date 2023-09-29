@@ -15,13 +15,13 @@ class ArtificialWhomb(BaseModel):
     p_atm: float = 760                      # atmospheric pressure
     drainage_site: str = "AD"               # site from where the blood is drained
     return_site: str = "IVCE"               # site to which the blood is returned
-    rpm: float = 0                          # pump no of rotations per minute
+    pump_rpm: float = 0                     # pump no of rotations per minute
     fico2_air: float = 0.000392             # fraction of co2 of the outside air
-    fio2: float = 0.205                     # fraction of inspired air going into the ecls oxygenator
-    co2_flow: float = 10                    # amount of co2 in ml/min provided to the oxygenator
-    temp_gas: float = 20.0                  # temperature of the gas flow
-    humidity_gas: float = 0.5               # humidity of the gas flow
-    sweep_gas: float = 1.5                  # sweep gas of the oxygenator
+    oxy_fio2: float = 0.205                 # fraction of inspired air going into the ecls oxygenator
+    oxy_co2_flow: float = 10                # amount of co2 in ml/min provided to the oxygenator
+    oxy_temp_gas: float = 20.0              # temperature of the gas flow
+    oxy_humidity_gas: float = 0.5           # humidity of the gas flow
+    oxy_sweep_gas: float = 1.5              # sweep gas of the oxygenator
     blood_viscosity = 5.5                   # viscosity of the blood in cP
     drainage_cannula_diameter: float = 4    # diameter of the drainage cannula in mm
     drainage_cannula_length: float = 10.0   # length of the drainage cannula in mm
@@ -113,39 +113,39 @@ class ArtificialWhomb(BaseModel):
         self.aw_running = state
 
     def set_fio2(self, new_fio2):
-        self.fio2 = new_fio2
+        self.oxy_fio2 = new_fio2
 
     def set_sweepgas(self, new_sweep):
-        self.sweep_gas = new_sweep
+        self.oxy_sweep_gas = new_sweep
     
     def set_co2_flow(self, new_co2_flow):
-        self.co2_flow = new_co2_flow
+        self.oxy_co2_flow = new_co2_flow
 
-    def set_rpm(self, new_rpm):
-        self.rpm = new_rpm
+    def set_pump_rpm(self, new_rpm):
+        self.pump_rpm = new_rpm
 
     def calc_model(self) -> None:
         if self.aw_running:
             # calculate the gas valve controlling the sweep gas
-            co2_ls = (self.co2_flow / 1000.0 / 60.0)    # in l/s    = co2 flow
-            sg_ls: float = (self.sweep_gas / 60.0) + co2_ls # in l/s    = sweep gas flow
+            co2_ls = (self.oxy_co2_flow / 1000.0 / 60.0)    # in l/s    = co2 flow
+            sg_ls: float = (self.oxy_sweep_gas / 60.0) + co2_ls # in l/s    = sweep gas flow
             r:float = (self._oxy_gas_in.pres - self._oxy_gas_out.pres) / (sg_ls + co2_ls)
 
             # calculate the fico2 of the sweep gas source assuming dry gas
-            fico2_sg = 0.000392 * (1.0 - self.fio2) / (1.0 - 0.205)
+            fico2_sg = 0.000392 * (1.0 - self.oxy_fio2) / (1.0 - 0.205)
         
             # calculate the total fico2 of the source gas (so with the co2 flow included)
             self.fico2_gas = (co2_ls / (sg_ls + co2_ls)) + fico2_sg
 
             # calculate the gas composition of gas source
-            set_gas_composition(self._oxy_gas_in, self.fio2, self.temp_gas, self.humidity_gas, self.fico2_gas)
+            set_gas_composition(self._oxy_gas_in, self.oxy_fio2, self.oxy_temp_gas, self.oxy_humidity_gas, self.fico2_gas)
 
             # set the resistance of the gasflow valve depending of the sweep gas
             self._oxy_gas_in_valve.r_for = r - 25.0
             self._oxy_gas_in_valve.no_back_flow = True
 
             # set the rpm
-            self._pump.pump_rpm = self.rpm
+            self._pump.pump_rpm = self.pump_rpm
 
             # set the out valve resistance to low
             self._oxy_gas_out_valve.r_for = 25
@@ -218,7 +218,7 @@ class ArtificialWhomb(BaseModel):
         # calculate the pressure 
         self._oxy_gas_in.calc_model()
         # set the gas composition of the reservoir
-        set_gas_composition(self._oxy_gas_in, self.fio2, self.temp_gas, self.humidity_gas, self.fico2_gas)
+        set_gas_composition(self._oxy_gas_in, self.oxy_fio2, self.oxy_temp_gas, self.oxy_humidity_gas, self.fico2_gas)
         # # add a reference the the ecls_parts object
         self._aw_parts.append(self._oxy_gas_in)
 
@@ -241,7 +241,7 @@ class ArtificialWhomb(BaseModel):
         # calculate the pressure 
         self._oxy_gas.calc_model()
         # set the gas composition of the gas part of the oxygenator
-        set_gas_composition(self._oxy_gas, self.fio2, self.temp_gas, self.humidity_gas, self.fico2_gas)
+        set_gas_composition(self._oxy_gas, self.oxy_fio2, self.oxy_temp_gas, self.oxy_humidity_gas, self.fico2_gas)
         # add a reference the the ecls_parts object
         self._aw_parts.append(self._oxy_gas)
 
@@ -264,7 +264,7 @@ class ArtificialWhomb(BaseModel):
         # calculate the pressure 
         self._oxy_gas_out.calc_model()
         # set the gas composition of the gas out
-        set_gas_composition(self._oxy_gas_out, self.fio2, self.temp_gas, self.humidity_gas, self.fico2_air)
+        set_gas_composition(self._oxy_gas_out, self.oxy_fio2, self.oxy_temp_gas, self.oxy_humidity_gas, self.fico2_air)
         # add a reference the the ecls_parts object
         self._aw_parts.append(self._oxy_gas_out)
 
