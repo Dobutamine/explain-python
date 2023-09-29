@@ -39,6 +39,9 @@ class Breathing(BaseModel):
     _temp_exp_volume: float = 0.0
 
 
+    def switch_breathing(self, state):
+        self.breathing_enabled = state
+        
     def calc_model(self) -> None:
         if self.is_intubated:
             self.exp_tidal_volume = self._model.models["Ventilator"].exp_tidal_volume

@@ -285,6 +285,34 @@ class Interface:
                     self.y_rt[idx][self.no_dp - 1] = t[parameter]
                     self.y_rt[idx] = np.roll(self.y_rt[idx], -1)
 
+    def ans(self, state):
+        if type(state) is bool:
+            self.model.models["Ans"].is_enabled = state
+    
+    def metabolism(self, state):
+        if type(state) is bool:
+            self.model.models["Metabolism"].is_enabled = state
+
+    def breathing(self, state):
+        if type(state) is bool:
+            self.model.models["Breathing"].switch_breathing(state)
+
+    def ecls(self, state):
+        if type(state) is bool:
+            self.model.models["Ecls"].ecls_running = state
+
+    def artificial_whomb(self, state):
+        if type(state) is bool:
+            self.model.models["ArtificialWhomb"].ecls_running = state
+
+    def placenta(self, state):
+        if type(state) is bool:
+            self.model.models["Placenta"].switch_placenta(state)
+            
+    def ventilator(self, state):
+        if type(state) is bool:
+            self.model.models["Ventilator"].switch_ventilator(state)
+
     # plotters
     def plot_heart_pv_rt(self):
         self.plot_rt(["LV.vol", "LV.pres"], autoscale=True, autoscale_interval=1.0,
@@ -303,7 +331,6 @@ class Interface:
                              combined=False, sharey=False, fill=False)
 
     # lung plotters
-
     def plot_lung_pressures(self, time_to_calculate=10, combined=True, sharey=True, autoscale=True, ylowerlim=0, yupperlim=100, fill=False, analyze=False):
         self.plot_time_graph(["DS.pres", "ALL.pres", "ALR.pres", "THORAX.pres"], time_to_calculate=time_to_calculate, autoscale=True, combined=combined, sharey=sharey,
                              sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)

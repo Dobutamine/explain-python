@@ -446,8 +446,8 @@ class Ecls(BaseModel):
             "no_back_flow": False,
             "comp_from": self._tubing_in,
             "comp_to": self._pump,
-            "r_for": 25,
-            "r_back": 25,
+            "r_for": 15,
+            "r_back": 15,
             "r_k": 0,
         })
         self._tubing_in_pump.init_model(model)
@@ -463,8 +463,8 @@ class Ecls(BaseModel):
             "no_back_flow": False,
             "comp_from": self._pump,
             "comp_to": self._oxy,
-            "r_for": 25,
-            "r_back": 25,
+            "r_for": 15,
+            "r_back": 15,
             "r_k": 0,
         })
         self._pump_oxy.init_model(model)
