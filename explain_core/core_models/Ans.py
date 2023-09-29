@@ -1,6 +1,7 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.core_models.BloodCapacitance import BloodCapacitance
+from explain_core.core_models.BloodTimeVaryingElastance import BloodTimeVaryingElastance
 from explain_core.core_models.Heart import Heart
 from explain_core.core_models.Breathing import Breathing
 from explain_core.functions.ActivationFunction import activation_function
@@ -11,6 +12,9 @@ class Ans(BaseModel):
     _baroreceptor: BloodCapacitance = {}
     _chemoreceptor: BloodCapacitance = {}
     _heart: Heart = {}
+    _left_ventricle: BloodTimeVaryingElastance = {}
+    _right_ventricle: BloodTimeVaryingElastance = {}
+    _venous_reservoir: BloodCapacitance = {}
     _breathing: Breathing = {}
     _a_map: float = 0.0
     _a_ph: float = 0.0
@@ -155,7 +159,15 @@ class Ans(BaseModel):
             self._breathing.target_minute_volume = target_mv
             
             # ven_pool, cont and svr not implemented yet
+            ven_pool = self.ven_pool_ref + self.g_map_ven_pool * self._d_map_ven_pool + self.g_po2_ven_pool * \
+                self._d_po2_ven_pool + self.g_pco2_ven_pool * self._d_pco2_ven_pool + self.g_ph_ven_pool * self._d_ph_ven_pool
 
+            cont = self.cont_ref + self.g_map_cont * self._d_map_cont + self.g_po2_cont * \
+                self._d_po2_cont + self.g_pco2_cont * self._d_pco2_cont + self.g_ph_cont * self._d_ph_cont
+
+            svr = self.svr_ref + self.g_map_svr * self._d_map_svr + self.g_po2_svr * \
+                self._d_po2_svr + self.g_pco2_svr * self._d_pco2_svr + self.g_ph_svr * self._d_ph_svr
+            
             # reset the update counter
             self._update_counter = 0.0
 
