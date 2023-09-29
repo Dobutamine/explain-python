@@ -22,6 +22,21 @@ class Ans(BaseModel):
     _d_pco2_hp: float = 0.0
     _d_ph_hp: float = 0.0
 
+    _d_map_ven_pool: float = 0.0
+    _d_po2_ven_pool: float = 0.0
+    _d_pco2_ven_pool: float = 0.0
+    _d_ph_ven_pool: float = 0.0
+
+    _d_map_cont: float = 0.0
+    _d_po2_cont: float = 0.0
+    _d_pco2_cont: float = 0.0
+    _d_ph_cont: float = 0.0
+
+    _d_map_svr: float = 0.0
+    _d_po2_svr: float = 0.0
+    _d_pco2_svr: float = 0.0
+    _d_ph_svr: float = 0.0
+
     _d_po2_ve: float = 0.0
     _d_pco2_ve: float = 0.0
     _d_ph_ve: float = 0.0
@@ -81,6 +96,47 @@ class Ans(BaseModel):
 
             self._d_ph_hp = self._update_window * \
                 ((1 / self.tc_ph_hp) * (-self._d_ph_hp + self._a_ph)) + self._d_ph_hp
+
+            
+            self._d_map_ven_pool = self._update_window * \
+                ((1 / self.tc_map_ven_pool) * (-self._d_map_ven_pool + self._a_map)) + self._d_map_ven_pool
+
+            self._d_po2_ven_pool = self._update_window * \
+                ((1 / self.tc_po2_ven_pool) * (-self._d_po2_ven_pool + self._a_po2)) + self._d_po2_ven_pool
+
+            self._d_pco2_ven_pool = self._update_window * \
+                ((1 / self.tc_pco2_ven_pool) * (-self._d_pco2_ven_pool + self._a_pco2)) + self._d_pco2_ven_pool
+
+            self._d_ph_ven_pool = self._update_window * \
+                ((1 / self.tc_ph_ven_pool) * (-self._d_ph_ven_pool + self._a_ph)) + self._d_ph_ven_pool
+
+
+            self._d_map_cont = self._update_window * \
+                ((1 / self.tc_map_cont) * (-self._d_map_cont + self._a_map)) + self._d_map_cont
+
+            self._d_po2_cont = self._update_window * \
+                ((1 / self.tc_po2_cont) * (-self._d_po2_cont + self._a_po2)) + self._d_po2_cont
+
+            self._d_pco2_cont = self._update_window * \
+                ((1 / self.tc_pco2_cont) * (-self._d_pco2_cont + self._a_pco2)) + self._d_pco2_cont
+
+            self._d_ph_cont = self._update_window * \
+                ((1 / self.tc_ph_cont) * (-self._d_ph_cont + self._a_ph)) + self._d_ph_cont
+
+
+            self._d_map_svr = self._update_window * \
+                ((1 / self.tc_map_svr) * (-self._d_map_svr + self._a_map)) + self._d_map_svr
+
+            self._d_po2_svr = self._update_window * \
+                ((1 / self.tc_po2_svr) * (-self._d_po2_svr + self._a_po2)) + self._d_po2_svr
+
+            self._d_pco2_svr = self._update_window * \
+                ((1 / self.tc_pco2_svr) * (-self._d_pco2_svr + self._a_pco2)) + self._d_pco2_svr
+
+            self._d_ph_svr = self._update_window * \
+                ((1 / self.tc_ph_svr) * (-self._d_ph_svr + self._a_ph)) + self._d_ph_svr
+
+
 
             self._d_po2_ve = self._update_window * \
                 ((1 / self.tc_po2_ve) * (-self._d_po2_ve + self._a_po2)) + self._d_po2_ve
