@@ -97,7 +97,6 @@ class Ans(BaseModel):
             self._d_ph_hp = self._update_window * \
                 ((1 / self.tc_ph_hp) * (-self._d_ph_hp + self._a_ph)) + self._d_ph_hp
 
-            
             self._d_map_ven_pool = self._update_window * \
                 ((1 / self.tc_map_ven_pool) * (-self._d_map_ven_pool + self._a_map)) + self._d_map_ven_pool
 
@@ -109,7 +108,6 @@ class Ans(BaseModel):
 
             self._d_ph_ven_pool = self._update_window * \
                 ((1 / self.tc_ph_ven_pool) * (-self._d_ph_ven_pool + self._a_ph)) + self._d_ph_ven_pool
-
 
             self._d_map_cont = self._update_window * \
                 ((1 / self.tc_map_cont) * (-self._d_map_cont + self._a_map)) + self._d_map_cont
@@ -136,8 +134,6 @@ class Ans(BaseModel):
             self._d_ph_svr = self._update_window * \
                 ((1 / self.tc_ph_svr) * (-self._d_ph_svr + self._a_ph)) + self._d_ph_svr
 
-
-
             self._d_po2_ve = self._update_window * \
                 ((1 / self.tc_po2_ve) * (-self._d_po2_ve + self._a_po2)) + self._d_po2_ve
 
@@ -148,6 +144,7 @@ class Ans(BaseModel):
                 ((1 / self.tc_ph_ve) * (-self._d_ph_ve + self._a_ph)) + self._d_ph_ve
 
             # apply the effects using the gain
+            
             self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hp + self.g_po2_hp * \
                 self._d_po2_hp + self.g_pco2_hp * self._d_pco2_hp + self.g_ph_hp * self._d_ph_hp
 
@@ -155,8 +152,9 @@ class Ans(BaseModel):
                 self.g_pco2_ve * self._d_pco2_ve + self.g_ph_ve * self._d_ph_ve
             if (target_mv < 0.01):
                 target_mv = 0.01
-
             self._breathing.target_minute_volume = target_mv
+            
+            # ven_pool, cont and svr not implemented yet
 
             # reset the update counter
             self._update_counter = 0.0
