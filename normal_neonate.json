@@ -1005,11 +1005,18 @@
       "plac_do2": 0.1,
       "plac_dco2": 0.1
     },
+    "Mob": {
+      "name": "Mob",
+      "description": "myocardial oxygen balance model",
+      "model_type": "Mob",
+      "is_enabled": true,
+      "dependencies": []
+    },
     "Ecls": {
       "name": "Ecls",
       "description": "ecls model",
       "model_type": "Ecls",
-      "is_enabled": true,
+      "is_enabled": false,
       "dependencies": [],
       "ecls_running": false,
       "drainage_site": "RA",
@@ -1037,7 +1044,7 @@
       "name": "ArtificialWhomb",
       "description": "artificial whomb model",
       "model_type": "ArtificialWhomb",
-      "is_enabled": true,
+      "is_enabled": false,
       "dependencies": [],
       "aw_running": false,
       "drainage_site": "AD",
