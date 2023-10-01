@@ -289,6 +289,10 @@ class Interface:
         if type(state) is bool:
             self.model.models["Ans"].is_enabled = state
     
+    def mob(self, state):
+        if type(state) is bool:
+            self.model.models["Mob"].is_enabled = state
+
     def metabolism(self, state):
         if type(state) is bool:
             self.model.models["Metabolism"].is_enabled = state
