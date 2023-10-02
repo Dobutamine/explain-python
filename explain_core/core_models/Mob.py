@@ -8,12 +8,12 @@ from explain_core.functions.BloodComposition import set_blood_composition
 from explain_core.functions.ActivationFunction import activation_function
 
 class Mob(BaseModel):
-    # independent variables
-    bm_vo2_ref: float = 100.0           # vo2 when the heart is not beating and depending on do2
-    bm_vo2_ref_factor: float = 1.0
-    bm_vo2_min: float = 80.0            # maximal reduction of baseline vo2
-    ecc_vo2_factor: float = 10.0
-    pva_vo2_factor: float = 10.0
+    # independent variables 
+    hw: float = 0.0                     # heart weight = 7.799 + 0.004296 * birth weight (grams)
+    bm_vo2_ref: float = 0.000159        # in ml O2/cardiac cycle/gram heart_weight: vo2 when the heart is not beating and depending on do2
+    bm_vo2_min: float = 0.000100        # minimal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
+    ecc_c: float = 0.0                  # not implemented yet but included in basal metabolism
+    pva_c: float = 0.0085               # CPVA in mL O2/cardiac cycle/mmHg*l
 
     bm_po2_set: float = 10.0       
     bm_po2_max: float = 10.0
@@ -64,6 +64,7 @@ class Mob(BaseModel):
 
     _a_bm_vo2: float = 0.0
     _d_bm_vo2: float = 0.0
+    _ml_to_mmol: float = 22.414
 
     def init_model(self, model: object) -> bool:
         # initialize the base model
@@ -77,6 +78,9 @@ class Mob(BaseModel):
         self._lv = self._model.models[self.lv_model]
         self._rv = self._model.models[self.rv_model]
 
+        # set the heart weight
+        self.hw = 7.799 + 0.004296 * self._model.weight * 1000.0
+
         # signal that the ventilator model is initialized and return it
         self._is_initialized = True
         return self._is_initialized
@@ -87,8 +91,8 @@ class Mob(BaseModel):
         to2_cor: float = self._cor.aboxy["to2"]                     # mmol o2 / l 
         
         # get the ecc from the heart chambers
-        self.ecc_lv = self._lv.pres_ms
-        self.ecc_rv = self._rv.pres_ms
+        self.ecc_lv = self._lv.el_max * self._lv.el_max_factor
+        self.ecc_rv = self._rv.el_max * self._rv.el_max_factor
         self.ecc = self.ecc_lv + self.ecc_rv
 
         # calculate the pressure volume loop area
@@ -98,7 +102,7 @@ class Mob(BaseModel):
         if self._heart.ncc_ventricular == 1:
             set_blood_composition(self._cor)
 
-        # calculate the oxygen metabolism
+        # calculate the oxygen metabolism in mmol O2 / cardiac cycle
         self.total_vo2 = self.oxygen_metabolism()
 
     def oxygen_metabolism(self) -> float:
@@ -110,21 +114,21 @@ class Mob(BaseModel):
 
         # calculate the gain depending on the reference and minimal baseline vo2 and po2 threshold from where the baseline vo2 is reduced
         # this gain determines how much the baseline vo2 is reduced when the po2 drops below the threshold
-        self.bm_po2_g = ((self.bm_vo2_ref * self.bm_vo2_ref_factor) - self.bm_vo2_min) / (self.bm_po2_set - self.bm_po2_min)
+        self.bm_po2_g = (self.bm_vo2_ref - self.bm_vo2_min) / (self.bm_po2_set - self.bm_po2_min)
 
         # incorporate the time constant
         self._d_bm_vo2 = self._t * ((1 / self.bm_po2_tc) * (-self._d_bm_vo2 + self._a_bm_vo2)) + self._d_bm_vo2
 
-        # calculate the baseline vo2
-        self.bm_vo2 = (self.bm_vo2_ref * self.bm_vo2_ref_factor) + self._d_bm_vo2 * self.bm_po2_g
+        # calculate the baseline vo2 in mmol O2 /  cardiac cycle
+        self.bm_vo2 = ((self.bm_vo2_ref + self._d_bm_vo2 * self.bm_po2_g) * self.hw) / self._ml_to_mmol
 
-        # calculate the ecc vo2
-        self.ecc_vo2 = self.ecc * self.ecc_vo2_factor
+        # calculate the ecc vo2 -> not implemented yet but included in baseline metabolism
+        self.ecc_vo2 = self.ecc * self.ecc_c
 
-        # calculate the pva vo2
-        self.pva_vo2 = self.pva * self.pva_vo2_factor
+        # calculate the pva vo2 in mmol O2 / cardiac cycle
+        self.pva_vo2 = (self.pva * self.pva_c) / self._ml_to_mmol
 
-        # return the total voi2
+        # return the total vo2 
         return self.bm_vo2 + self.ecc_vo2 + self.pva_vo2
 
 

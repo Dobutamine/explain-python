@@ -1010,15 +1010,7 @@
       "description": "myocardial oxygen balance model",
       "model_type": "Mob",
       "is_enabled": true,
-      "dependencies": ["Heart", "AA", "AA_COR", "COR", "LV", "RV"],
-      "bm_vo2_ref": 100,
-      "bm_vo2_min": 80.0,
-      "bm_po2_set": 10.0,     
-      "bm_po2_max": 10.0,
-      "bm_po2_min": 0.0,
-      "bm_po2_tc": 5.0,
-      "ecc_vo2_factor": 10.0,
-      "pva_vo2_factor": 10.0
+      "dependencies": ["Heart", "AA", "AA_COR", "COR", "LV", "RV"]
     },
     "Ecls": {
       "name": "Ecls",
