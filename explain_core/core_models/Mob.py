@@ -149,8 +149,6 @@ class Mob(BaseModel):
         # so we need a to2 dependent parameter (maybe through a activation function) which dampens the ANS influence on
         # the heartrate and contractility and decreases it further when hypoxemia gets worse
 
-
-
     def oxygen_metabolism(self) -> float:
         # get the po2 in mmHg from coronaries
         po2_cor = self._cor.aboxy["po2"]
@@ -171,7 +169,7 @@ class Mob(BaseModel):
         self.bm_vo2 = ((self.bm_vo2_ref + self._d_bm_vo2 * self.bm_po2_g) * self.hw) / self._ml_to_mmol
 
         # calculate the influence on the contractility and heartrate which overrule the ANS influence
-        
+
 
 
         # calculate the ecc vo2 -> not implemented yet but included in baseline metabolism

@@ -476,7 +476,7 @@ class Interface:
         for component in self.model.models:
             component_type = self.model.models[component].model_type
 
-            if (component_type == "BloodResistor" or component_type == "BloodValve"):
+            if (component_type == "Resistor"):
                 properties.append(component + ".flow")
 
         self.analyze(properties, time_to_calculate, sampleinterval=0.0005)
