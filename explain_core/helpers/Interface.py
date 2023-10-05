@@ -600,6 +600,9 @@ class Interface:
         # define a result object
         result = {}
 
+        # find the weight factor
+        weight = 1.0
+
         # add the ncc ventricular
         properties.insert(0, "Heart.ncc_ventricular")
 
@@ -674,11 +677,11 @@ class Interface:
 
             if prop_category[1] == "vol":
                 data = np.array(y[idx])
-                max = round(np.amax(data) * 1000, 5)
-                min = round(np.amin(data) * 1000, 5)
+                max = round(np.amax(data) * 1000  / self.model.weight, 5)
+                min = round(np.amin(data) * 1000  / self.model.weight, 5)
 
                 print(
-                    "{:<16}: max {:10}, min {:10} ml". format(parameter, max, min))
+                    "{:<16}: max {:10}, min {:10} ml/kg". format(parameter, max, min))
                 result[parameter + ".max"] = max
                 result[parameter + ".min"] = min
                 continue
@@ -696,13 +699,13 @@ class Interface:
                 t_start = x[0]
                 t_end = x[-1]
 
-                sum = np.sum(data)
-                sum_forward = np.sum(data_forward)
-                sum_backward = np.sum(data_backward)
+                sum = np.sum(data) * 1000.0 / self.model.weight
+                sum_forward = np.sum(data_forward) * 1000.0 /  self.model.weight
+                sum_backward = np.sum(data_backward) * 1000.0 / self.model.weight
 
-                flow = (sum * sampleinterval / (t_end - t_start)) * 60.0
+                flow = ((sum * sampleinterval / (t_end - t_start)) * 60.0)
                 if is_ventilator:
-                    flow = (sum * sampleinterval / (t_end - t_start))
+                    flow = (sum * sampleinterval / (t_end - t_start)) 
                 flow = round(flow, 5)
                 flow_forward = 0
                 flow_backward = 0
@@ -725,12 +728,12 @@ class Interface:
                         bpm = self.model.models['Heart'].heart_rate
 
                     sv = round(flow / bpm, 5)
-                    print("{:16}: net {:10}, forward {:10}, backward {:10} l/min, stroke volume: {:10} l/heartbeat, ". format(
+                    print("{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min, stroke volume: {:10} ml/kg, ". format(
                         parameter, flow, flow_forward, flow_backward, sv))
                 
                     result[parameter + ".sv"] = sv
                 else:
-                    print("{:16}: net {:10}, forward {:10}, backward {:10} l/min".format(
+                    print("{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min".format(
                         parameter, flow, flow_forward, flow_backward))
                 
                 result[parameter + ".net"] = flow

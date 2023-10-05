@@ -54,6 +54,7 @@ class Mob(BaseModel):
     stroke_work_rv: float = 0.0                 # stroke work of right ventricle
     stroke_volume_lv: float = 0.0               # stroke volume in liters
     stroke_volume_rv: float = 0.0               # stroke volume in liters
+    sv_lv: float = 0.0
 
     # local state variables
     _heart: Heart = {}
@@ -194,6 +195,7 @@ class Mob(BaseModel):
             # calculate the stroke volume of the ventricles
             self.stroke_volume_lv = self._sv_lv_cum  # in l/cardiac cycle
             self.stroke_volume_rv = self._sv_rv_cum  # in l/cardiac cycle
+            self.sv_lv = self.stroke_volume_lv * 1000.0 / self._model.weight
             
             # reset the counters
             self._pv_area_lv = 0.0
