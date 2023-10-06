@@ -2,6 +2,7 @@
   "name": "normal neonate",
   "description": "normal 3.3 kg neonate at an age of 24h with shunts",
   "weight": 3.3,
+  "height": 0.5,
   "modeling_stepsize": 0.0005,
   "model_time_total": 0.0,
   "models": {

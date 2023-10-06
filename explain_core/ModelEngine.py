@@ -3,6 +3,7 @@ import pickle
 import importlib
 import multitimer
 import random
+import math
 from time import perf_counter
 
 from explain_core.helpers.DataCollector import DataCollector
@@ -28,7 +29,13 @@ class ModelEngine:
     description: str = ""
 
     # define an attribute holding the weight
-    weight: float = 0.0
+    weight: float = 3.3
+
+    # define an attribute holding the length in meters
+    height: float = 0.50
+
+     # define an attribute holding the body surface area in meters (BSA (m2) =(weight(kg) * height(cm)/3600)^0.5
+    bsa: float = 0.214
 
     # define an attribute holding the modeling stepsize
     modeling_stepsize: float = 0.0005
@@ -99,6 +106,8 @@ class ModelEngine:
             self.name = self.model_definition['name']
             self.description = self.model_definition['description']
             self.weight = self.model_definition['weight']
+            self.height = self.model_definition['height']
+            self.bsa = math.pow((self.weight * (self.height * 100.0) / 3600.0), 0.5)
             self.modeling_stepsize = self.model_definition['modeling_stepsize']
             self.model_time_total = self.model_definition['model_time_total']
 
