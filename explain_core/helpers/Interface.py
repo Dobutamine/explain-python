@@ -433,6 +433,9 @@ class Interface:
                              time_to_calculate=time_to_calculate, autoscale=True, combined=combined, sharey=sharey, sampleinterval=0.0005, ylowerlim=ylowerlim, yupperlim=yupperlim, fill=fill, fill_between=False, analyze=analyze)
 
     # getters
+    def analyze_heart(self, weight_based=True, time_to_calculate = 60):
+        self.analyze(["LA_LV.flow", "RA_RV.flow", "RV_PA.flow", "LV_AA.flow", "IVCI_RA.flow", "SVC_RA.flow", "LA.pres_in","RA.pres_in","LV.pres_in", "RV.pres_in", "AA.pres_in", "IVCI.pres_in", "LA.vol", "RA.vol","LV.vol","RV.vol", "Heart.heart_rate", "Mob.sv_lv_kg", "Mob.sv_rv_kg"], weight_based=weight_based, sampleinterval=0.0005, time_to_calculate=time_to_calculate)
+    
     def get_vitals(self, time_to_calculate=10):
         result = self.analyze(["AA.pres", "PA.pres", "IVCI.pres"])
         self.get_bloodgas("AD")
@@ -596,13 +599,15 @@ class Interface:
 
         self.analyze(properties, time_to_calculate)
 
-    def analyze(self, properties, time_to_calculate=10, sampleinterval=0.005, calculate=True):
+    def analyze(self, properties, time_to_calculate=10, sampleinterval=0.005, calculate=True, weight_based = False):
         # define a result object
         result = {}
 
         # find the weight factor
         weight = 1.0
-
+        if weight_based:
+            weight = self.model.weight
+        
         # add the ncc ventricular
         properties.insert(0, "Heart.ncc_ventricular")
 
@@ -651,8 +656,9 @@ class Interface:
             
             # find the modeltype of the property which is needed to be analyzed
             model_type:str = self.model.models[prop_category[0]].model_type
-            if "Blood" in model_type:
-                is_blood = True
+            if model_type == "Resistor":
+                if "Blood" in self.model.models[prop_category[0]]._model_comp_from.model_type:
+                    is_blood = True
 
             if model_type == "GasCapacitance" or model_type == "Breathing":
                 is_gas = True
@@ -677,11 +683,14 @@ class Interface:
 
             if prop_category[1] == "vol":
                 data = np.array(y[idx])
-                max = round(np.amax(data) * 1000  / self.model.weight, 5)
-                min = round(np.amin(data) * 1000  / self.model.weight, 5)
+                max = round(np.amax(data) * 1000  / weight, 5)
+                min = round(np.amin(data) * 1000  / weight, 5)
 
-                print(
-                    "{:<16}: max {:10}, min {:10} ml/kg". format(parameter, max, min))
+                if weight_based:
+                    print("{:<16}: max {:10}, min {:10} ml/kg". format(parameter, max, min))
+                else:
+                    print("{:<16}: max {:10}, min {:10} ml". format(parameter, max, min))
+
                 result[parameter + ".max"] = max
                 result[parameter + ".min"] = min
                 continue
@@ -699,9 +708,9 @@ class Interface:
                 t_start = x[0]
                 t_end = x[-1]
 
-                sum = np.sum(data) * 1000.0 / self.model.weight
-                sum_forward = np.sum(data_forward) * 1000.0 /  self.model.weight
-                sum_backward = np.sum(data_backward) * 1000.0 / self.model.weight
+                sum = np.sum(data) * 1000.0 / weight
+                sum_forward = np.sum(data_forward) * 1000.0 /  weight
+                sum_backward = np.sum(data_backward) * 1000.0 / weight
 
                 flow = ((sum * sampleinterval / (t_end - t_start)) * 60.0)
                 if is_ventilator:
@@ -728,13 +737,21 @@ class Interface:
                         bpm = self.model.models['Heart'].heart_rate
 
                     sv = round(flow / bpm, 5)
-                    print("{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min, stroke volume: {:10} ml/kg, ". format(
+                    if weight_based:
+                        print("{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min, stroke volume: {:10} ml/kg, ". format(
+                        parameter, flow, flow_forward, flow_backward, sv))
+                    else:
+                        print("{:16}: net {:10}, forward {:10}, backward {:10} ml/min, stroke volume: {:10} ml, ". format(
                         parameter, flow, flow_forward, flow_backward, sv))
                 
                     result[parameter + ".sv"] = sv
                 else:
-                    print("{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min".format(
-                        parameter, flow, flow_forward, flow_backward))
+                    if weight_based:
+                        print("{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min".format(
+                            parameter, flow, flow_forward, flow_backward))
+                    else:
+                        print("{:16}: net {:10}, forward {:10}, backward {:10} ml/min".format(
+                            parameter, flow, flow_forward, flow_backward))
                 
                 result[parameter + ".net"] = flow
                 result[parameter + ".forward"] = flow_forward

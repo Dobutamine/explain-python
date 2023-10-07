@@ -12,8 +12,8 @@
       "model_type": "BloodTimeVaryingElastance",
       "is_enabled": true,
       "dependencies": [],
-      "u_vol": -0.0025,
       "vol": 0.007824975926284438,
+      "u_vol": 0.0,
       "el_min": 1500,
       "el_max": 2000,
       "el_k": 0
@@ -25,7 +25,7 @@
       "is_enabled": true,
       "dependencies": [],
       "vol": 0.007824975926284438,
-      "u_vol": -0.0025,
+      "u_vol": 0.0,
       "el_min": 1500,
       "el_max": 2000,
       "el_k": 0
@@ -37,7 +37,7 @@
       "is_enabled": true,
       "dependencies": [],
       "vol": 0.0055155539340687116,
-      "u_vol": -0.0025,
+      "u_vol": 0.0,
       "el_min": 800,
       "el_max": 14000,
       "el_k": 0
@@ -49,7 +49,7 @@
       "is_enabled": true,
       "dependencies": [],
       "vol": 0.004032886510701252,
-      "u_vol": -0.0025,
+      "u_vol": 0.0,
       "el_min": 800,
       "el_max": 14000,
       "el_k": 0

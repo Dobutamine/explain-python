@@ -19,14 +19,17 @@ class Container(Capacitance):
         # calculate the elastance
         self.el = self.el_base * self.el_base_factor + self.act_factor
 
-        # do the capacitans actions -> calculate pressure
-        self.pres = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + \
-            self.el * \
-            (self.vol - (self.u_vol * self.u_vol_factor)) + \
-            self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
+        # calculate the pressure depending on the volume, unstressed volume and elastance
+        self.pres_in = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + self.el * (self.vol - (self.u_vol * self.u_vol_factor))
+        
+        # calculate the pressures exerted by the surrounding tissues or other forces
+        self.pres_out =  self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus
 
         # calculate the transmural pressure
-        self.pres_tm = self.pres - 2 * (self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus)
+        self.pres_tm = self.pres_in - self.pres_out
+
+        # calculate the total pressure
+        self.pres = self.pres_in + self.pres_out
 
         # reset the pressure which are recalculated every model iterattion
         self.pres_ext = 0.0
