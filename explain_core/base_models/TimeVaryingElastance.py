@@ -35,12 +35,10 @@ class TimeVaryingElastance(Capacitance):
         self.pres_ed = self.el_k * self.el_k_factor * math.pow(vol_diff, 2) + \
             self.el_min * self.el_min_factor * vol_diff
         self.pres_ms = self.el_max * self.el_max_factor * vol_diff
-        self.pres_in = self.act_factor * \
-            (self.pres_ms - self.pres_ed) + self.pres_ed + \
-            self.pres_cc + self.pres_atm + self.pres_mus
+        self.pres_in = self.act_factor * (self.pres_ms - self.pres_ed) + self.pres_ed + self.pres_atm
 
         # calculate the pressures exerted by the surrounding tissues or other forces
-        self.pres_out = self.pres_ext + self.pres_cc + self.pres_atm + self.pres_mus 
+        self.pres_out = self.pres_ext + self.pres_cc + self.pres_mus 
 
         # calculate the transmural pressure
         self.pres_tm = self.pres_in - self.pres_out
