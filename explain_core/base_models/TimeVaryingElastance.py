@@ -13,6 +13,7 @@ class TimeVaryingElastance(Capacitance):
     el_k: float = 0.0
     el_k_factor: float = 1.0
     act_factor: float = 0.0
+    el_current: float = 0.0
 
     # dependent variables
     vol: float = 0.0
@@ -32,10 +33,11 @@ class TimeVaryingElastance(Capacitance):
 
         # calculate the pressure depending on the volume, unstressed volume, elastance and activation factor
         vol_diff = self.vol - (self.u_vol * self.u_vol_factor)
-        self.pres_ed = self.el_k * self.el_k_factor * math.pow(vol_diff, 2) + \
-            self.el_min * self.el_min_factor * vol_diff
+        self.pres_ed = self.el_min * self.el_min_factor * vol_diff + self.el_k * self.el_k_factor * math.pow(vol_diff, 2)
         self.pres_ms = self.el_max * self.el_max_factor * vol_diff
         self.pres_in = self.act_factor * (self.pres_ms - self.pres_ed) + self.pres_ed + self.pres_atm
+        if vol_diff != 0:
+            self.el_current = self.pres_in / vol_diff
 
         # calculate the pressures exerted by the surrounding tissues or other forces
         self.pres_out = self.pres_ext + self.pres_cc + self.pres_mus 
