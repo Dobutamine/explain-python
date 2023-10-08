@@ -826,7 +826,7 @@
       "heart_rate": 140.0,
       "pq_time": 0.1,
       "qrs_time": 0.075,
-      "qt_time": 0.4
+      "qt_time": 0.25
     },
     "Ans": {
       "name": "Ans",
