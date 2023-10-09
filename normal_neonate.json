@@ -14,8 +14,8 @@
       "dependencies": [],
       "vol": 0.007824975926284438,
       "u_vol": 0.0,
-      "el_min": 1500,
-      "el_max": 2000,
+      "el_min": 1200,
+      "el_max": 4100,
       "el_k": 0
     },
     "RA": {
@@ -26,8 +26,8 @@
       "dependencies": [],
       "vol": 0.007824975926284438,
       "u_vol": 0.0,
-      "el_min": 1500,
-      "el_max": 2000,
+      "el_min": 1200,
+      "el_max": 4100,
       "el_k": 0
     },
     "LV": {
@@ -38,8 +38,8 @@
       "dependencies": [],
       "vol": 0.0055155539340687116,
       "u_vol": 0.0,
-      "el_min": 800,
-      "el_max": 14000,
+      "el_min": 920,
+      "el_max": 27500,
       "el_k": 0
     },
     "RV": {
@@ -50,8 +50,8 @@
       "dependencies": [],
       "vol": 0.004032886510701252,
       "u_vol": 0.0,
-      "el_min": 800,
-      "el_max": 14000,
+      "el_min": 920,
+      "el_max": 27500,
       "el_k": 0
     },
     "COR": {
@@ -212,7 +212,7 @@
       "description": "vena cava inferior extrathoracic ",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.08051258955283728,
+      "vol": 0.071,
       "u_vol": 0.05710848,
       "el_base": 146,
       "el_k": 0
@@ -222,7 +222,7 @@
       "description": "superior vena cava",
       "model_type": "BloodCapacitance",
       "is_enabled": true,
-      "vol": 0.06333875298887778,
+      "vol": 0.063,
       "u_vol": 0.03624192,
       "el_base": 230,
       "el_k": 0
