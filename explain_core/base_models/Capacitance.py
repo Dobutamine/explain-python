@@ -17,6 +17,7 @@ class Capacitance(BaseModel):
 
     # dependent variables
     vol: float = 0.0
+    vol_total: float = 0.0
     pres: float = 0.0
     pres_ext: float = 0.0
     pres_cc: float = 0.0
@@ -31,9 +32,14 @@ class Capacitance(BaseModel):
 
         # calculate the pressure depending on the volume, unstressed volume, elastance
         el:float = self.el_base * self.el_base_factor * self.el_base_ans_factor * self.el_base_drug_factor
+        vol:float = self.vol * (1.0 / self.u_vol_factor)
+        u_vol:float = self.u_vol * self.u_vol_factor
 
-        self.pres_in = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + \
-            el * (self.vol - (self.u_vol * self.u_vol_factor)) + self.pres_atm
+        # calculate the total volume in this capacitance
+        self.vol_total = vol + u_vol
+
+        self.pres_in = self.el_k * self.el_k_factor * math.pow(vol - u_vol, 2) + \
+            el * (vol - u_vol) + self.pres_atm
         
         # calculate the pressures exerted by the surrounding tissues or other forces
         self.pres_out = self.pres_ext + self.pres_cc + self.pres_mus
@@ -67,7 +73,7 @@ class Capacitance(BaseModel):
         # decrease the volume
         self.vol -= dvol
 
-        # guard against negative volumes
+        # guard against volumes below the unstressed volume
         if self.vol < 0:
             # so we need to remove more volume then we have which is not possible. Calculate how much volume can be removed
             vol_not_removed = -self.vol

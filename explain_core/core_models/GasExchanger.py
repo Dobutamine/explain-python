@@ -52,12 +52,13 @@ class GasExchanger(BaseModel):
             self.dif_o2_factor * self._t
 
         # calculate the new O2 concentrations of the gas and blood compartments
+        _blood_vol = self._blood.vol + self._blood.u_vol
         new_to2_blood: float = (
-            to2_blood * self._blood.vol - self._flux_o2) / self._blood.vol
+            to2_blood * _blood_vol - self._flux_o2) / _blood_vol
         if new_to2_blood < 0:
             new_to2_blood = 0
 
-        new_co2_gas = (co2_gas * self._gas.vol + self._flux_o2) / self._gas.vol
+        new_co2_gas = (co2_gas * self._gas.vol_total + self._flux_o2) / self._gas.vol_total
         if new_co2_gas < 0:
             new_co2_gas = 0
 
@@ -67,12 +68,12 @@ class GasExchanger(BaseModel):
 
         # calculate the new CO2 concentrations of the gas and blood compartments
         new_tco2_blood: float = (
-            tco2_blood * self._blood.vol - self._flux_co2) / self._blood.vol
+            tco2_blood * _blood_vol - self._flux_co2) / _blood_vol
         if new_tco2_blood < 0:
             new_tco2_blood = 0
 
-        new_cco2_gas = (cco2_gas * self._gas.vol +
-                        self._flux_co2) / self._gas.vol
+        new_cco2_gas = (cco2_gas * self._gas.vol_total +
+                        self._flux_co2) / self._gas.vol_total
         if new_cco2_gas < 0:
             new_cco2_gas = 0
 

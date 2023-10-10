@@ -47,6 +47,9 @@ class Ans(BaseModel):
     _update_window: float = 0.015
     _update_counter: float = 0.0
 
+    _venpool:float = 1.0
+
+
     def init_model(self, model: object) -> bool:
         # initialize the basemodel parent class
         super().init_model(model)
@@ -161,6 +164,9 @@ class Ans(BaseModel):
             # ven_pool, cont and svr not implemented yet
             ven_pool = self.ven_pool_ref + self.g_map_ven_pool * self._d_map_ven_pool + self.g_po2_ven_pool * \
                 self._d_po2_ven_pool + self.g_pco2_ven_pool * self._d_pco2_ven_pool + self.g_ph_ven_pool * self._d_ph_ven_pool
+            if ven_pool > 0:
+                self._venpool = ven_pool
+                self._model.models["IVCE"].u_vol_factor = ven_pool
 
             cont = self.cont_ref + self.g_map_cont * self._d_map_cont + self.g_po2_cont * \
                 self._d_po2_cont + self.g_pco2_cont * self._d_pco2_cont + self.g_ph_cont * self._d_ph_cont

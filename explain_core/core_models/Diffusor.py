@@ -53,13 +53,16 @@ class Diffusor(BaseModel):
             self.dif_o2_factor * self._t
 
         # calculate the new O2 concentrations of the blood compartments
+        _blood1_vol: float = self._blood1.vol + self._blood1.u_vol
+        _blood2_vol: float = self._blood2.vol + self._blood2.u_vol
+
         new_to2_blood1: float = (
-            to2_blood1 * self._blood1.vol - self._flux_o2) / self._blood1.vol
+            to2_blood1 * _blood1_vol - self._flux_o2) / _blood1_vol
         if new_to2_blood1 < 0:
             new_to2_blood1 = 0
 
         new_to2_blood2: float = (
-            to2_blood2 * self._blood2.vol + self._flux_o2) / self._blood2.vol
+            to2_blood2 * _blood2_vol + self._flux_o2) / _blood2_vol
         if new_to2_blood2 < 0:
             new_to2_blood2 = 0
 
@@ -69,12 +72,12 @@ class Diffusor(BaseModel):
 
         # calculate the new CO2 concentrations of the blood compartments
         new_tco2_blood1: float = (
-            tco2_blood1 * self._blood1.vol - self._flux_co2) / self._blood1.vol
+            tco2_blood1 * _blood1_vol - self._flux_co2) / _blood1_vol
         if new_tco2_blood1 < 0:
             new_tco2_blood1 = 0
 
         new_tco2_blood2: float = (
-            tco2_blood2 * self._blood2.vol + self._flux_co2) / self._blood2.vol
+            tco2_blood2 * _blood2_vol + self._flux_co2) / _blood2_vol
         if new_tco2_blood2 < 0:
             new_tco2_blood2 = 0
 

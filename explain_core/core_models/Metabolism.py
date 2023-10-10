@@ -13,7 +13,7 @@ class Metabolism(BaseModel):
 
         for model, fvo2 in self.metabolic_active_models.items():
             # get the vol, tco2 and to2 from the blood compartment
-            vol: float = self._model.models[model].vol
+            vol: float = self._model.models[model].vol_total
             to2: float = self._model.models[model].aboxy['to2']
             tco2: float = self._model.models[model].aboxy['tco2']
 

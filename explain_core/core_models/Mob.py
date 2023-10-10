@@ -206,21 +206,21 @@ class Mob(BaseModel):
             self._sv_rv_cum = 0.0
 
         # calculate the pv area of this model step
-        _dV_lv = self._lv.vol - self._prev_lv_vol
+        _dV_lv = self._lv.vol_total - self._prev_lv_vol
         self._pv_area_lv += (_dV_lv * self._prev_lv_pres) + (_dV_lv * (self._lv.pres - self._prev_lv_pres)) / 2.0
         if _dV_lv > 0:
             self._sv_lv_cum += _dV_lv
 
-        _dV_rv = self._rv.vol - self._prev_rv_vol
+        _dV_rv = self._rv.vol_total - self._prev_rv_vol
         self._pv_area_rv += (_dV_rv * self._prev_rv_pres) + (_dV_rv * (self._rv.pres - self._prev_rv_pres)) / 2.0
         if _dV_rv > 0:
             self._sv_rv_cum += _dV_rv
 
         # store current volumes and pressures
-        self._prev_lv_vol = self._lv.vol
+        self._prev_lv_vol = self._lv.vol_total
         self._prev_lv_pres = self._lv.pres
         
-        self._prev_rv_vol = self._rv.vol
+        self._prev_rv_vol = self._rv.vol_total
         self._prev_rv_pres = self._rv.pres
 
         # return the total pressure volume area of both ventricles

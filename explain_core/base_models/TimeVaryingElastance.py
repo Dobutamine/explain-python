@@ -20,6 +20,7 @@ class TimeVaryingElastance(Capacitance):
 
     # dependent variables
     vol: float = 0.0
+    vol_total: float = 0.0
     pres: float = 0.0
     pres_atm: float = 0.0
     pres_mus: float = 0.0
@@ -35,7 +36,12 @@ class TimeVaryingElastance(Capacitance):
     def calc_model(self) -> None:
 
         # calculate the pressure depending on the volume, unstressed volume, elastance and activation factor
-        vol_diff = self.vol - (self.u_vol * self.u_vol_factor)
+        vol:float = self.vol * (1.0 / self.u_vol_factor)
+        u_vol:float = self.u_vol * self.u_vol_factor
+        vol_diff = vol - u_vol
+
+        # calculate the total volume in this capacitance
+        self.vol_total = vol + u_vol
 
         emin: float = self.el_min * self.el_min_factor * self.el_min_ans_factor * self.el_min_drug_factor
         emax: float = self.el_max * self.el_max_factor * self.el_max_ans_factor * self.el_max_drug_factor

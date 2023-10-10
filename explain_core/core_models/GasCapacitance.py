@@ -39,6 +39,17 @@ class GasCapacitance(Capacitance):
 
 
     # override the calc_model method as the blood capacitance has some specific actions
+    def init_model(self, model: object) -> bool:
+        # calculate the total volume in this capacitance
+        self.vol_total = self.vol * (1.0 / self.u_vol_factor) + self.u_vol * self.u_vol_factor
+
+        # initialize the base model
+        super().init_model(model)
+      
+        # signal that the ventilator model is initialized and return it
+        self._is_initialized = True
+        return self._is_initialized
+
     def calc_model(self) -> None:
         # add heat to the gas
         self.add_heat()
@@ -61,35 +72,25 @@ class GasCapacitance(Capacitance):
         # execute the parent class method
         super().volume_in(dvol)
 
-        # change the gas composition
-        if self.vol <= 0:
-            self.vol = 0.0
-            self.co2 = 0.0
-            self.cco2 = 0.0
-            self.cn2 = 0.0
-            self.ch2o = 0.0
-            self.cother = 0.0
-            self.ctotal = 0.0
-        else:
-            # change the gas concentrations
-            dco2: float = (model_from.co2 - self.co2) * dvol
-            self.co2 = (self.co2 * self.vol + dco2) / self.vol
+        # change the gas concentrations
+        dco2: float = (model_from.co2 - self.co2) * dvol
+        self.co2 = (self.co2 * self.vol_total + dco2) / self.vol_total
 
-            dcco2: float = (model_from.cco2 - self.cco2) * dvol
-            self.cco2: float = (self.cco2 * self.vol + dcco2) / self.vol
+        dcco2: float = (model_from.cco2 - self.cco2) * dvol
+        self.cco2: float = (self.cco2 * self.vol_total + dcco2) / self.vol_total
 
-            dcn2 = (model_from.cn2 - self.cn2) * dvol
-            self.cn2 = (self.cn2 * self.vol + dcn2) / self.vol
+        dcn2 = (model_from.cn2 - self.cn2) * dvol
+        self.cn2 = (self.cn2 * self.vol_total + dcn2) / self.vol_total
 
-            dch2o = (model_from.ch2o - self.ch2o) * dvol
-            self.ch2o = (self.ch2o * self.vol + dch2o) / self.vol
+        dch2o = (model_from.ch2o - self.ch2o) * dvol
+        self.ch2o = (self.ch2o * self.vol_total + dch2o) / self.vol_total
 
-            dcother = (model_from.cother - self.cother) * dvol
-            self.cother = (self.cother * self.vol + dcother) / self.vol
+        dcother = (model_from.cother - self.cother) * dvol
+        self.cother = (self.cother * self.vol_total + dcother) / self.vol_total
 
-            # change temperature due to influx of gas
-            dtemp = (model_from.temp - self.temp) * dvol
-            self.temp = (self.temp * self.vol + dtemp) / self.vol
+        # change temperature due to influx of gas
+        dtemp = (model_from.temp - self.temp) * dvol
+        self.temp = (self.temp * self.vol_total + dtemp) / self.vol_total
 
     def calc_gas_composition(self) -> None:
         # calculate the concentration in mmol/l using the sum of all concentrations
@@ -123,10 +124,9 @@ class GasCapacitance(Capacitance):
 
         # do the diffusion from water vapour depending on the tissue water vapour and gas water vapour pressure
         dH2O: float = 0.00001 * (pH2Ot - self.ph2o) * self._t
-        if self.vol > 0:
-            self.ch2o = (self.ch2o * self.vol + dH2O) / self.vol
+        self.ch2o = (self.ch2o * self.vol_total + dH2O) / self.vol_total
 
-        # as the water vapour also takes volume this is added to the compliance
+        # as the water vapour also takevol_totals volume this is added to the compliance
         if self.pres != 0 and not self.fixed_composition:
             # as dH2O is in mmol/l we have convert it as the gas constant is in mol
             self.vol += ((self._gas_constant * (273.15 + self.temp)) / self.pres) * (dH2O / 1000.0)
@@ -139,7 +139,7 @@ class GasCapacitance(Capacitance):
         # change the volume as the temperature changes
         if self.pres != 0 and not self.fixed_composition:
             # as Ctotal is in mmol/l we have convert it as the gas constant is in mol
-            dV: float = (self.ctotal * self.vol * self._gas_constant * dT) / self.pres
+            dV: float = (self.ctotal * self.vol_total * self._gas_constant * dT) / self.pres
             self.vol += dV / 1000.0
 
         # guard against negative volumes

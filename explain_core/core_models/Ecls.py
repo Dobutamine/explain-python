@@ -150,8 +150,8 @@ class Ecls(BaseModel):
             self.post_oxy_pres = self._tubing_out.pres
 
             # get the volumes
-            self.tubing_in_volume = self._tubing_in.vol
-            self.tubing_out_volume = self._tubing_out.vol
+            self.tubing_in_volume = self._tubing_in.vol + self._tubing_in.u_vol
+            self.tubing_out_volume = self._tubing_out.vol + self._tubing_out.u_vol
 
             # other measurements
             self.hemoglobin = self._tubing_in.aboxy['hemoglobin']

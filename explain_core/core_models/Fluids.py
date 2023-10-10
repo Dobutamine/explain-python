@@ -62,13 +62,14 @@ class Fluid:
         self.site.vol += self.delta_vol
 
         # process the aboxy and solutes if the fluid_composition is not none
+        _site_vol = self.site.vol + self.site.u_vol
         if self.fluid_comp is not None:
             for solute, conc in self.aboxy.items():
                 d_solute = (conc - self.site.aboxy[solute]) * self.delta_vol
-                self.site.aboxy[solute] += d_solute / self.site.vol
+                self.site.aboxy[solute] += d_solute / _site_vol
             for solute, conc in self.solutes.items():
                 d_solute = (conc - self.site.solutes[solute]) * self.delta_vol
-                self.site.solutes[solute] += d_solute / self.site.vol            
+                self.site.solutes[solute] += d_solute / _site_vol          
         
         return self.completed
 

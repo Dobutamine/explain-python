@@ -69,16 +69,16 @@ class Resistor(BaseModel):
         self.p2_ext = 0
 
         # calculate the resistances
-        rfor: float = self.r_for * self.r_for_factor * self.r_ans_factor * self.r_drug_factor
-        rback: float = self.r_back * self.r_back_factor * self.r_ans_factor * self.r_drug_factor
+        rfor: float = self.r_for * self.r_for_factor * self.r_ans_factor * self.r_drug_factor + self.r_k * self.r_k_factor * self.flow**2
+        rback: float = self.r_back * self.r_back_factor * self.r_ans_factor * self.r_drug_factor + self.r_k * self.r_k_factor * self.flow**2
 
         # calculate the flow
         if self.no_flow or (_p1 <= _p2 and self.no_back_flow):
             self.flow = 0.0
         elif _p1 > _p2:  # forward flow
-            self.flow = (_p1 - _p2) / (rfor + self.r_k * self.r_k_factor * self.flow**2)
+            self.flow = (_p1 - _p2) / rfor
         else:  # back flow
-            self.flow = (_p1 - _p2) / (rback + self.r_k * self.r_k_factor * self.flow**2)
+            self.flow = (_p1 - _p2) / rback
 
         # reset the ans and drug factors as they are set every cycle
         self.r_ans_factor = 1.0

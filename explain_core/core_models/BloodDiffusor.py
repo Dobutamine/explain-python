@@ -54,19 +54,22 @@ class BloodDiffusor(BaseModel):
         self._flux_co2 = (pco2_comp_blood1 - pco2_comp_blood2) * self.dif_co2 * self.dif_co2_factor * self._t
 
         # calculate the new O2 and CO2 concentrations
-        new_to2_comp_blood1: float = (to2_comp_blood1 * self._comp_blood1.vol - self._flux_o2) / self._comp_blood1.vol
+        _comp_blood1_vol:float = self._comp_blood1.vol + self._comp_blood1.u_vol
+        _comp_blood2_vol:float = self._comp_blood2.vol + self._comp_blood2.u_vol
+
+        new_to2_comp_blood1: float = (to2_comp_blood1 * _comp_blood1_vol - self._flux_o2) / _comp_blood1_vol
         if new_to2_comp_blood1 < 0:
             new_to2_comp_blood1 = 0
 
-        new_to2_comp_blood2: float = (to2_comp_blood2 * self._comp_blood2.vol + self._flux_o2) / self._comp_blood2.vol
+        new_to2_comp_blood2: float = (to2_comp_blood2 * _comp_blood2_vol + self._flux_o2) / _comp_blood2_vol
         if new_to2_comp_blood2 < 0:
             new_to2_comp_blood2 = 0
 
-        new_tco2_comp_blood1: float = (tco2_comp_blood1 * self._comp_blood1.vol - self._flux_co2) / self._comp_blood1.vol
+        new_tco2_comp_blood1: float = (tco2_comp_blood1 * _comp_blood1_vol - self._flux_co2) / _comp_blood1_vol
         if new_tco2_comp_blood1 < 0:
             new_tco2_comp_blood1 = 0
 
-        new_tco2_comp_blood2: float = (tco2_comp_blood2 * self._comp_blood2.vol + self._flux_co2) / self._comp_blood2.vol
+        new_tco2_comp_blood2: float = (tco2_comp_blood2 * _comp_blood2_vol + self._flux_co2) / _comp_blood2_vol
         if new_tco2_comp_blood2 < 0:
             new_tco2_comp_blood2 = 0
 
