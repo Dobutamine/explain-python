@@ -18,6 +18,8 @@ class Resistor(BaseModel):
     r_k_factor: float = 1.0
     r_ext: float = 0.0
     r_ext_factor: float = 1.0
+    r_ans_factor: float = 1.0
+    r_drug_factor: float = 1.0
     no_back_flow: bool = False
     no_flow: bool = False
     length: float = 0.0                 # in mm
@@ -66,15 +68,21 @@ class Resistor(BaseModel):
         self.p1_ext = 0
         self.p2_ext = 0
 
+        # calculate the resistances
+        rfor: float = self.r_for * self.r_for_factor * self.r_ans_factor * self.r_drug_factor
+        rback: float = self.r_back * self.r_back_factor * self.r_ans_factor * self.r_drug_factor
+
         # calculate the flow
         if self.no_flow or (_p1 <= _p2 and self.no_back_flow):
             self.flow = 0.0
         elif _p1 > _p2:  # forward flow
-            self.flow = (_p1 - _p2) / (self.r_for * self.r_for_factor) - \
-                self.r_k * self.r_k_factor * self.flow**2
+            self.flow = (_p1 - _p2) / rfor - self.r_k * self.r_k_factor * self.flow**2
         else:  # back flow
-            self.flow = (_p1 - _p2) / (self.r_back * self.r_back_factor) + \
-                self.r_k * self.r_k_factor * self.flow**2
+            self.flow = (_p1 - _p2) / rback + self.r_k * self.r_k_factor * self.flow**2
+
+        # reset the ans and drug factors as they are set every cycle
+        self.r_ans_factor = 1.0
+        self.r_drug_factor = 1.0
 
         # calculate the velocity = flow_rate (in mm^3/s) / (pi * radius^2) in m/s
         if (self.area > 0):

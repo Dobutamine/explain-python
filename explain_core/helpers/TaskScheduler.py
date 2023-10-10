@@ -1,6 +1,5 @@
 import math
 
-
 class TaskScheduler:
     # local parameters
     is_enabled = True

@@ -20,14 +20,6 @@ class Interface:
 
         # plot line colors
         self.lines = ['r-', 'b-', 'g-', 'c-', 'm-', 'y-', 'k-', 'w-']
-
-        # define a list holding the prop changes
-        self.propChanges = []
-        self.prop_update_interval = 0.015
-        self.prop_update_counter = 0
-
-        self.output_path = str(os.path.join(Path().absolute())) + r'/'
-
         self.plot_background_color = '#1E2029'
         self.plot_height = 3
         self.plot_dpi = 300
@@ -949,86 +941,9 @@ class Interface:
         print(
             f' Ready in {self.model.run_duration:.1f} sec. Average model step in {self.model.step_duration:.4f} ms.')
 
+    def set_property(self, prop, new_value, in_time: float = 1.0, at_time: float = 0.0):
+        self.model.set_property(prop, new_value, in_time, at_time)
 
-class propChange:
-    def __init__(self, prop, new_value, in_time, at_time=0, update_interval=0.015):
+    def get_property(self, property, new_value):
+        pass
 
-        self.prop = prop
-        self.current_value = getattr(prop['model'], prop['prop'])
-        self.initial_value = self.current_value
-        self._target_value = new_value
-        self.at_time = at_time
-        self.in_time = in_time
-
-        if (in_time > 0):
-            self.step_size = (
-                (self._target_value - self.current_value) / self.in_time) * update_interval
-        else:
-            self.step_size = 0
-
-        self.update_interval = update_interval
-        self.running = False
-        self.completed = False
-        self.running_time = 0
-
-    def update(self):
-        if self.completed == False:
-            # check whether the property should start changing (if the at_time has passed)
-            if self.running_time >= self.at_time:
-                if (self.running == False):
-                    print(
-                        f"- {self.prop['label']} change started at {self.running_time}. Inital value: {self.initial_value}")
-                self.running = True
-            else:
-                self.running = False
-
-            self.running_time += self.update_interval
-
-            if (self.running):
-                self.current_value += self.step_size
-                if abs(self.current_value - self._target_value) < abs(self.step_size):
-                    self.current_value = self._target_value
-                    self.step_size = 0
-                    self.running = False
-                    self.completed = True
-
-                if (self.step_size == 0):
-                    self.current_value = self._target_value
-                    self.completed = True
-                    print(
-                        f"- {self.prop['label']} change stopped at {self.running_time}. New value: {self.current_value}")
-
-                setattr(self.prop['model'],
-                        self.prop['prop'], self.current_value)
-
-    def cancel(self):
-        self.step_size = 0
-        self.current_value = self.initial_value
-        self.completed = True
-        setattr(self.prop['model'], self.prop['prop'], self.current_value)
-
-    def complete(self):
-        self.step_size = 0
-        self.current_value = self._target_value
-        self.completed = True
-        setattr(self.prop['model'], self.prop['prop'], self.current_value)
-
-
-    # def write_to_excel(self, properties, filename='data', time_to_calculate=10, sampleinterval=0.005, calculate=True):
-    #     self.analyze(properties, time_to_calculate=time_to_calculate,
-    #                  sampleinterval=sampleinterval, calculate=calculate)
-    #     # build a parameter list
-    #     parameters = ['time']
-    #     for p in properties:
-    #         parameters.append(p)
-
-    #     data = []
-    #     for index, t in enumerate(self.model.model_data):
-    #         dataline = []
-    #         for idx, parameter in enumerate(parameters):
-    #             dataline.append(t[parameter])
-    #         data.append(dataline)
-
-    #     df = pd.DataFrame(data, columns=parameters)
-    #     path = self.output_path + filename + '.xlsx'
-    #     df.to_excel(path)

@@ -845,7 +845,7 @@
       "svr_ref": 1.0,
       "ven_pool_ref": 1.0,
       "set_baro": 57.0,
-      "max_baro": 90.0,
+      "max_baro": 110.0,
       "min_baro": 20.0,
       "g_map_hp": -1.48,
       "g_map_ven_pool": 0.0,

@@ -6,7 +6,7 @@ class Container(Capacitance):
     # independent variables
     vol_extra: float = 0.0
     el: float = 0.0
-    act_factor: float = 1.0
+    act_factor: float = 0.0
 
     # override the calc_model method as the blood capacitance has some specific actions
     def calc_model(self) -> None:

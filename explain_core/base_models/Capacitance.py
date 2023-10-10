@@ -9,6 +9,8 @@ class Capacitance(BaseModel):
     u_vol_factor: float = 1.0
     el_base: float = 0.0
     el_base_factor: float = 1.0
+    el_base_ans_factor: float = 1.0
+    el_base_drug_factor: float = 1.0
     el_k: float = 0.0
     el_k_factor: float = 1.0
     fixed_composition: bool = False
@@ -28,8 +30,10 @@ class Capacitance(BaseModel):
     def calc_model(self) -> None:
 
         # calculate the pressure depending on the volume, unstressed volume, elastance
+        el:float = self.el_base * self.el_base_factor * self.el_base_ans_factor * self.el_base_drug_factor
+
         self.pres_in = self.el_k * self.el_k_factor * math.pow(self.vol - (self.u_vol * self.u_vol_factor), 2) + \
-            self.el_base * self.el_base_factor * (self.vol - (self.u_vol * self.u_vol_factor)) + self.pres_atm
+            el * (self.vol - (self.u_vol * self.u_vol_factor)) + self.pres_atm
         
         # calculate the pressures exerted by the surrounding tissues or other forces
         self.pres_out = self.pres_ext + self.pres_cc + self.pres_mus
@@ -44,6 +48,10 @@ class Capacitance(BaseModel):
         self.pres_ext = 0.0
         self.pres_cc = 0.0
         self.pres_mus = 0.0
+
+        # reset the ans and drug factors as they're recalculated every model cycle
+        self.el_base_ans_factor = 1.0
+        self.el_base_drug_factor = 1.0
 
     def volume_in(self, dvol: float) -> None:
         # increase the volume

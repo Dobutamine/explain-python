@@ -8,12 +8,15 @@ class TimeVaryingElastance(Capacitance):
     el_base: float = 0.0
     el_min: float = 0.0
     el_min_factor: float = 1.0
+    el_min_ans_factor: float = 1.0
+    el_min_drug_factor: float = 1.0
     el_max: float = 0.0
     el_max_factor: float = 1.0
+    el_max_ans_factor: float = 1.0
+    el_max_drug_factor: float = 1.0
     el_k: float = 0.0
     el_k_factor: float = 1.0
     act_factor: float = 0.0
-    el_current: float = 0.0
 
     # dependent variables
     vol: float = 0.0
@@ -33,11 +36,13 @@ class TimeVaryingElastance(Capacitance):
 
         # calculate the pressure depending on the volume, unstressed volume, elastance and activation factor
         vol_diff = self.vol - (self.u_vol * self.u_vol_factor)
-        self.pres_ed = self.el_min * self.el_min_factor * vol_diff + self.el_k * self.el_k_factor * math.pow(vol_diff, 2)
-        self.pres_ms = self.el_max * self.el_max_factor * vol_diff
+
+        emin: float = self.el_min * self.el_min_factor * self.el_min_ans_factor * self.el_min_drug_factor
+        emax: float = self.el_max * self.el_max_factor * self.el_max_ans_factor * self.el_max_drug_factor
+
+        self.pres_ed = emin * vol_diff + self.el_k * self.el_k_factor * math.pow(vol_diff, 2)
+        self.pres_ms = emax * vol_diff
         self.pres_in = self.act_factor * (self.pres_ms - self.pres_ed) + self.pres_ed + self.pres_atm
-        if vol_diff != 0:
-            self.el_current = self.pres_in / vol_diff
 
         # calculate the pressures exerted by the surrounding tissues or other forces
         self.pres_out = self.pres_ext + self.pres_cc + self.pres_mus 
@@ -52,4 +57,11 @@ class TimeVaryingElastance(Capacitance):
         self.pres_ext = 0.0
         self.pres_cc = 0.0
         self.pres_mus = 0.0
+
+        # reset the ans and drug factors as they're recalculated every model cycle
+        self.el_min_ans_factor = 1.0
+        self.el_min_drug_factor = 1.0
+        
+        self.el_max_ans_factor = 1.0
+        self.el_max_drug_factor = 1.0
 
