@@ -1012,6 +1012,13 @@
       "is_enabled": true,
       "dependencies": ["Heart", "AA", "AA_COR", "COR", "LV", "RV"]
     },
+    "Fluids": {
+      "name": "Fluids",
+      "description": "adding and removing of volume",
+      "model_type": "Fluids",
+      "is_enabled": true,
+      "dependencies": []
+    },
     "Ecls": {
       "name": "Ecls",
       "description": "ecls model",

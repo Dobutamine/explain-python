@@ -28,7 +28,7 @@ class BloodTimeVaryingElastance(TimeVaryingElastance):
             return
 
         # process the to2 and tco2
-        for solute in ['to2', 'tco2']:
+        for solute in ['to2', 'tco2', 'hemoglobin', 'albumin']:
             d_solute = (model_from.aboxy[solute] - self.aboxy[solute]) * dvol
             self.aboxy[solute] += d_solute / self.vol
 
