@@ -1012,12 +1012,45 @@
       "is_enabled": true,
       "dependencies": ["Heart", "AA", "AA_COR", "COR", "LV", "RV"]
     },
+    "Pda": {
+      "name": "Pda",
+      "description": "persistent ductus arteriosus model",
+      "model_type": "Pda",
+      "is_enabled": true,
+      "dependencies": ["DA"],
+      "da_model": "DA",
+      "no_flow": true,
+      "diameter": 1.0,
+      "length": 10,
+      "viscosity": 6.0,
+      "non_lin_factor": 1.0
+    },
     "Fluids": {
       "name": "Fluids",
       "description": "adding and removing of volume",
       "model_type": "Fluids",
       "is_enabled": true,
-      "dependencies": []
+      "dependencies": [],
+      "fluid_types": {
+        "normal saline": {
+            "solutes": {
+                "na": 154.0,
+                "k": 0.0,
+                "ca": 0.0,
+                "cl": 154.0,
+                "lact": 0.0,
+                "mg": 0.0
+            },
+            "aboxy": {}
+        },
+        "packed cells": {
+            "solutes": {
+            },
+            "aboxy": {
+                "hemoglobin": 12.0
+            }
+        }
+      }
     },
     "Ecls": {
       "name": "Ecls",

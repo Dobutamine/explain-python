@@ -76,9 +76,9 @@ class Resistor(BaseModel):
         if self.no_flow or (_p1 <= _p2 and self.no_back_flow):
             self.flow = 0.0
         elif _p1 > _p2:  # forward flow
-            self.flow = (_p1 - _p2) / rfor - self.r_k * self.r_k_factor * self.flow**2
+            self.flow = (_p1 - _p2) / (rfor + self.r_k * self.r_k_factor * self.flow**2)
         else:  # back flow
-            self.flow = (_p1 - _p2) / rback + self.r_k * self.r_k_factor * self.flow**2
+            self.flow = (_p1 - _p2) / (rback + self.r_k * self.r_k_factor * self.flow**2)
 
         # reset the ans and drug factors as they are set every cycle
         self.r_ans_factor = 1.0

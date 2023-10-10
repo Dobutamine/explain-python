@@ -74,26 +74,7 @@ class Fluid:
 
 
 class Fluids(BaseModel):
-    fluid_types = {
-        "normal saline": {
-            "solutes": {
-                "na": 154.0,
-                "k": 0.0,
-                "ca": 0.0,
-                "cl": 154.0,
-                "lact": 0.0,
-                "mg": 0.0
-            },
-            "aboxy": {}
-        },
-        "packed cells": {
-            "solutes": {
-            },
-            "aboxy": {
-                "hemoglobin": 12.0
-            }
-        }
-    }
+    fluid_types = {}
     _infusions: Fluid = []
 
     def calc_model(self):
@@ -126,7 +107,7 @@ class Fluids(BaseModel):
             return True
         else:
             # fluid not found
-            print("zero or negative volume change!")
+            print("zero or negative volume changes are not allowed. Use the remove_volume method to remove volume!")
             return False
 
 
@@ -136,7 +117,7 @@ class Fluids(BaseModel):
             self._infusions.append(new_fluid)
             return True
         else:
-            print("zero or negative volume change!")
+            print("zero or negative volume changes are not allowed. Use the add_volume method to add volume!")
             return False
 
 
