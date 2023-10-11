@@ -200,30 +200,53 @@ class Ans(BaseModel):
                 target_mv = 0.01
             self._breathing.target_minute_volume = target_mv
             
-            # ven_pool, cont and svr not implemented yet
-            ven_pool = self.ven_pool_ref + self.g_map_ven_pool * self._d_map_ven_pool + self.g_po2_ven_pool * \
-                self._d_po2_ven_pool + self.g_pco2_ven_pool * self._d_pco2_ven_pool + self.g_ph_ven_pool * self._d_ph_ven_pool
+            # cumulative effect on unstressed volume/stressed volume distribution of the venous reservoirs
+            cum_ven_pool_change = self.g_map_ven_pool * self._d_map_ven_pool + self.g_po2_ven_pool * self._d_po2_ven_pool + self.g_pco2_ven_pool * self._d_pco2_ven_pool + self.g_ph_ven_pool * self._d_ph_ven_pool
+            ven_pool = self.ven_pool_ref
+            if cum_ven_pool_change > 0:
+                ven_pool = self.ven_pool_ref + cum_ven_pool_change      
+            if cum_ven_pool_change < 0:
+                ven_pool = self.ven_pool_ref - cum_ven_pool_change
+                ven_pool = 1.0 / ven_pool
             if ven_pool > 0:
                 self._venpool = ven_pool
                 for r in self._venous_reservoirs:
                     r.u_vol_factor = ven_pool
 
-            cont = self.cont_ref + self.g_map_cont * self._d_map_cont + self.g_po2_cont * \
-                self._d_po2_cont + self.g_pco2_cont * self._d_pco2_cont + self.g_ph_cont * self._d_ph_cont
+            
+            # cumulative effect on the heart contractility
+            cum_cont_change = self.g_map_cont * self._d_map_cont + self.g_po2_cont * self._d_po2_cont + self.g_pco2_cont * self._d_pco2_cont + self.g_ph_cont * self._d_ph_cont
+            cont = self.cont_ref
+            if cum_cont_change > 0:
+                cont = self.cont_ref + cum_cont_change
+            if cum_cont_change < 0:
+                cont = self.cont_ref - cum_cont_change
+                cont = 1.0 / cont
             if cont > 0:
                 self._cont = cont
                 for hc in self._heart_chambers:
                     hc.el_max_ans_factor = cont
 
 
-            svr = self.svr_ref + self.g_map_svr * self._d_map_svr + self.g_po2_svr * \
-                self._d_po2_svr + self.g_pco2_svr * self._d_pco2_svr + self.g_ph_svr * self._d_ph_svr
+            cum_svr_change = self.g_map_svr * self._d_map_svr + self.g_po2_svr * self._d_po2_svr + self.g_pco2_svr * self._d_pco2_svr + self.g_ph_svr * self._d_ph_svr
+            svr = self.svr_ref
+            if cum_svr_change > 0:
+                svr = self.svr_ref + cum_svr_change
+            if cum_svr_change < 0:
+                svr = self.svr_ref - cum_svr_change
+                svr = 1.0 / svr  
             if svr > 0:
                 self._svr = svr
                 for svr_target in self._svr_targets:
                     svr_target.r_ans_factor = svr
 
-            pvr = self.pvr_ref + self.g_po2_pvr * self._d_po2_pvr + self.g_pco2_pvr * self._d_pco2_pvr + self.g_ph_pvr * self._d_ph_pvr
+            cum_pvr_change = self.g_po2_pvr * self._d_po2_pvr + self.g_pco2_pvr * self._d_pco2_pvr + self.g_ph_pvr * self._d_ph_pvr
+            pvr = self.pvr_ref
+            if cum_pvr_change > 0:
+                pvr = self.pvr_ref + cum_pvr_change
+            if cum_pvr_change < 0:
+                pvr = self.pvr_ref = cum_pvr_change
+                pvr = 1.0 / pvr
             if pvr > 0:
                 self._pvr = pvr
                 for pvr_target in self._pvr_targets:
