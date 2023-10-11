@@ -245,7 +245,7 @@ class Ans(BaseModel):
             if cum_pvr_change > 0:
                 pvr = self.pvr_ref + cum_pvr_change
             if cum_pvr_change < 0:
-                pvr = self.pvr_ref = cum_pvr_change
+                pvr = self.pvr_ref - cum_pvr_change
                 pvr = 1.0 / pvr
             if pvr > 0:
                 self._pvr = pvr
