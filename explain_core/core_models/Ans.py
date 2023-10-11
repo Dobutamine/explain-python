@@ -58,6 +58,8 @@ class Ans(BaseModel):
     _svr: float = 1.0
     _pvr: float = 1.0
 
+    _pressures: float = []
+    _data_window: int = 133
 
     def init_model(self, model: object) -> bool:
         # initialize the basemodel parent class
@@ -81,16 +83,24 @@ class Ans(BaseModel):
         for pvrt in self.pvr_targets:
             self._pvr_targets.append(self._model.models[pvrt])
 
+        # fill the list of pressures with the baroreflex start point
+        self._pressures = [self.set_baro] * self._data_window
+
         return self._is_initialized
 
     def calc_model(self) -> None:
 
         if self._update_counter > self._update_window:
-            # get the baroreflex input
-            _baro_pres: float = self._baroreceptor.pres
+            # insert a new pressure at the start of the list
+            self._pressures.insert(0, self._baroreceptor.pres)
+
+            # remove the last pressure from the list
+            self._pressures.pop()
+            
+            # get the moving average of the pressure
+            _baro_pres: float = sum(self._pressures) / (self._data_window)
 
             # for the chemoreflex we need the acidbase and oxygenation of the location of the chemoreceptor
-            # calculate the po2 and pco2 in the blood compartments
             set_blood_composition(self._chemoreceptor)
 
             # get the chemoreflex inputs
@@ -149,7 +159,6 @@ class Ans(BaseModel):
             self._d_ph_cont = self._update_window * \
                 ((1 / self.tc_ph_cont) * (-self._d_ph_cont + self._a_ph)) + self._d_ph_cont
 
-
             self._d_map_svr = self._update_window * \
                 ((1 / self.tc_map_svr) * (-self._d_map_svr + self._a_map)) + self._d_map_svr
 
@@ -161,6 +170,15 @@ class Ans(BaseModel):
 
             self._d_ph_svr = self._update_window * \
                 ((1 / self.tc_ph_svr) * (-self._d_ph_svr + self._a_ph)) + self._d_ph_svr
+
+            self._d_po2_pvr = self._update_window * \
+                ((1 / self.tc_po2_pvr) * (-self._d_po2_pvr + self._a_po2)) + self._d_po2_pvr
+
+            self._d_pco2_pvr = self._update_window * \
+                ((1 / self.tc_pco2_pvr) * (-self._d_pco2_pvr + self._a_pco2)) + self._d_pco2_pvr
+
+            self._d_ph_pvr = self._update_window * \
+                ((1 / self.tc_ph_pvr) * (-self._d_ph_pvr + self._a_ph)) + self._d_ph_pvr
 
             self._d_po2_ve = self._update_window * \
                 ((1 / self.tc_po2_ve) * (-self._d_po2_ve + self._a_po2)) + self._d_po2_ve

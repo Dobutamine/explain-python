@@ -80,10 +80,6 @@ class Resistor(BaseModel):
         else:  # back flow
             self.flow = (_p1 - _p2) / rback
 
-        # reset the ans and drug factors as they are set every cycle
-        self.r_ans_factor = 1.0
-        self.r_drug_factor = 1.0
-
         # calculate the velocity = flow_rate (in mm^3/s) / (pi * radius^2) in m/s
         if (self.area > 0):
             self.velocity = self.flow / 1000.0 / self.area
