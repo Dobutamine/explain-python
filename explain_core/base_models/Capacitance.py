@@ -55,10 +55,6 @@ class Capacitance(BaseModel):
         self.pres_cc = 0.0
         self.pres_mus = 0.0
 
-        # reset the ans and drug factors as they're recalculated every model cycle
-        self.el_base_ans_factor = 1.0
-        self.el_base_drug_factor = 1.0
-
     def volume_in(self, dvol: float) -> None:
         # increase the volume
         self.vol += dvol

@@ -64,10 +64,3 @@ class TimeVaryingElastance(Capacitance):
         self.pres_cc = 0.0
         self.pres_mus = 0.0
 
-        # reset the ans and drug factors as they're recalculated every model cycle
-        self.el_min_ans_factor = 1.0
-        self.el_min_drug_factor = 1.0
-        
-        self.el_max_ans_factor = 1.0
-        self.el_max_drug_factor = 1.0
-

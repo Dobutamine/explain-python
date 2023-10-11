@@ -1,5 +1,6 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
+from explain_core.base_models.Resistor import Resistor
 from explain_core.core_models.BloodCapacitance import BloodCapacitance
 from explain_core.core_models.BloodTimeVaryingElastance import BloodTimeVaryingElastance
 from explain_core.core_models.Heart import Heart
@@ -12,9 +13,10 @@ class Ans(BaseModel):
     _baroreceptor: BloodCapacitance = {}
     _chemoreceptor: BloodCapacitance = {}
     _heart: Heart = {}
-    _left_ventricle: BloodTimeVaryingElastance = {}
-    _right_ventricle: BloodTimeVaryingElastance = {}
-    _venous_reservoir: BloodCapacitance = {}
+    _venous_reservoirs: BloodCapacitance = []
+    _heart_chambers: BloodTimeVaryingElastance = []
+    _svr_targets: Resistor = []
+    _pvr_targets: Resistor = []
     _breathing: Breathing = {}
     _a_map: float = 0.0
     _a_ph: float = 0.0
@@ -41,6 +43,10 @@ class Ans(BaseModel):
     _d_pco2_svr: float = 0.0
     _d_ph_svr: float = 0.0
 
+    _d_po2_pvr: float = 0.0
+    _d_pco2_pvr: float = 0.0
+    _d_ph_pvr: float = 0.0
+
     _d_po2_ve: float = 0.0
     _d_pco2_ve: float = 0.0
     _d_ph_ve: float = 0.0
@@ -48,6 +54,9 @@ class Ans(BaseModel):
     _update_counter: float = 0.0
 
     _venpool:float = 1.0
+    _cont: float = 1.0
+    _svr: float = 1.0
+    _pvr: float = 1.0
 
 
     def init_model(self, model: object) -> bool:
@@ -59,6 +68,18 @@ class Ans(BaseModel):
         self._chemoreceptor = self._model.models[self.chemoreceptor_location]
         self._heart = self._model.models['Heart']
         self._breathing = self._model.models['Breathing']
+
+        for hc in self.heart_chambers:
+            self._heart_chambers.append(self._model.models[hc])
+
+        for venres in self.venous_reservoirs:
+            self._venous_reservoirs.append(self._model.models[venres])
+
+        for svrt in self.svr_targets:
+            self._svr_targets.append(self._model.models[svrt])
+
+        for pvrt in self.pvr_targets:
+            self._pvr_targets.append(self._model.models[pvrt])
 
         return self._is_initialized
 
@@ -166,13 +187,29 @@ class Ans(BaseModel):
                 self._d_po2_ven_pool + self.g_pco2_ven_pool * self._d_pco2_ven_pool + self.g_ph_ven_pool * self._d_ph_ven_pool
             if ven_pool > 0:
                 self._venpool = ven_pool
-                self._model.models["IVCE"].u_vol_factor = ven_pool
+                for r in self._venous_reservoirs:
+                    r.u_vol_factor = ven_pool
 
             cont = self.cont_ref + self.g_map_cont * self._d_map_cont + self.g_po2_cont * \
                 self._d_po2_cont + self.g_pco2_cont * self._d_pco2_cont + self.g_ph_cont * self._d_ph_cont
+            if cont > 0:
+                self._cont = cont
+                for hc in self._heart_chambers:
+                    hc.el_max_ans_factor = cont
+
 
             svr = self.svr_ref + self.g_map_svr * self._d_map_svr + self.g_po2_svr * \
                 self._d_po2_svr + self.g_pco2_svr * self._d_pco2_svr + self.g_ph_svr * self._d_ph_svr
+            if svr > 0:
+                self._svr = svr
+                for svr_target in self._svr_targets:
+                    svr_target.r_ans_factor = svr
+
+            pvr = self.pvr_ref + self.g_po2_pvr * self._d_po2_pvr + self.g_pco2_pvr * self._d_pco2_pvr + self.g_ph_pvr * self._d_ph_pvr
+            if pvr > 0:
+                self._pvr = pvr
+                for pvr_target in self._pvr_targets:
+                    pvr_target.r_ans_factor = pvr
             
             # reset the update counter
             self._update_counter = 0.0
