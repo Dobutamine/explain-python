@@ -353,64 +353,42 @@ class Ans(BaseModel):
 
         self._update_counter += self._t
 
-    def calc_effect(self, d, g_high, g_low, v_ref, nv_min, nv_max) -> float:
+    def calc_factor(self, cum_factor) -> float:
         # reset the cumulative hr factor
         factor: float = 1.0
-        cum_factor: float = 0.0
-
-        # apply the appropriate gain depending whether map is above or under the threshold
-        if d > 0:
-            cum_factor = g_high * d
-        else:
-            cum_factor = g_low * d
         
-        #   calculate the hr_factor which determines the heartrate 
         if cum_factor > 0:
             factor = 1.0 + cum_factor
         if cum_factor < 0:
             factor = 1.0 - cum_factor
             factor = 1.0 / factor
         
-        # if the factor is within the limits then apply the effect
-        nv: float  = factor * v_ref
-        if nv > nv_max:
-            nv = nv_max
-
-        if nv < nv_min:
-            nv = nv_min
-
-        return nv
+        return factor
 
     def calc_hr_effects(self):
-        new_hr = self.calc_effect(self._d_map_hr, self.g_map_high_hr, self.g_map_low_hr, self.hr_ref, self.hr_ref_min, self.hr_ref_max)
+        # reset the cumulative hr factor
+        cum_hr_factor: float = 0.0
 
-        # # reset the cumulative hr factor
-        # cum_hr_factor: float = 0.0
+        # apply the appropriate gain depending whether map is above or under the threshold
+        if self._d_map_hr > 0:
+            cum_hr_factor = self.g_map_high_hr * self._d_map_hr
+        else:
+            cum_hr_factor = self.g_map_low_hr * self._d_map_hr
 
-        # # apply the appropriate gain depending whether map is above or under the threshold
-        # if self._d_map_hr > 0:
-        #     cum_hr_factor = self.g_map_high_hr * self._d_map_hr
-        # else:
-        #     cum_hr_factor = self.g_map_low_hr * self._d_map_hr
-        
-        # #   calculate the hr_factor which determines the heartrate 
-        # if cum_hr_factor > 0:
-        #     self._hr_factor = 1.0 + cum_hr_factor
-        # if cum_hr_factor < 0:
-        #     self._hr_factor = 1.0 - cum_hr_factor
-        #     self._hr_factor = 1.0 / self._hr_factor
-        
-        # # if the factor is within the limits then apply the effect
-        # new_hr = self._hr_factor * self.hr_ref
-        # if new_hr > self.hr_ref_max:
-        #     new_hr = self.hr_ref_max
+        # calculate the new heartrate
+        self._hr_factor = self.calc_factor(cum_hr_factor)
 
-        # if new_hr < self.hr_ref_min:
-        #     new_hr = self.hr_ref_min
+        # if the factor is within the limits then apply the effect
+        new_hr: float  = self._hr_factor * self.hr_ref
+        if new_hr > self.hr_ref_max:
+            new_hr = self.hr_ref_max
+
+        if new_hr < self.hr_ref_min:
+            new_hr = self.hr_ref_min
 
         # apply the effect
-        for hr_target in self.hr_targets:
-            hr.heart_rate = new_hr
+        for hr_target in self._hr_targets:
+            hr_target.heart_rate = new_hr
         
 
     def calc_mv_effects(self):
