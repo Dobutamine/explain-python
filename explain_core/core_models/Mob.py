@@ -10,15 +10,15 @@ from explain_core.functions.ActivationFunction import activation_function
 class Mob(BaseModel):
     # independent variables 
     hw: float = 0.0                     # heart weight = 7.799 + 0.004296 * birth weight (grams)
-    bm_vo2_ref: float = 0.000159        # in ml O2/cardiac cycle/gram heart_weight: vo2 when the heart is not beating and depending on do2
-    bm_vo2_min: float = 0.0000318       # minimal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
+    bm_vo2_ref: float = 0.0001590 / 2.2      # in ml O2/cardiac cycle/gram heart_weight: vo2 when the heart is not beating and depending on do2
+    bm_vo2_min: float = 0.0000318 / 2.2      # minimal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
     ecc_c: float = 0.0                  # not implemented yet but included in basal metabolism
-    pva_c: float = 0.00425              # CPVA in mL O2/cardiac cycle/mmHg*l
+    pva_c: float = 0.00425 / 2.2              # CPVA in mL O2/cardiac cycle/mmHg*l
     resp_q: float = 0.5                 # respiratory quotient
 
     po2_set: float = 10.0       
     po2_max: float = 10.0
-    po2_min: float = 0.0
+    po2_min: float = 0.0 
     
     bm_po2_tc: float = 5.0
     bm_po2_g: float = 2.0               # maximal reduction of 20%   -10 * 2.0 = 20
@@ -181,7 +181,7 @@ class Mob(BaseModel):
         self.pva_vo2 = (self.pva * self.pva_c) / self._ml_to_mmol
 
         # return the total vo2 
-        return self.bm_vo2 + self.ecc_vo2 + self.pva_vo2
+        return self.bm_vo2 + self.pva_vo2 + self.ecc_vo2
 
     def calc_pe(self) -> float:
         pass
