@@ -20,14 +20,33 @@ class Ans(BaseModel):
     svr_targets: str = ["AD_INT", "AD_KID","AD_LS", "AAR_RUB", "AD_RLB"]
     pvr_targets: str = ["PA_LL", "PA_RL"]
 
-    hr_ref: float = 140.0
-    hr_ref_max: float = 210.0
-    hr_ref_min: float = 60.0
-    mv_ref: float = 0.66
+    hr_factor: float = 1.0
+    hr_factor_max: float = 5.0
+    hr_factor_min: float = 0.1
+
+    mv_factor: float = 1.0
+    mv_factor_max: float = 5.0
+    mv_factor_min: float = 0.1
+
     venpool_ref: float = 1.0
+    venpool_factor:float = 1.0
+    venpool_factor_max:float = 5.0
+    venpool_factor_min:float = 0.1
+
     cont_ref: float = 1.0
+    cont_factor: float = 1.0
+    cont_factor_max: float = 5.0
+    cont_factor_min: float = 0.1
+
     svr_ref: float = 1.0
+    svr_factor: float = 1.0
+    svr_factor_max: float = 5.0
+    svr_factor_min: float = 0.1
+
     pvr_ref: float = 1.0
+    pvr_factor: float = 1.0
+    pvr_factor_max: float = 5.0
+    pvr_factor_min: float = 0.1
 
     min_map: float = 20.0
     set_map: float = 57.5
@@ -118,11 +137,11 @@ class Ans(BaseModel):
     tc_po2_pvr: float = 30.0
 
     hr_effects_enabled: bool = True
-    mv_effects_enabled: bool = False
-    venpool_effects_enabled: bool = False
-    cont_effects_enabled: bool = False
-    svr_effects_enabled: bool = False
-    pvr_effects_enabled: bool = False
+    mv_effects_enabled: bool = True
+    venpool_effects_enabled: bool = True
+    cont_effects_enabled: bool = True
+    svr_effects_enabled: bool = True
+    pvr_effects_enabled: bool = True
 
     # dependent variables
     g_map_high_hr: float = 0.0
@@ -231,13 +250,7 @@ class Ans(BaseModel):
     _update_window: float = 0.015
     _update_counter: float = 0.0
 
-    _hr_factor: float = 1.0
-    _hr_factor_hi: float = 1.0
-    _hr_factor_lo: float = 1.0
-    _venpool:float = 1.0
-    _cont: float = 1.0
-    _svr: float = 1.0
-    _pvr: float = 1.0
+
 
     _pressures: float = []
     _data_window: int = 133
@@ -353,6 +366,266 @@ class Ans(BaseModel):
 
         self._update_counter += self._t
 
+
+
+    def calc_hr_effects(self):
+        # reset the cumulative hr factor
+        cum_hr_factor: float = 0.0
+
+        # mean arterial pressure influence on hr
+        if self._d_map_hr > 0:
+            cum_hr_factor = self.g_map_high_hr * self._d_map_hr
+        else:
+            cum_hr_factor = self.g_map_low_hr * self._d_map_hr
+
+        # pco2 influence on hr
+        if self._d_pco2_hr > 0:
+            cum_hr_factor += self.g_pco2_high_hr * self._d_pco2_hr
+        else:
+            cum_hr_factor += self.g_pco2_low_hr * self._d_pco2_hr
+        
+        # ph influence on hr
+        if self._d_ph_hr > 0:
+            cum_hr_factor += self.g_ph_high_hr * self._d_ph_hr
+        else:
+            cum_hr_factor += self.g_ph_low_hr * self._d_ph_hr
+
+        # po2 influence on hr
+        if self._d_po2_hr > 0:
+            cum_hr_factor += self.g_po2_high_hr * self._d_po2_hr
+        else:
+            cum_hr_factor += self.g_po2_low_hr * self._d_po2_hr
+
+        # calculate the new heartrate factor
+        self.hr_factor = self.calc_factor(cum_hr_factor)
+
+        # gueard the minimum and maximum factor values
+        if self.hr_factor > self.hr_factor_max:
+            self.hr_factor = self.hr_factor_max
+        if self.hr_factor < self.hr_factor_min:
+            self.hr_factor = self.hr_factor_min
+
+        # apply the effect
+        for hr_target in self._hr_targets:
+            hr_target.hr_ans_factor = self.hr_factor
+        
+    def calc_mv_effects(self):
+        # reset the cumulative mv factor
+        cum_mv_factor: float = 0.0
+
+        # mean arterial pressure influence on mv
+        if self._d_map_mv > 0:
+            cum_mv_factor = self.g_map_high_mv * self._d_map_mv
+        else:
+            cum_mv_factor = self.g_map_low_mv * self._d_map_mv
+
+        # pco2 influence on mv
+        if self._d_pco2_mv > 0:
+            cum_mv_factor += self.g_pco2_high_mv * self._d_pco2_mv
+        else:
+            cum_mv_factor += self.g_pco2_low_mv * self._d_pco2_mv
+        
+        # ph influence on mv
+        if self._d_ph_mv > 0:
+            cum_mv_factor += self.g_ph_high_mv * self._d_ph_mv
+        else:
+            cum_mv_factor += self.g_ph_low_mv * self._d_ph_mv
+
+        # po2 influence on mv
+        if self._d_po2_mv > 0:
+            cum_mv_factor += self.g_po2_high_mv * self._d_po2_mv
+        else:
+            cum_mv_factor += self.g_po2_low_mv * self._d_po2_mv
+
+        # calculate the new heartrate factor
+        self.mv_factor = self.calc_factor(cum_mv_factor)
+
+        # gueard the minimum and maximum factor values
+        if self.mv_factor > self.mv_factor_max:
+            self.mv_factor = self.mv_factor_max
+        if self.mv_factor < self.mv_factor_min:
+            self.mv_factor = self.mv_factor_min
+
+        # apply the effect
+        for mv_target in self._mv_targets:
+            mv_target.mv_ans_factor = self.mv_factor
+        
+    def calc_cont_effects(self):
+        # reset the cumulative cont factor
+        cum_cont_factor: float = 0.0
+
+        # mean arterial pressure influence on cont
+        if self._d_map_cont > 0:
+            cum_cont_factor = self.g_map_high_cont * self._d_map_cont
+        else:
+            cum_cont_factor = self.g_map_low_cont * self._d_map_cont
+
+        # pco2 influence on cont
+        if self._d_pco2_cont > 0:
+            cum_cont_factor += self.g_pco2_high_cont * self._d_pco2_cont
+        else:
+            cum_cont_factor += self.g_pco2_low_cont * self._d_pco2_cont
+        
+        # ph influence on cont
+        if self._d_ph_cont > 0:
+            cum_cont_factor += self.g_ph_high_cont * self._d_ph_cont
+        else:
+            cum_cont_factor += self.g_ph_low_cont * self._d_ph_cont
+
+        # po2 influence on cont
+        if self._d_po2_cont > 0:
+            cum_cont_factor += self.g_po2_high_cont * self._d_po2_cont
+        else:
+            cum_cont_factor += self.g_po2_low_cont * self._d_po2_cont
+
+        # calculate the new heartrate factor
+        self.cont_factor = self.calc_factor(cum_cont_factor)
+
+        # gueard the minimum and maximum factor values
+        if self.cont_factor > self.cont_factor_max:
+            self.cont_factor = self.cont_factor_max
+        if self.cont_factor < self.cont_factor_min:
+            self.cont_factor = self.cont_factor_min
+
+        # calculate the new heart_rate
+        new_cont: float  = self.cont_factor * self.cont_ref
+
+        # apply the effect
+        for cont_target in self._cont_targets:
+            cont_target.el_max_factor = new_cont
+
+    def calc_venpool_effects(self):
+        # reset the cumulative venpool factor
+        cum_venpool_factor: float = 0.0
+
+        # mean arterial pressure influence on venpool
+        if self._d_map_venpool > 0:
+            cum_venpool_factor = self.g_map_high_venpool * self._d_map_venpool
+        else:
+            cum_venpool_factor = self.g_map_low_venpool * self._d_map_venpool
+
+        # pco2 influence on venpool
+        if self._d_pco2_venpool > 0:
+            cum_venpool_factor += self.g_pco2_high_venpool * self._d_pco2_venpool
+        else:
+            cum_venpool_factor += self.g_pco2_low_venpool * self._d_pco2_venpool
+        
+        # ph influence on venpool
+        if self._d_ph_venpool > 0:
+            cum_venpool_factor += self.g_ph_high_venpool * self._d_ph_venpool
+        else:
+            cum_venpool_factor += self.g_ph_low_venpool * self._d_ph_venpool
+
+        # po2 influence on venpool
+        if self._d_po2_venpool > 0:
+            cum_venpool_factor += self.g_po2_high_venpool * self._d_po2_venpool
+        else:
+            cum_venpool_factor += self.g_po2_low_venpool * self._d_po2_venpool
+
+        # calculate the new heartrate factor
+        self.venpool_factor = self.calc_factor(cum_venpool_factor)
+
+        # gueard the minimum and maximum factor values
+        if self.venpool_factor > self.venpool_factor_max:
+            self.venpool_factor = self.venpool_factor_max
+        if self.venpool_factor < self.venpool_factor_min:
+            self.venpool_factor = self.venpool_factor_min
+
+        # calculate the new heart_rate
+        new_venpool: float  = self.venpool_factor * self.venpool_ref
+
+        # apply the effect
+        for venpool_target in self._venpool_targets:
+            venpool_target.u_vol_factor = new_venpool
+
+    def calc_svr_effects(self):
+        # reset the cumulative svr factor
+        cum_svr_factor: float = 0.0
+
+        # mean arterial pressure influence on svr
+        if self._d_map_svr > 0:
+            cum_svr_factor = self.g_map_high_svr * self._d_map_svr
+        else:
+            cum_svr_factor = self.g_map_low_svr * self._d_map_svr
+
+        # pco2 influence on svr
+        if self._d_pco2_svr > 0:
+            cum_svr_factor += self.g_pco2_high_svr * self._d_pco2_svr
+        else:
+            cum_svr_factor += self.g_pco2_low_svr * self._d_pco2_svr
+        
+        # ph influence on svr
+        if self._d_ph_svr > 0:
+            cum_svr_factor += self.g_ph_high_svr * self._d_ph_svr
+        else:
+            cum_svr_factor += self.g_ph_low_svr * self._d_ph_svr
+
+        # po2 influence on svr
+        if self._d_po2_svr > 0:
+            cum_svr_factor += self.g_po2_high_svr * self._d_po2_svr
+        else:
+            cum_svr_factor += self.g_po2_low_svr * self._d_po2_svr
+
+        # calculate the new heartrate factor
+        self.svr_factor = self.calc_factor(cum_svr_factor)
+
+        # gueard the minimum and maximum factor values
+        if self.svr_factor > self.svr_factor_max:
+            self.svr_factor = self.svr_factor_max
+        if self.svr_factor < self.svr_factor_min:
+            self.svr_factor = self.svr_factor_min
+
+        # calculate the new heart_rate
+        new_svr: float  = self.svr_factor * self.svr_ref
+
+        # apply the effect
+        for svr_target in self._svr_targets:
+            svr_target.r_ans_factor = new_svr
+
+    def calc_pvr_effects(self):
+        # reset the cumulative pvr factor
+        cum_pvr_factor: float = 0.0
+
+        # mean arterial pressure influence on pvr
+        if self._d_map_pvr > 0:
+            cum_pvr_factor = self.g_map_high_pvr * self._d_map_pvr
+        else:
+            cum_pvr_factor = self.g_map_low_pvr * self._d_map_pvr
+
+        # pco2 influence on pvr
+        if self._d_pco2_pvr > 0:
+            cum_pvr_factor += self.g_pco2_high_pvr * self._d_pco2_pvr
+        else:
+            cum_pvr_factor += self.g_pco2_low_pvr * self._d_pco2_pvr
+        
+        # ph influence on pvr
+        if self._d_ph_pvr > 0:
+            cum_pvr_factor += self.g_ph_high_pvr * self._d_ph_pvr
+        else:
+            cum_pvr_factor += self.g_ph_low_pvr * self._d_ph_pvr
+
+        # po2 influence on pvr
+        if self._d_po2_pvr > 0:
+            cum_pvr_factor += self.g_po2_high_pvr * self._d_po2_pvr
+        else:
+            cum_pvr_factor += self.g_po2_low_pvr * self._d_po2_pvr
+
+        # calculate the new heartrate factor
+        self.pvr_factor = self.calc_factor(cum_pvr_factor)
+
+        # gueard the minimum and maximum factor values
+        if self.pvr_factor > self.pvr_factor_max:
+            self.pvr_factor = self.pvr_factor_max
+        if self.pvr_factor < self.pvr_factor_min:
+            self.pvr_factor = self.pvr_factor_min
+
+        # calculate the new heart_rate
+        new_pvr: float  = self.pvr_factor * self.pvr_ref
+
+        # apply the effect
+        for pvr_target in self._pvr_targets:
+            pvr_target.r_ans_factor = new_pvr
+
     def calc_factor(self, cum_factor) -> float:
         # reset the cumulative hr factor
         factor: float = 1.0
@@ -365,115 +638,8 @@ class Ans(BaseModel):
         
         return factor
 
-    def calc_hr_effects(self):
-        # reset the cumulative hr factor
-        cum_hr_factor: float = 0.0
-
-        # apply the appropriate gain depending whether map is above or under the threshold
-        if self._d_map_hr > 0:
-            cum_hr_factor = self.g_map_high_hr * self._d_map_hr
-        else:
-            cum_hr_factor = self.g_map_low_hr * self._d_map_hr
-
-        # calculate the new heartrate
-        self._hr_factor = self.calc_factor(cum_hr_factor)
-
-        # if the factor is within the limits then apply the effect
-        new_hr: float  = self._hr_factor * self.hr_ref
-        if new_hr > self.hr_ref_max:
-            new_hr = self.hr_ref_max
-
-        if new_hr < self.hr_ref_min:
-            new_hr = self.hr_ref_min
-
-        # apply the effect
-        for hr_target in self._hr_targets:
-            hr_target.heart_rate = new_hr
-        
-
-    def calc_mv_effects(self):
-        pass
-
-    def calc_cont_effects(self):
-        pass
-
-    def calc_venpool_effects(self):
-        pass
-
-    def calc_svr_effects(self):
-        pass
-
-    def calc_pvr_effects(self):
-        pass
-
     def time_constant(self, tc, cv, nv, t = 0.015):
         return t * (( 1.0 / tc) * (-cv + nv)) + cv
-
-
-    def apply_effects(self):
-            # hr - cumulative effect on the heart rate
-            self._heart.heart_rate = self.heart_rate_ref + self.g_map_hp * self._d_map_hr + self.g_po2_hp * \
-                self._d_po2_hr + self.g_pco2_hp * self._d_pco2_hr + self.g_ph_hp * self._d_ph_hr
-
-            # mv - cumulative ffect on the minute volume
-            target_mv = self.minute_volume_ref + self.g_po2_ve * self._d_po2_mv + \
-                self.g_pco2_ve * self._d_pco2_mv + self.g_ph_ve * self._d_ph_mv
-            if (target_mv < 0.01):
-                target_mv = 0.01
-            self._breathing.target_minute_volume = target_mv
-            
-            # venpool - cumulative effect on unstressed volume/stressed volume distribution of the venous reservoirs
-            cum_venpool_change = self.g_map_venpool * self._d_map_venpool + self.g_po2_venpool * self._d_po2_venpool + self.g_pco2_venpool * self._d_pco2_venpool + self.g_ph_venpool * self._d_ph_venpool
-            venpool = self.venpool_ref
-            if cum_venpool_change > 0:
-                venpool = self.venpool_ref + cum_venpool_change      
-            if cum_venpool_change < 0:
-                venpool = self.venpool_ref - cum_venpool_change
-                venpool = 1.0 / venpool
-            if venpool > 0:
-                self._venpool = venpool
-                for r in self._venous_reservoirs:
-                    r.u_vol_factor = venpool
-
-            
-            # cont - cumulative effect on the heart contractility
-            cum_cont_change = self.g_map_cont * self._d_map_cont + self.g_po2_cont * self._d_po2_cont + self.g_pco2_cont * self._d_pco2_cont + self.g_ph_cont * self._d_ph_cont
-            cont = self.cont_ref
-            if cum_cont_change > 0:
-                cont = self.cont_ref + cum_cont_change
-            if cum_cont_change < 0:
-                cont = self.cont_ref - cum_cont_change
-                cont = 1.0 / cont
-            if cont > 0:
-                self._cont = cont
-                for hc in self._heart_chambers:
-                    hc.el_max_ans_factor = cont
-
-            # svr - cumulative effect on the systemic vascular resistance
-            cum_svr_change = self.g_map_svr * self._d_map_svr + self.g_po2_svr * self._d_po2_svr + self.g_pco2_svr * self._d_pco2_svr + self.g_ph_svr * self._d_ph_svr
-            svr = self.svr_ref
-            if cum_svr_change > 0:
-                svr = self.svr_ref + cum_svr_change
-            if cum_svr_change < 0:
-                svr = self.svr_ref - cum_svr_change
-                svr = 1.0 / svr  
-            if svr > 0:
-                self._svr = svr
-                for svr_target in self._svr_targets:
-                    svr_target.r_ans_factor = svr
-
-            # pvr - cumulative effect on the pulmonary vascular resistance
-            cum_pvr_change = self.g_po2_pvr * self._d_po2_pvr + self.g_pco2_pvr * self._d_pco2_pvr + self.g_ph_pvr * self._d_ph_pvr
-            pvr = self.pvr_ref
-            if cum_pvr_change > 0:
-                pvr = self.pvr_ref + cum_pvr_change
-            if cum_pvr_change < 0:
-                pvr = self.pvr_ref - cum_pvr_change
-                pvr = 1.0 / pvr
-            if pvr > 0:
-                self._pvr = pvr
-                for pvr_target in self._pvr_targets:
-                    pvr_target.r_ans_factor = pvr
 
     def translate_mxe(self, mxe) -> float:
         # a mxe of 1.5 that max effect is 1.5 * reference value (hr_ref, mv_ref, venpool_ref, cont_ref, svr_ref, pvr_ref)
@@ -488,7 +654,81 @@ class Ans(BaseModel):
         return 0
 
     def calc_gains(self):
+        # heart rate gains
         self.g_map_low_hr = self.translate_mxe(self.mxe_map_low_hr) / (self.min_map - self.set_map)
         self.g_map_high_hr = self.translate_mxe(self.mxe_map_high_hr) / (self.max_map - self.set_map)
+
+        self.g_pco2_low_hr = self.translate_mxe(self.mxe_pco2_low_hr) / (self.min_pco2 - self.set_pco2)
+        self.g_pco2_high_hr = self.translate_mxe(self.mxe_pco2_high_hr) / (self.max_pco2 - self.set_pco2)
+
+        self.g_ph_low_hr = self.translate_mxe(self.mxe_ph_low_hr) / (self.min_ph - self.set_ph)
+        self.g_ph_high_hr = self.translate_mxe(self.mxe_ph_high_hr) / (self.max_ph - self.set_ph)
+
+        self.g_po2_low_hr = self.translate_mxe(self.mxe_po2_low_hr) / (self.min_po2 - self.set_po2)
+        self.g_po2_high_hr = self.translate_mxe(self.mxe_po2_high_hr) / (self.max_po2 - self.set_po2)
+
+        # minute volume gains
+        self.g_map_low_mv = self.translate_mxe(self.mxe_map_low_mv) / (self.min_map - self.set_map)
+        self.g_map_high_mv = self.translate_mxe(self.mxe_map_high_mv) / (self.max_map - self.set_map)
+
+        self.g_pco2_low_mv = self.translate_mxe(self.mxe_pco2_low_mv) / (self.min_pco2 - self.set_pco2)
+        self.g_pco2_high_mv = self.translate_mxe(self.mxe_pco2_high_mv) / (self.max_pco2 - self.set_pco2)
+
+        self.g_ph_low_mv = self.translate_mxe(self.mxe_ph_low_mv) / (self.min_ph - self.set_ph)
+        self.g_ph_high_mv = self.translate_mxe(self.mxe_ph_high_mv) / (self.max_ph - self.set_ph)
+
+        self.g_po2_low_mv = self.translate_mxe(self.mxe_po2_low_mv) / (self.min_po2 - self.set_po2)
+        self.g_po2_high_mv = self.translate_mxe(self.mxe_po2_high_mv) / (self.max_po2 - self.set_po2)
+
+        # venpool gains
+        self.g_map_low_venpool = self.translate_mxe(self.mxe_map_low_venpool) / (self.min_map - self.set_map)
+        self.g_map_high_venpool = self.translate_mxe(self.mxe_map_high_venpool) / (self.max_map - self.set_map)
+
+        self.g_pco2_low_venpool = self.translate_mxe(self.mxe_pco2_low_venpool) / (self.min_pco2 - self.set_pco2)
+        self.g_pco2_high_venpool = self.translate_mxe(self.mxe_pco2_high_venpool) / (self.max_pco2 - self.set_pco2)
+
+        self.g_ph_low_venpool = self.translate_mxe(self.mxe_ph_low_venpool) / (self.min_ph - self.set_ph)
+        self.g_ph_high_venpool = self.translate_mxe(self.mxe_ph_high_venpool) / (self.max_ph - self.set_ph)
+
+        self.g_po2_low_venpool = self.translate_mxe(self.mxe_po2_low_venpool) / (self.min_po2 - self.set_po2)
+        self.g_po2_high_venpool = self.translate_mxe(self.mxe_po2_high_venpool) / (self.max_po2 - self.set_po2)
+
+        # cont gains
+        self.g_map_low_cont = self.translate_mxe(self.mxe_map_low_cont) / (self.min_map - self.set_map)
+        self.g_map_high_cont = self.translate_mxe(self.mxe_map_high_cont) / (self.max_map - self.set_map)
+
+        self.g_pco2_low_cont = self.translate_mxe(self.mxe_pco2_low_cont) / (self.min_pco2 - self.set_pco2)
+        self.g_pco2_high_cont = self.translate_mxe(self.mxe_pco2_high_cont) / (self.max_pco2 - self.set_pco2)
+
+        self.g_ph_low_cont = self.translate_mxe(self.mxe_ph_low_cont) / (self.min_ph - self.set_ph)
+        self.g_ph_high_cont = self.translate_mxe(self.mxe_ph_high_cont) / (self.max_ph - self.set_ph)
+
+        self.g_po2_low_cont = self.translate_mxe(self.mxe_po2_low_cont) / (self.min_po2 - self.set_po2)
+        self.g_po2_high_cont = self.translate_mxe(self.mxe_po2_high_cont) / (self.max_po2 - self.set_po2)
+
+        # svr gains
+        self.g_map_low_svr = self.translate_mxe(self.mxe_map_low_svr) / (self.min_map - self.set_map)
+        self.g_map_high_svr = self.translate_mxe(self.mxe_map_high_svr) / (self.max_map - self.set_map)
+
+        self.g_pco2_low_svr = self.translate_mxe(self.mxe_pco2_low_svr) / (self.min_pco2 - self.set_pco2)
+        self.g_pco2_high_svr = self.translate_mxe(self.mxe_pco2_high_svr) / (self.max_pco2 - self.set_pco2)
+
+        self.g_ph_low_svr = self.translate_mxe(self.mxe_ph_low_svr) / (self.min_ph - self.set_ph)
+        self.g_ph_high_svr = self.translate_mxe(self.mxe_ph_high_svr) / (self.max_ph - self.set_ph)
+
+        self.g_po2_low_svr = self.translate_mxe(self.mxe_po2_low_svr) / (self.min_po2 - self.set_po2)
+        self.g_po2_high_svr = self.translate_mxe(self.mxe_po2_high_svr) / (self.max_po2 - self.set_po2)
         
+        # pvr gains
+        self.g_map_low_pvr = self.translate_mxe(self.mxe_map_low_pvr) / (self.min_map - self.set_map)
+        self.g_map_high_pvr = self.translate_mxe(self.mxe_map_high_pvr) / (self.max_map - self.set_map)
+
+        self.g_pco2_low_pvr = self.translate_mxe(self.mxe_pco2_low_pvr) / (self.min_pco2 - self.set_pco2)
+        self.g_pco2_high_pvr = self.translate_mxe(self.mxe_pco2_high_pvr) / (self.max_pco2 - self.set_pco2)
+
+        self.g_ph_low_pvr = self.translate_mxe(self.mxe_ph_low_pvr) / (self.min_ph - self.set_ph)
+        self.g_ph_high_pvr = self.translate_mxe(self.mxe_ph_high_pvr) / (self.max_ph - self.set_ph)
+
+        self.g_po2_low_pvr = self.translate_mxe(self.mxe_po2_low_pvr) / (self.min_po2 - self.set_po2)
+        self.g_po2_high_pvr = self.translate_mxe(self.mxe_po2_high_pvr) / (self.max_po2 - self.set_po2)
 

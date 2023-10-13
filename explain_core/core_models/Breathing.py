@@ -12,6 +12,8 @@ class Breathing(BaseModel):
     targets: list = []
     is_intubated: bool = False
     tv_source: str = "MOUTH_DS"
+    minute_volume_ref: float = 0.64
+    mv_ans_factor: float = 1.0
 
     # dependent variables
     resp_rate: float = 40.0
@@ -46,7 +48,9 @@ class Breathing(BaseModel):
         if self.is_intubated:
             self.exp_tidal_volume = self._model.models["Ventilator"].exp_tidal_volume
 
-
+        # calculate the target minute volume
+        self.target_minute_volume = self.minute_volume_ref * self.mv_ans_factor
+        
         # calculate the respiratory rate and target tidal volume from the target minute volume
         self.vt_rr_controller()
 

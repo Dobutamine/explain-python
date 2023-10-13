@@ -6,9 +6,11 @@ from explain_core.base_models.TimeVaryingElastance import TimeVaryingElastance
 class Heart(BaseModel):
     # independent variables
     heart_rate: float = 120.0
+    heart_rate_ref: float = 140.0
     pq_time: float = 0.0
     qrs_time: float = 0.0
     qt_time: float = 0.0
+    hr_ans_factor: float = 1.0
 
     # dependent variables
     cqt_time: float = 0.0
@@ -48,6 +50,9 @@ class Heart(BaseModel):
         self._cor = self._model.models[self.coronaries]
 
     def calc_model(self) -> None:
+        # calculate the heartrate
+        self.heart_rate = self.heart_rate_ref * self.hr_ans_factor
+
         # calculate the qtc time depending on the heartrate
         self.cqt_time = self.calc_qtc(self.heart_rate)
 
