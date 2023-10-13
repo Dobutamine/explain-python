@@ -680,6 +680,9 @@ class Ans(BaseModel):
         self.g_po2_low_mv = self.translate_mxe(self.mxe_po2_low_mv) / (self.min_po2 - self.set_po2)
         self.g_po2_high_mv = self.translate_mxe(self.mxe_po2_high_mv) / (self.max_po2 - self.set_po2)
 
+        print(self.g_po2_low_mv)
+        print(self.g_po2_high_mv)
+
         # venpool gains
         self.g_map_low_venpool = self.translate_mxe(self.mxe_map_low_venpool) / (self.min_map - self.set_map)
         self.g_map_high_venpool = self.translate_mxe(self.mxe_map_high_venpool) / (self.max_map - self.set_map)
