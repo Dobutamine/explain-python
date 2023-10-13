@@ -27,7 +27,6 @@ class Ans(BaseModel):
     svr_effect_factor: float = 0.0
     pvr_effect_factor: float = 0.0
 
-    
     min_map: float = 20.0
     set_map: float = 57.5
     max_map: float = 100.0
@@ -44,14 +43,6 @@ class Ans(BaseModel):
     set_po2: float = 57.5
     max_po2: float = 100.0
 
-    hr_effects_enabled: bool = True
-    mv_effects_enabled: bool = True
-    venpool_effects_enabled: bool = True
-    cont_effects_enabled: bool = True
-    svr_effects_enabled: bool = True
-    pvr_effects_enabled: bool = True
-
-  
     # local variables
     _baroreceptor: BloodCapacitance = {}
     _chemoreceptor: BloodCapacitance = {}
