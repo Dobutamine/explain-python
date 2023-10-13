@@ -130,7 +130,7 @@ class Ans(BaseModel):
             self._pco2 = self._chemoreceptor.aboxy['pco2']
             self._ph = self._chemoreceptor.aboxy['ph']
 
-            # calculate the ans effect factors
+            # calculate the ans effect factors and apply the effects
             self.hr_effect_factor = self._hr_effector.calc_ans_effect_factor(self._map, self._pco2, self._ph, self._po2)
             for hrt in self._hr_targets:
                 hrt.hr_ans_factor = self.hr_effect_factor
