@@ -132,7 +132,7 @@ class Ans(BaseModel):
 
             self.venpool_effect_factor = self._venpool_effector.calc_ans_effect_factor(self._map, self._pco2, self._ph, self._po2)
             for vpt in self._venpool_targets:
-                vpt.u_vol_factor = self.venpool_effect_factor
+                vpt.u_vol_ans_factor = self.venpool_effect_factor
 
             self.cont_effect_factor = self._cont_effector.calc_ans_effect_factor(self._map, self._pco2, self._ph, self._po2)
             for contt in self._cont_targets:
@@ -394,8 +394,6 @@ class AnsTarget:
 
         # return the calculated factor
         return self.factor
-
-        
 
     def calc_factor(self, cum_factor) -> float:
         # reset the cumulative hr factor

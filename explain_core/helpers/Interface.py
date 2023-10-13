@@ -429,18 +429,18 @@ class Interface:
         self.analyze(["LA_LV.flow", "RA_RV.flow", "RV_PA.flow", "LV_AA.flow", "IVCI_RA.flow", "SVC_RA.flow", "LA.pres_in","RA.pres_in","LV.pres_in", "RV.pres_in", "AA.pres_in", "IVCI.pres_in", "LA.vol", "RA.vol","LV.vol","RV.vol", "Heart.heart_rate", "Mob.sv_lv_kg", "Mob.sv_rv_kg"], weight_based=weight_based, sampleinterval=0.0005, time_to_calculate=time_to_calculate)
     
     def get_vitals(self, time_to_calculate=10):
-        result = self.analyze(["AA.pres", "PA.pres", "IVCI.pres"])
+        result = self.analyze(["AA.pres_in", "PA.pres_in", "IVCI.pres_in"])
         self.get_bloodgas("AD")
 
         vitals = {
             "heartrate": self.model.models['Heart'].heart_rate,
             "spo2_pre": self.model.models['AA'].aboxy['so2'],
             "spo2_post": self.model.models['AD'].aboxy['so2'],
-            "abp_systole": result["AA.pres.max"],
-            "abp_diastole": result["AA.pres.min"],
-            "pap_systole": result["PA.pres.max"],
-            "pap_diastole": result["PA.pres.min"],
-            "cvp": result["IVCI.pres.min"] + 0.3333 * (result["IVCI.pres.max"] - result["IVCI.pres.min"]),
+            "abp_systole": result["AA.pres_in.max"],
+            "abp_diastole": result["AA.pres_in.min"],
+            "pap_systole": result["PA.pres_in.max"],
+            "pap_diastole": result["PA.pres_in.min"],
+            "cvp": result["IVCI.pres_in.min"] + 0.3333 * (result["IVCI.pres_in.max"] - result["IVCI.pres_in.min"]),
             "resp_rate": self.model.models['Breathing'].resp_rate,
             "pH": self.model.models['AA'].aboxy['ph'],
             "po2": self.model.models['AA'].aboxy['po2'],
@@ -659,7 +659,7 @@ class Interface:
                 is_ventilator = True
             
 
-            if prop_category[1] == "pres":
+            if prop_category[1] == "pres" or prop_category[1] == "pres_in" or prop_category[1] == "pres_tm":
                 data = np.array(y[idx])
                 max = round(np.amax(data), 5)
                 min = round(np.amin(data), 5)

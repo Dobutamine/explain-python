@@ -7,6 +7,7 @@ class Capacitance(BaseModel):
     # independent variables
     u_vol: float = 0.0
     u_vol_factor: float = 1.0
+    u_vol_ans_factor: float = 1.0
     el_base: float = 0.0
     el_base_factor: float = 1.0
     el_base_ans_factor: float = 1.0
@@ -32,8 +33,8 @@ class Capacitance(BaseModel):
 
         # calculate the pressure depending on the volume, unstressed volume, elastance
         el:float = self.el_base * self.el_base_factor * self.el_base_ans_factor * self.el_base_drug_factor
-        vol:float = self.vol * (1.0 / self.u_vol_factor)
-        u_vol:float = self.u_vol * self.u_vol_factor
+        vol:float = self.vol * (1.0 / (self.u_vol_factor * self.u_vol_ans_factor))
+        u_vol:float = self.u_vol * self.u_vol_factor * self.u_vol_ans_factor
 
         # calculate the total volume in this capacitance
         self.vol_total = vol + u_vol
