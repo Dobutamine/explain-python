@@ -11,6 +11,9 @@ class Heart(BaseModel):
     qrs_time: float = 0.0
     qt_time: float = 0.0
     hr_ans_factor: float = 1.0
+    hr_mob_factor: float = 1.0
+    hr_temp_factor: float = 1.0
+    hr_drug_factor: float = 1.0
 
     # dependent variables
     cqt_time: float = 0.0
@@ -50,8 +53,8 @@ class Heart(BaseModel):
         self._cor = self._model.models[self.coronaries]
 
     def calc_model(self) -> None:
-        # calculate the heartrate
-        self.heart_rate = self.heart_rate_ref * self.hr_ans_factor
+        # calculate the heartrate from the reference value and all other influences
+        self.heart_rate = self.heart_rate_ref * self.hr_ans_factor * self.hr_mob_factor * self.hr_temp_factor * self.hr_drug_factor
 
         # calculate the qtc time depending on the heartrate
         self.cqt_time = self.calc_qtc(self.heart_rate)
