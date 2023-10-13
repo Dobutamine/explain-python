@@ -22,6 +22,11 @@ class Ans(BaseModel):
     
     hr_effect_factor: float = 0.0
     mv_effect_factor: float = 0.0
+    venpool_effect_factor: float = 0.0
+    cont_effect_factor: float = 0.0
+    svr_effect_factor: float = 0.0
+    pvr_effect_factor: float = 0.0
+
     
     min_map: float = 20.0
     set_map: float = 57.5
@@ -134,6 +139,22 @@ class Ans(BaseModel):
             for mvt in self._mv_targets:
                 mvt.mv_ans_factor = self.mv_effect_factor
 
+            self.venpool_effect_factor = self._venpool_effector.calc_ans_effect_factor(self._map, self._pco2, self._ph, self._po2)
+            for vpt in self._venpool_targets:
+                vpt.u_vol_factor = self.venpool_effect_factor
+
+            self.cont_effect_factor = self._cont_effector.calc_ans_effect_factor(self._map, self._pco2, self._ph, self._po2)
+            for contt in self._cont_targets:
+                contt.el_max_ans_factor = self.cont_effect_factor
+
+            self.svr_effect_factor = self._svr_effector.calc_ans_effect_factor(self._map, self._pco2, self._ph, self._po2)
+            for svrt in self._svr_targets:
+                svrt.r_ans_factor = self.svr_effect_factor
+            
+            self.pvr_effect_factor = self._pvr_effector.calc_ans_effect_factor(self._map, self._pco2, self._ph, self._po2)
+            for pvrt in self._pvr_targets:
+                pvrt.r_ans_factor = self.pvr_effect_factor
+
             # reset the update counter
             self._update_counter = 0.0
 
@@ -192,6 +213,78 @@ class Ans(BaseModel):
         self._mv_effector.mxe_po2_high = self.mv_mxe_po2_high
         self._mv_effector.tc_po2 = self.mv_tc_po2
         self._mv_effector.calc_gains()
+
+        self._venpool_effector = AnsTarget()
+        self._venpool_effector.factor = self.venpool_factor
+        self._venpool_effector.factor_max = self.venpool_factor_max
+        self._venpool_effector.factor_min = self.venpool_factor_min
+        self._venpool_effector.mxe_map_low = self.venpool_mxe_map_low
+        self._venpool_effector.mxe_map_high = self.venpool_mxe_map_high
+        self._venpool_effector.tc_map = self.venpool_tc_map
+        self._venpool_effector.mxe_pco2_low = self.venpool_mxe_pco2_low
+        self._venpool_effector.mxe_pco2_high = self.venpool_mxe_pco2_high
+        self._venpool_effector.tc_pco2 = self.venpool_tc_pco2
+        self._venpool_effector.mxe_ph_low = self.venpool_mxe_ph_low
+        self._venpool_effector.mxe_ph_high = self.venpool_mxe_ph_high
+        self._venpool_effector.tc_ph = self.venpool_tc_ph
+        self._venpool_effector.mxe_po2_low = self.venpool_mxe_po2_low
+        self._venpool_effector.mxe_po2_high = self.venpool_mxe_po2_high
+        self._venpool_effector.tc_po2 = self.venpool_tc_po2
+        self._venpool_effector.calc_gains()
+
+        self._cont_effector = AnsTarget()
+        self._cont_effector.factor = self.cont_factor
+        self._cont_effector.factor_max = self.cont_factor_max
+        self._cont_effector.factor_min = self.cont_factor_min
+        self._cont_effector.mxe_map_low = self.cont_mxe_map_low
+        self._cont_effector.mxe_map_high = self.cont_mxe_map_high
+        self._cont_effector.tc_map = self.cont_tc_map
+        self._cont_effector.mxe_pco2_low = self.cont_mxe_pco2_low
+        self._cont_effector.mxe_pco2_high = self.cont_mxe_pco2_high
+        self._cont_effector.tc_pco2 = self.cont_tc_pco2
+        self._cont_effector.mxe_ph_low = self.cont_mxe_ph_low
+        self._cont_effector.mxe_ph_high = self.cont_mxe_ph_high
+        self._cont_effector.tc_ph = self.cont_tc_ph
+        self._cont_effector.mxe_po2_low = self.cont_mxe_po2_low
+        self._cont_effector.mxe_po2_high = self.cont_mxe_po2_high
+        self._cont_effector.tc_po2 = self.cont_tc_po2
+        self._cont_effector.calc_gains()
+
+        self._svr_effector = AnsTarget()
+        self._svr_effector.factor = self.svr_factor
+        self._svr_effector.factor_max = self.svr_factor_max
+        self._svr_effector.factor_min = self.svr_factor_min
+        self._svr_effector.mxe_map_low = self.svr_mxe_map_low
+        self._svr_effector.mxe_map_high = self.svr_mxe_map_high
+        self._svr_effector.tc_map = self.svr_tc_map
+        self._svr_effector.mxe_pco2_low = self.svr_mxe_pco2_low
+        self._svr_effector.mxe_pco2_high = self.svr_mxe_pco2_high
+        self._svr_effector.tc_pco2 = self.svr_tc_pco2
+        self._svr_effector.mxe_ph_low = self.svr_mxe_ph_low
+        self._svr_effector.mxe_ph_high = self.svr_mxe_ph_high
+        self._svr_effector.tc_ph = self.svr_tc_ph
+        self._svr_effector.mxe_po2_low = self.svr_mxe_po2_low
+        self._svr_effector.mxe_po2_high = self.svr_mxe_po2_high
+        self._svr_effector.tc_po2 = self.svr_tc_po2
+        self._svr_effector.calc_gains()
+
+        self._pvr_effector = AnsTarget()
+        self._pvr_effector.factor = self.pvr_factor
+        self._pvr_effector.factor_max = self.pvr_factor_max
+        self._pvr_effector.factor_min = self.pvr_factor_min
+        self._pvr_effector.mxe_map_low = self.pvr_mxe_map_low
+        self._pvr_effector.mxe_map_high = self.pvr_mxe_map_high
+        self._pvr_effector.tc_map = self.pvr_tc_map
+        self._pvr_effector.mxe_pco2_low = self.pvr_mxe_pco2_low
+        self._pvr_effector.mxe_pco2_high = self.pvr_mxe_pco2_high
+        self._pvr_effector.tc_pco2 = self.pvr_tc_pco2
+        self._pvr_effector.mxe_ph_low = self.pvr_mxe_ph_low
+        self._pvr_effector.mxe_ph_high = self.pvr_mxe_ph_high
+        self._pvr_effector.tc_ph = self.pvr_tc_ph
+        self._pvr_effector.mxe_po2_low = self.pvr_mxe_po2_low
+        self._pvr_effector.mxe_po2_high = self.pvr_mxe_po2_high
+        self._pvr_effector.tc_po2 = self.pvr_tc_po2
+        self._pvr_effector.calc_gains()
 
 
     
