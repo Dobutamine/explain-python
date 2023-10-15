@@ -308,6 +308,14 @@ class Interface:
     def ventilator(self, state):
         if type(state) is bool:
             self.model.models["Ventilator"].switch_ventilator(state)
+    
+    def resuscitation(self, state):
+        if type(state) is bool:
+            self.model.models["Resuscitation"].is_enabled = state
+
+    def drugs(self, state):
+        if type(state) is bool:
+            self.model.models["Drugs"].is_enabled = state
 
     # plotters
     def plot_heart_pv_rt(self):

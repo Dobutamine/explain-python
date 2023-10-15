@@ -1130,6 +1130,13 @@
         }
       }
     },
+    "Drugs": {
+      "name": "Drugs",
+      "description": "drug model",
+      "model_type": "Drugs",
+      "is_enabled": true,
+      "dependencies": []
+    },
     "Resuscitation": {
       "name": "Resuscitation",
       "description": "resuscitation model",
@@ -1141,6 +1148,7 @@
       "chest_comp_pres": 20.0,
       "vent_freq": 30.0,
       "vent_pres": 20.0,
+      "vent_fio2": 0.21,
       "vent_insp_time": 1.0,
       "vent_comp_ratio": 0.33
     },
