@@ -1072,13 +1072,13 @@
       "po2_max": 10.0,
       "hr_po2_factor": 1.0,
       "hr_po2_factor_max": 1.0,
-      "hr_po2_factor_min": 0.1,
+      "hr_po2_factor_min": 0.01,
       "cont_po2_factor": 1.0,
       "cont_po2_factor_max": 1.0,
-      "cont_po2_factor_min": 0.1,
+      "cont_po2_factor_min": 0.01,
       "ans_po2_factor": 1.0,
-      "ans_po2_factor_at_po2_max": 0.01,
-      "ans_po2_factor_at_po2_min": 1.0
+      "ans_po2_factor_max": 1.0,
+      "ans_po2_factor_min": 0.01
     },
     "Pda": {
       "name": "Pda",

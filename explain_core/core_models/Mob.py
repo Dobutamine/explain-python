@@ -39,8 +39,9 @@ class Mob(BaseModel):
     ans_po2_tc: float = 5.0
     ans_po2_g: float = 0.0
     ans_po2_factor: float = 1.0
-    ans_po2_factor_at_po2_max: float = 0.0
-    ans_po2_factor_at_po2_min: float = 1.0
+    ans_po2_factor_max: float = 1.0
+    ans_po2_factor_min: float = 0.01
+    ans_activity_factor: float = 1.0
 
     heart_model: str = "Heart"
     aa_model: str = "AA"
@@ -174,7 +175,7 @@ class Mob(BaseModel):
         self.bm_po2_g = (self.bm_vo2_ref - self.bm_vo2_min) / (self.po2_max - self.po2_min)
         self.cont_po2_g = (self.cont_po2_factor_max - self.cont_po2_factor_min) / (self.po2_max - self.po2_min)
         self.hr_po2_g = (self.hr_po2_factor_max - self.hr_po2_factor_min) / (self.po2_max - self.po2_min)
-        self.ans_po2_g = (self.ans_po2_factor_at_po2_max - self.ans_po2_factor_at_po2_min) / (self.po2_max - self.po2_min)
+        self.ans_po2_g = (self.ans_po2_factor_max - self.ans_po2_factor_min) / (self.po2_max - self.po2_min)
 
         # incorporate the time constants
         self._d_bm_vo2 = self._t * ((1 / self.bm_po2_tc) * (-self._d_bm_vo2 + self._a_po2)) + self._d_bm_vo2
@@ -186,23 +187,18 @@ class Mob(BaseModel):
         self.bm_vo2 = ((self.bm_vo2_ref + self._d_bm_vo2 * self.bm_po2_g) * self.hw) / self._ml_to_mmol
   
         # when hypoxia gets severe the ANS influence gets inhibited and the heartrate, contractility and baseline metabolism are decreased
+        # calculate the new ans activity (1.0 is max activity and 0.0 is min activity)
+        self.ans_activity_factor = 1.0 + self.ans_po2_g * self._d_ans
+        self._heart.ans_activity_factor = self.ans_activity_factor
 
-        # calculate the new ans dampening factor -> we have to pull the ans factor to 1.0
-        self.ans_po2_factor = self.ans_po2_g * self._d_ans
-        # factor = 0.0 if po2 10 or higher ans goes to 1.0 at minimal po2
-        # 0 = no inhibition and 1.0 is max inhibition
-        # 0 = cancelout factor => 1.0   at 1.0 cancel_outfactor = 1.0 / self._heart.hr_ans_factor
-        cancelout_factor = 1.0 + ((1.0 / self._heart.hr_ans_factor) * self.ans_po2_factor)
-        # support hrans = 1.5 -> cancelout factor = 1/1.5  = 0.6667
-        # we want our self.hr_mob_factor to approach that 0.6667 dependeng in ans_po2_factor => 
-
-
-
-
-        # calculate the new hr factor
-        self.hr_po2_factor = self.calc_factor(self.hr_po2_g * self._d_hr)
-        # calculate the new cont factor
-        self.cont_po2_factor = self.calc_factor(self.cont_po2_g * self._d_cont)
+        self.hr_po2_factor = 1.0 + self.hr_po2_g * self._d_hr
+        self._heart.hr_mob_factor = self.hr_po2_factor
+        
+        self.cont_po2_factor = 1.0 + self.cont_po2_g * self._d_cont
+        self._heart._lv.el_max_ans_factor = self.cont_po2_factor
+        self._heart._rv.el_max_ans_factor = self.cont_po2_factor
+        self._heart._la.el_max_ans_factor = self.cont_po2_factor
+        self._heart._ra.el_max_ans_factor = self.cont_po2_factor
 
 
         # calculate the ecc vo2 -> not implemented yet but included in baseline metabolism

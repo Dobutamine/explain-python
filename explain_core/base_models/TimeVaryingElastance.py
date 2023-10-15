@@ -57,6 +57,9 @@ class TimeVaryingElastance(Capacitance):
 
         self.pres_ed = emin * vol_diff + self.el_k * self.el_k_factor * math.pow(vol_diff, 2)
         self.pres_ms = emax * vol_diff
+        if (self.pres_ms < self.pres_ed):
+            self.pres_ms = self.pres_ed
+            
         self.pres_in = self.act_factor * (self.pres_ms - self.pres_ed) + self.pres_ed + self.pres_atm
 
         # calculate the pressures exerted by the surrounding tissues or other forces
