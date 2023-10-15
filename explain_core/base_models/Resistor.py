@@ -19,6 +19,7 @@ class Resistor(BaseModel):
     r_ext: float = 0.0
     r_ext_factor: float = 1.0
     r_ans_factor: float = 1.0
+    ans_activity_factor: float = 1.0
     r_mob_factor: float = 1.0
     r_drug_factor: float = 1.0
     no_back_flow: bool = False
@@ -71,12 +72,12 @@ class Resistor(BaseModel):
 
         # calculate the resistances
         _rfor_base = self.r_for * self.r_for_factor
-        rfor: float = _rfor_base + (self.r_ans_factor * _rfor_base - _rfor_base) + \
+        rfor: float = _rfor_base + (self.r_ans_factor * _rfor_base - _rfor_base) * self.ans_activity_factor + \
                                    (self.r_mob_factor * _rfor_base - _rfor_base) + \
                                    (self.r_drug_factor * _rfor_base - _rfor_base) + \
                                     self.r_k * self.r_k_factor * self.flow**2
         _rback_base = self.r_back * self.r_back_factor
-        rback: float = _rback_base + (self.r_ans_factor * _rback_base - _rback_base) + \
+        rback: float = _rback_base + (self.r_ans_factor * _rback_base - _rback_base) * self.ans_activity_factor + \
                                      (self.r_mob_factor * _rback_base - _rback_base) + \
                                      (self.r_drug_factor * _rback_base - _rback_base) + \
                                       self.r_k * self.r_k_factor * self.flow**2

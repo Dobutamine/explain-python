@@ -14,6 +14,7 @@ class Breathing(BaseModel):
     tv_source: str = "MOUTH_DS"
     minute_volume_ref: float = 0.64
     mv_ans_factor: float = 1.0
+    ans_activity_factor: float = 1.0
 
     # dependent variables
     resp_rate: float = 40.0
@@ -50,7 +51,7 @@ class Breathing(BaseModel):
 
         # calculate the target minute volume
         self.target_minute_volume = self.minute_volume_ref + \
-                                    (self.mv_ans_factor * self.minute_volume_ref - self.minute_volume_ref)
+                                    (self.mv_ans_factor * self.minute_volume_ref - self.minute_volume_ref) * self.ans_activity_factor
         
         # calculate the respiratory rate and target tidal volume from the target minute volume
         self.vt_rr_controller()

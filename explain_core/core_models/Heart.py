@@ -11,6 +11,7 @@ class Heart(BaseModel):
     qrs_time: float = 0.0
     qt_time: float = 0.0
     hr_ans_factor: float = 1.0
+    ans_activity_factor: float = 1.0
     hr_mob_factor: float = 1.0
     hr_temp_factor: float = 1.0
     hr_drug_factor: float = 1.0
@@ -55,7 +56,7 @@ class Heart(BaseModel):
     def calc_model(self) -> None:
         # calculate the heartrate from the reference value and all other influences
         self.heart_rate = self.heart_rate_ref + \
-                          (self.hr_ans_factor * self.heart_rate_ref - self.heart_rate_ref)  + \
+                          (self.hr_ans_factor * self.heart_rate_ref - self.heart_rate_ref) * self.ans_activity_factor  + \
                           (self.hr_mob_factor * self.heart_rate_ref - self.heart_rate_ref)  + \
                           (self.hr_temp_factor * self.heart_rate_ref - self.heart_rate_ref) + \
                           (self.hr_drug_factor * self.heart_rate_ref - self.heart_rate_ref)

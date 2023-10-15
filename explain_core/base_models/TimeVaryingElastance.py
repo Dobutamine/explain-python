@@ -19,6 +19,7 @@ class TimeVaryingElastance(Capacitance):
     el_k: float = 0.0
     el_k_factor: float = 1.0
     act_factor: float = 0.0
+    ans_activity_factor: float = 1.0
 
     # dependent variables
     vol: float = 0.0
@@ -48,9 +49,9 @@ class TimeVaryingElastance(Capacitance):
 
         _emin_base: float = self.el_min * self.el_min_factor
         _emax_base: float = self.el_max * self.el_max_factor
-        emin: float = _emin_base + (self.el_min_ans_factor * _emin_base - _emin_base) + \
+        emin: float = _emin_base + (self.el_min_ans_factor * _emin_base - _emin_base) * self.ans_activity_factor + \
                                    (self.el_base_drug_factor * _emin_base - _emin_base)
-        emax: float = _emax_base + (self.el_max_ans_factor * _emax_base - _emax_base) + \
+        emax: float = _emax_base + (self.el_max_ans_factor * _emax_base - _emax_base) * self.ans_activity_factor + \
                                    (self.el_max_drug_factor * _emax_base - _emax_base) + \
                                    (self.el_max_mob_factor * _emax_base - _emax_base)
 
