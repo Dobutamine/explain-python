@@ -11,6 +11,7 @@ class Mob(BaseModel):
     # independent variables 
     hw: float = 0.0                         # heart weight = 7.799 + 0.004296 * birth weight (grams)
     bm_vo2_ref: float = 0.0001590           # in ml O2/cardiac cycle/gram heart_weight: vo2 when the heart is not beating and depending on do2
+    bm_vo2_max: float = 0.0001590           # maximal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
     bm_vo2_min: float = 0.0000318           # minimal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
     ecc_c: float = 0.0                      # not implemented yet but included in basal metabolism
     pva_c: float = 0.00425                  # CPVA in mL O2/cardiac cycle/mmHg*l
@@ -21,34 +22,28 @@ class Mob(BaseModel):
     po2_max: float = 10.0
     po2_min: float = 0.0 
     
-    bm_po2_tc: float = 5.0
-    bm_po2_g: float = 2.0
+    bm_tc: float = 5.0
     
-    cont_po2_tc: float = 5.0
-    cont_po2_g: float = 0.0
-    cont_po2_factor: float = 1.0
-    cont_po2_factor_max: float = 2.5
-    cont_po2_factor_min: float = 0.5
+    cont_tc: float = 5.0
+    cont_factor: float = 1.0
+    cont_factor_max: float = 2.5
+    cont_factor_min: float = 0.5
 
-    hr_po2_tc: float = 5.0
-    hr_po2_g: float = 0.0
-    hr_po2_factor: float = 1.0
-    hr_po2_factor_max: float = 2.5
-    hr_po2_factor_min: float = 0.5
+    hr_tc: float = 5.0
+    hr_factor: float = 1.0
+    hr_factor_max: float = 2.5
+    hr_factor_min: float = 0.5
 
-    ans_po2_tc: float = 5.0
-    ans_po2_g: float = 0.0
-    ans_po2_factor: float = 1.0
-    ans_po2_factor_max: float = 1.0
-    ans_po2_factor_min: float = 0.01
+    ans_tc: float = 5.0
+    ans_factor: float = 1.0
+    ans_factor_max: float = 1.0
+    ans_factor_min: float = 0.01
     ans_activity_factor: float = 1.0
 
     heart_model: str = "Heart"
     aa_model: str = "AA"
     aa_cor_model: str = "AA_COR"
     cor_model: str = "COR"
-    lv_model: str = "LV"
-    rv_model: str = "RV"
 
     # dependent variables
     mob: float = 0.0
@@ -57,9 +52,11 @@ class Mob(BaseModel):
     bm_vo2: float = 0.0
     ecc_vo2: float = 0.0
     pva_vo2: float = 0.0
+    bm_g: float = 2.0
+    cont_g: float = 0.0
+    hr_g: float = 0.0
+    ans_g: float = 0.0
 
-    to2_co2: float = 0.0
-    to2_in: float = 0.0
     ecc_lv: float = 0.0                         # pres_ms of the heart chamber 
     ecc_rv: float = 0.0
     ecc: float = 0.0
@@ -76,8 +73,6 @@ class Mob(BaseModel):
     _aa: BloodCapacitance = {}
     _aa_cor: Resistor = {}
     _cor: BloodTimeVaryingElastance = {}
-    _lv: BloodTimeVaryingElastance = {}
-    _rv: BloodTimeVaryingElastance = {}
 
     _prev_lv_vol: float = 0.0
     _prev_lv_pres: float = 0.0
@@ -105,13 +100,12 @@ class Mob(BaseModel):
         self._aa = self._model.models[self.aa_model]
         self._aa_cor = self._model.models[self.aa_cor_model]
         self._cor = self._model.models[self.cor_model]
-        self._lv = self._model.models[self.lv_model]
-        self._rv = self._model.models[self.rv_model]
 
         # set the heart weight
         self.hw = 7.799 + 0.004296 * self._model.weight * 1000.0
 
         self.bm_vo2_ref = self.bm_vo2_ref * self.vo2_factor
+        self.bm_vo2_max = self.bm_vo2_max * self. vo2_factor
         self.bm_vo2_min = self.bm_vo2_min * self. vo2_factor
         self.pva_c = self.pva_c * self.vo2_factor
         self.ecc_c = self.ecc_c * self.vo2_factor
@@ -126,8 +120,8 @@ class Mob(BaseModel):
         to2_cor: float = self._cor.aboxy["to2"]                     # mmol o2 / l 
         
         # get the ecc from the heart chambers
-        self.ecc_lv = self._lv.el_max * self._lv.el_max_factor
-        self.ecc_rv = self._rv.el_max * self._rv.el_max_factor
+        self.ecc_lv = self._heart._lv.el_max * self._heart._lv.el_max_factor
+        self.ecc_rv = self._heart._rv.el_max * self._heart._rv.el_max_factor
         self.ecc = self.ecc_lv + self.ecc_rv
 
         # calculate the pressure volume loop area
@@ -172,33 +166,35 @@ class Mob(BaseModel):
 
         # calculate the gain depending on the reference and minimal baseline vo2 and po2 threshold from where the baseline vo2 is reduced
         # this gain determines how much the baseline vo2 is reduced when the po2 drops below the threshold
-        self.bm_po2_g = (self.bm_vo2_ref - self.bm_vo2_min) / (self.po2_max - self.po2_min)
-        self.cont_po2_g = (self.cont_po2_factor_max - self.cont_po2_factor_min) / (self.po2_max - self.po2_min)
-        self.hr_po2_g = (self.hr_po2_factor_max - self.hr_po2_factor_min) / (self.po2_max - self.po2_min)
-        self.ans_po2_g = (self.ans_po2_factor_max - self.ans_po2_factor_min) / (self.po2_max - self.po2_min)
+        self.bm_g = (self.bm_vo2_max - self.bm_vo2_min) / (self.po2_max - self.po2_min)
+        self.cont_g = (self.cont_factor_max - self.cont_factor_min) / (self.po2_max - self.po2_min)
+        self.hr_g = (self.hr_factor_max - self.hr_factor_min) / (self.po2_max - self.po2_min)
+        self.ans_g = (self.ans_factor_max - self.ans_factor_min) / (self.po2_max - self.po2_min)
 
         # incorporate the time constants
-        self._d_bm_vo2 = self._t * ((1 / self.bm_po2_tc) * (-self._d_bm_vo2 + self._a_po2)) + self._d_bm_vo2
-        self._d_hr = self._t * ((1 / self.hr_po2_tc) * (-self._d_hr + self._a_po2)) + self._d_hr
-        self._d_cont = self._t * ((1 / self.cont_po2_tc) * (-self._d_cont + self._a_po2)) + self._d_cont
-        self._d_ans = self._t * ((1 / self.ans_po2_tc) * (-self._d_ans + self._a_po2)) + self._d_ans
+        self._d_bm_vo2 = self._t * ((1 / self.bm_tc) * (-self._d_bm_vo2 + self._a_po2)) + self._d_bm_vo2
+        self._d_hr = self._t * ((1 / self.hr_tc) * (-self._d_hr + self._a_po2)) + self._d_hr
+        self._d_cont = self._t * ((1 / self.cont_tc) * (-self._d_cont + self._a_po2)) + self._d_cont
+        self._d_ans = self._t * ((1 / self.ans_tc) * (-self._d_ans + self._a_po2)) + self._d_ans
 
         # calculate the baseline vo2 in mmol O2 /  cardiac cycle
-        self.bm_vo2 = ((self.bm_vo2_ref + self._d_bm_vo2 * self.bm_po2_g) * self.hw) / self._ml_to_mmol
+        self.bm_vo2 = ((self.bm_vo2_ref + self._d_bm_vo2 * self.bm_g) * self.hw) / self._ml_to_mmol
   
         # when hypoxia gets severe the ANS influence gets inhibited and the heartrate, contractility and baseline metabolism are decreased
-        # calculate the new ans activity (1.0 is max activity and 0.0 is min activity)
-        self.ans_activity_factor = 1.0 + self.ans_po2_g * self._d_ans
+        # calculate the new ans activity (1.0 is max activity and 0.0 is min activity) which controls the ans activity
+        self.ans_activity_factor = 1.0 + self.ans_g * self._d_ans
         self._heart.ans_activity_factor = self.ans_activity_factor
 
-        self.hr_po2_factor = 1.0 + self.hr_po2_g * self._d_hr
+        # calculate the mob factor which controls the heart rate
+        self.hr_factor = 1.0 + self.hr_g * self._d_hr
         self._heart.hr_mob_factor = self.hr_po2_factor
         
-        self.cont_po2_factor = 1.0 + self.cont_po2_g * self._d_cont
-        self._heart._lv.el_max_ans_factor = self.cont_po2_factor
-        self._heart._rv.el_max_ans_factor = self.cont_po2_factor
-        self._heart._la.el_max_ans_factor = self.cont_po2_factor
-        self._heart._ra.el_max_ans_factor = self.cont_po2_factor
+        # calculate the mob factor which controls the contractility of the heart
+        self.cont_factor = 1.0 + self.cont_g * self._d_cont
+        self._heart._lv.el_max_ans_factor = self.cont_factor
+        self._heart._rv.el_max_ans_factor = self.cont_factor
+        self._heart._la.el_max_ans_factor = self.cont_factor
+        self._heart._ra.el_max_ans_factor = self.cont_factor
 
 
         # calculate the ecc vo2 -> not implemented yet but included in baseline metabolism
@@ -252,28 +248,6 @@ class Mob(BaseModel):
 
         # return the total pressure volume area of both ventricles
         return self.stroke_work_lv + self.stroke_work_rv
-
-    def calc_factor(self, cum_factor) -> float:
-        # reset the cumulative hr factor
-        factor: float = 1.0
-        if cum_factor > 0:
-            factor = 1.0 + cum_factor
-        if cum_factor < 0:
-            factor = 1.0 - cum_factor
-            factor = 1.0 / factor
-        return factor
-
-    def translate_mxe(self, mxe) -> float:
-        # a mxe of 1.5 that max effect is 1.5 * reference value (hr_ref, mv_ref, venpool_ref, cont_ref, svr_ref, pvr_ref)
-        if mxe > 1.0:
-            mxe = mxe - 1.0
-            return mxe
-        
-        if mxe > 0.0 and mxe < 1.0:
-            mxe = (-1.0 / mxe) + 1.0
-            return mxe
-
-        return 0
 
 
 
