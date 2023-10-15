@@ -52,7 +52,9 @@ class Breathing(BaseModel):
         # calculate the target minute volume
         self.target_minute_volume = self.minute_volume_ref + \
                                     (self.mv_ans_factor * self.minute_volume_ref - self.minute_volume_ref) * self.ans_activity_factor
-        
+        if self.target_minute_volume < 0.01:
+            self.target_minute_volume = 0.01
+
         # calculate the respiratory rate and target tidal volume from the target minute volume
         self.vt_rr_controller()
 
