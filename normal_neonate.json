@@ -1130,6 +1130,20 @@
         }
       }
     },
+    "Resuscitation": {
+      "name": "Resuscitation",
+      "description": "resuscitation model",
+      "model_type": "Resuscitation",
+      "is_enabled": true,
+      "dependencies": [],
+      "thorax_model": "THORAX",
+      "chest_comp_freq": 100.0,
+      "chest_comp_pres": 20.0,
+      "vent_freq": 30.0,
+      "vent_pres": 20.0,
+      "vent_insp_time": 1.0,
+      "vent_comp_ratio": 0.33
+    },
     "Ecls": {
       "name": "Ecls",
       "description": "ecls model",
