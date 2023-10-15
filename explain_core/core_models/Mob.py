@@ -9,25 +9,38 @@ from explain_core.functions.ActivationFunction import activation_function
 
 class Mob(BaseModel):
     # independent variables 
-    hw: float = 0.0                     # heart weight = 7.799 + 0.004296 * birth weight (grams)
-    bm_vo2_ref: float = 0.0001590 / 2.2      # in ml O2/cardiac cycle/gram heart_weight: vo2 when the heart is not beating and depending on do2
-    bm_vo2_min: float = 0.0000318 / 2.2      # minimal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
-    ecc_c: float = 0.0                  # not implemented yet but included in basal metabolism
-    pva_c: float = 0.00425 / 2.2              # CPVA in mL O2/cardiac cycle/mmHg*l
-    resp_q: float = 0.5                 # respiratory quotient
+    hw: float = 0.0                         # heart weight = 7.799 + 0.004296 * birth weight (grams)
+    bm_vo2_ref: float = 0.0001590           # in ml O2/cardiac cycle/gram heart_weight: vo2 when the heart is not beating and depending on do2
+    bm_vo2_min: float = 0.0000318           # minimal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
+    ecc_c: float = 0.0                      # not implemented yet but included in basal metabolism
+    pva_c: float = 0.00425                  # CPVA in mL O2/cardiac cycle/mmHg*l
+    resp_q: float = 0.5                     # respiratory quotient
+    vo2_factor: float = 0.45
 
     po2_set: float = 10.0       
     po2_max: float = 10.0
     po2_min: float = 0.0 
     
     bm_po2_tc: float = 5.0
-    bm_po2_g: float = 2.0               # maximal reduction of 20%   -10 * 2.0 = 20
+    bm_po2_g: float = 2.0
     
     cont_po2_tc: float = 5.0
     cont_po2_g: float = 0.0
+    cont_po2_factor: float = 1.0
+    cont_po2_factor_max: float = 2.5
+    cont_po2_factor_min: float = 0.5
 
     hr_po2_tc: float = 5.0
     hr_po2_g: float = 0.0
+    hr_po2_factor: float = 1.0
+    hr_po2_factor_max: float = 2.5
+    hr_po2_factor_min: float = 0.5
+
+    ans_po2_tc: float = 5.0
+    ans_po2_g: float = 0.0
+    ans_po2_factor: float = 1.0
+    ans_po2_factor_at_po2_max: float = 0.0
+    ans_po2_factor_at_po2_min: float = 1.0
 
     heart_model: str = "Heart"
     aa_model: str = "AA"
@@ -79,6 +92,7 @@ class Mob(BaseModel):
     _d_bm_vo2: float = 0.0
     _d_cont: float = 0.0
     _d_hr: float = 0.0
+    _d_ans: float = 0.0
     _ml_to_mmol: float = 22.414
 
     def init_model(self, model: object) -> bool:
@@ -95,6 +109,11 @@ class Mob(BaseModel):
 
         # set the heart weight
         self.hw = 7.799 + 0.004296 * self._model.weight * 1000.0
+
+        self.bm_vo2_ref = self.bm_vo2_ref * self.vo2_factor
+        self.bm_vo2_min = self.bm_vo2_min * self. vo2_factor
+        self.pva_c = self.pva_c * self.vo2_factor
+        self.ecc_c = self.ecc_c * self.vo2_factor
 
         # signal that the ventilator model is initialized and return it
         self._is_initialized = True
@@ -142,14 +161,6 @@ class Mob(BaseModel):
                 self._cor.aboxy["to2"] = new_to2_cor
                 self._cor.aboxy["tco2"] = new_tco2_cor
 
-        # calculate the effect on the heartrate, contractility and coronary bloodflow
-        # acute hypoxia leads to an increase in heartrate, contractility and coronary blood flow -> this is modeled by the ANS model
-
-        # and we have direct hypoxic effects making the heart less susceptible for ANS influence
-        # when hypoxia gets severe the ANS influence gets inhibited and the heartrate, contractility and baseline metabolism are decreased
-
-        # so we need a to2 dependent parameter (maybe through a activation function) which dampens the ANS influence on
-        # the heartrate and contractility and decreases it further when hypoxemia gets worse
 
     def oxygen_metabolism(self) -> float:
         # get the po2 in mmHg from coronaries
@@ -160,18 +171,38 @@ class Mob(BaseModel):
 
         # calculate the gain depending on the reference and minimal baseline vo2 and po2 threshold from where the baseline vo2 is reduced
         # this gain determines how much the baseline vo2 is reduced when the po2 drops below the threshold
-        self.bm_po2_g = (self.bm_vo2_ref - self.bm_vo2_min) / (self.po2_set - self.po2_min)
+        self.bm_po2_g = (self.bm_vo2_ref - self.bm_vo2_min) / (self.po2_max - self.po2_min)
+        self.cont_po2_g = (self.cont_po2_factor_max - self.cont_po2_factor_min) / (self.po2_max - self.po2_min)
+        self.hr_po2_g = (self.hr_po2_factor_max - self.hr_po2_factor_min) / (self.po2_max - self.po2_min)
+        self.ans_po2_g = (self.ans_po2_factor_at_po2_max - self.ans_po2_factor_at_po2_min) / (self.po2_max - self.po2_min)
 
         # incorporate the time constants
         self._d_bm_vo2 = self._t * ((1 / self.bm_po2_tc) * (-self._d_bm_vo2 + self._a_po2)) + self._d_bm_vo2
         self._d_hr = self._t * ((1 / self.hr_po2_tc) * (-self._d_hr + self._a_po2)) + self._d_hr
         self._d_cont = self._t * ((1 / self.cont_po2_tc) * (-self._d_cont + self._a_po2)) + self._d_cont
+        self._d_ans = self._t * ((1 / self.ans_po2_tc) * (-self._d_ans + self._a_po2)) + self._d_ans
 
         # calculate the baseline vo2 in mmol O2 /  cardiac cycle
         self.bm_vo2 = ((self.bm_vo2_ref + self._d_bm_vo2 * self.bm_po2_g) * self.hw) / self._ml_to_mmol
+  
+        # when hypoxia gets severe the ANS influence gets inhibited and the heartrate, contractility and baseline metabolism are decreased
 
-        # calculate the influence on the contractility and heartrate which overrule the ANS influence
+        # calculate the new ans dampening factor -> we have to pull the ans factor to 1.0
+        self.ans_po2_factor = self.ans_po2_g * self._d_ans
+        # factor = 0.0 if po2 10 or higher ans goes to 1.0 at minimal po2
+        # 0 = no inhibition and 1.0 is max inhibition
+        # 0 = cancelout factor => 1.0   at 1.0 cancel_outfactor = 1.0 / self._heart.hr_ans_factor
+        cancelout_factor = 1.0 + ((1.0 / self._heart.hr_ans_factor) * self.ans_po2_factor)
+        # support hrans = 1.5 -> cancelout factor = 1/1.5  = 0.6667
+        # we want our self.hr_mob_factor to approach that 0.6667 dependeng in ans_po2_factor => 
 
+
+
+
+        # calculate the new hr factor
+        self.hr_po2_factor = self.calc_factor(self.hr_po2_g * self._d_hr)
+        # calculate the new cont factor
+        self.cont_po2_factor = self.calc_factor(self.cont_po2_g * self._d_cont)
 
 
         # calculate the ecc vo2 -> not implemented yet but included in baseline metabolism
@@ -180,7 +211,7 @@ class Mob(BaseModel):
         # calculate the pva vo2 in mmol O2 / cardiac cycle
         self.pva_vo2 = (self.pva * self.pva_c) / self._ml_to_mmol
 
-        # return the total vo2 
+        # return the total vo2 in mmol O2 / carciac cycle
         return self.bm_vo2 + self.pva_vo2 + self.ecc_vo2
 
     def calc_pe(self) -> float:
@@ -225,6 +256,28 @@ class Mob(BaseModel):
 
         # return the total pressure volume area of both ventricles
         return self.stroke_work_lv + self.stroke_work_rv
+
+    def calc_factor(self, cum_factor) -> float:
+        # reset the cumulative hr factor
+        factor: float = 1.0
+        if cum_factor > 0:
+            factor = 1.0 + cum_factor
+        if cum_factor < 0:
+            factor = 1.0 - cum_factor
+            factor = 1.0 / factor
+        return factor
+
+    def translate_mxe(self, mxe) -> float:
+        # a mxe of 1.5 that max effect is 1.5 * reference value (hr_ref, mv_ref, venpool_ref, cont_ref, svr_ref, pvr_ref)
+        if mxe > 1.0:
+            mxe = mxe - 1.0
+            return mxe
+        
+        if mxe > 0.0 and mxe < 1.0:
+            mxe = (-1.0 / mxe) + 1.0
+            return mxe
+
+        return 0
 
 
 

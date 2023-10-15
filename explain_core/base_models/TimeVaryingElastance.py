@@ -14,6 +14,7 @@ class TimeVaryingElastance(Capacitance):
     el_max: float = 0.0
     el_max_factor: float = 1.0
     el_max_ans_factor: float = 1.0
+    el_max_mob_factor: float = 1.0
     el_max_drug_factor: float = 1.0
     el_k: float = 0.0
     el_k_factor: float = 1.0
@@ -37,15 +38,21 @@ class TimeVaryingElastance(Capacitance):
     def calc_model(self) -> None:
 
         # calculate the pressure depending on the volume, unstressed volume, elastance and activation factor
-        vol:float = self.vol * (1.0 / (self.u_vol_factor * self.u_vol_ans_factor))
-        u_vol:float = self.u_vol * self.u_vol_factor * self.u_vol_ans_factor
+        _u_vol_base: float = self.u_vol * self.u_vol_factor
+        u_vol:float = _u_vol_base + (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
+        vol:float = self.vol - (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
         vol_diff = vol - u_vol
 
         # calculate the total volume in this capacitance
         self.vol_total = vol + u_vol
 
-        emin: float = self.el_min * self.el_min_factor * self.el_min_ans_factor * self.el_min_drug_factor
-        emax: float = self.el_max * self.el_max_factor * self.el_max_ans_factor * self.el_max_drug_factor
+        _emin_base: float = self.el_min * self.el_min_factor
+        _emax_base: float = self.el_max * self.el_max_factor
+        emin: float = _emin_base + (self.el_min_ans_factor * _emin_base - _emin_base) + \
+                                   (self.el_base_drug_factor * _emin_base - _emin_base)
+        emax: float = _emax_base + (self.el_max_ans_factor * _emax_base - _emax_base) + \
+                                   (self.el_max_drug_factor * _emax_base - _emax_base) + \
+                                   (self.el_max_mob_factor * _emax_base - _emax_base)
 
         self.pres_ed = emin * vol_diff + self.el_k * self.el_k_factor * math.pow(vol_diff, 2)
         self.pres_ms = emax * vol_diff

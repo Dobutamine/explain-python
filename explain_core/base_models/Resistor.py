@@ -19,6 +19,7 @@ class Resistor(BaseModel):
     r_ext: float = 0.0
     r_ext_factor: float = 1.0
     r_ans_factor: float = 1.0
+    r_mob_factor: float = 1.0
     r_drug_factor: float = 1.0
     no_back_flow: bool = False
     no_flow: bool = False
@@ -69,8 +70,16 @@ class Resistor(BaseModel):
         self.p2_ext = 0
 
         # calculate the resistances
-        rfor: float = self.r_for * self.r_for_factor * self.r_ans_factor * self.r_drug_factor + self.r_k * self.r_k_factor * self.flow**2
-        rback: float = self.r_back * self.r_back_factor * self.r_ans_factor * self.r_drug_factor + self.r_k * self.r_k_factor * self.flow**2
+        _rfor_base = self.r_for * self.r_for_factor
+        rfor: float = _rfor_base + (self.r_ans_factor * _rfor_base - _rfor_base) + \
+                                   (self.r_mob_factor * _rfor_base - _rfor_base) + \
+                                   (self.r_drug_factor * _rfor_base - _rfor_base) + \
+                                    self.r_k * self.r_k_factor * self.flow**2
+        _rback_base = self.r_back * self.r_back_factor
+        rback: float = _rback_base + (self.r_ans_factor * _rback_base - _rback_base) + \
+                                     (self.r_mob_factor * _rback_base - _rback_base) + \
+                                     (self.r_drug_factor * _rback_base - _rback_base) + \
+                                      self.r_k * self.r_k_factor * self.flow**2
 
         # calculate the flow
         if self.no_flow or (_p1 <= _p2 and self.no_back_flow):

@@ -54,7 +54,11 @@ class Heart(BaseModel):
 
     def calc_model(self) -> None:
         # calculate the heartrate from the reference value and all other influences
-        self.heart_rate = self.heart_rate_ref * self.hr_ans_factor * self.hr_mob_factor * self.hr_temp_factor * self.hr_drug_factor
+        self.heart_rate = self.heart_rate_ref + \
+                          (self.hr_ans_factor * self.heart_rate_ref - self.heart_rate_ref)  + \
+                          (self.hr_mob_factor * self.heart_rate_ref - self.heart_rate_ref)  + \
+                          (self.hr_temp_factor * self.heart_rate_ref - self.heart_rate_ref) + \
+                          (self.hr_drug_factor * self.heart_rate_ref - self.heart_rate_ref)
 
         # calculate the qtc time depending on the heartrate
         self.cqt_time = self.calc_qtc(self.heart_rate)

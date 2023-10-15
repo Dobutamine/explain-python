@@ -32,10 +32,14 @@ class Capacitance(BaseModel):
     def calc_model(self) -> None:
 
         # calculate the pressure depending on the volume, unstressed volume, elastance
-        el:float = self.el_base * self.el_base_factor * self.el_base_ans_factor * self.el_base_drug_factor
-        vol:float = self.vol * (1.0 / (self.u_vol_factor * self.u_vol_ans_factor))
-        u_vol:float = self.u_vol * self.u_vol_factor * self.u_vol_ans_factor
-
+        _el_base: float = self.el_base * self.el_base_factor
+        el:float = _el_base + (self.el_base_ans_factor * _el_base - _el_base) + \
+                              (self.el_base_drug_factor * _el_base - _el_base)
+                              
+        _u_vol_base: float = self.u_vol * self.u_vol_factor
+        u_vol:float = _u_vol_base + (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
+        vol:float = self.vol - (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
+        
         # calculate the total volume in this capacitance
         self.vol_total = vol + u_vol
 
