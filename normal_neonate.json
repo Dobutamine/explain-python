@@ -1062,7 +1062,7 @@
       "description": "myocardial oxygen balance model",
       "model_type": "Mob",
       "is_enabled": true,
-      "dependencies": ["Heart", "AA", "AA_COR", "COR", "LV", "RV"],
+      "dependencies": ["Heart", "AA", "AA_COR", "COR"],
       "vo2_factor": 0.45,
       "heart_model": "Heart",
       "aa_model": "AA",

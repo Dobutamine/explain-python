@@ -10,9 +10,9 @@ from explain_core.functions.ActivationFunction import activation_function
 class Mob(BaseModel):
     # independent variables 
     hw: float = 0.0                         # heart weight = 7.799 + 0.004296 * birth weight (grams)
-    bm_vo2_ref: float = 0.0001590           # in ml O2/cardiac cycle/gram heart_weight: vo2 when the heart is not beating and depending on do2
-    bm_vo2_max: float = 0.0001590           # maximal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
-    bm_vo2_min: float = 0.0000318           # minimal vo2 in ml O2/cardiac cycle/gram heart_weight when do2 dropping below threshold
+    bm_vo2_ref: float = 0.0001590           # in ml O2/cardiac cycle/gram heart_weight: vo2 when the heart is not beating
+    bm_vo2_max: float = 0.0001590           # maximal vo2 in ml O2/cardiac cycle/gram heart_weight
+    bm_vo2_min: float = 0.0000318           # minimal vo2 in ml O2/cardiac cycle/gram heart_weight
     ecc_c: float = 0.0                      # not implemented yet but included in basal metabolism
     pva_c: float = 0.00425                  # CPVA in mL O2/cardiac cycle/mmHg*l
     resp_q: float = 0.5                     # respiratory quotient
@@ -187,7 +187,7 @@ class Mob(BaseModel):
 
         # calculate the mob factor which controls the heart rate
         self.hr_factor = 1.0 + self.hr_g * self._d_hr
-        self._heart.hr_mob_factor = self.hr_po2_factor
+        self._heart.hr_mob_factor = self.hr_factor
         
         # calculate the mob factor which controls the contractility of the heart
         self.cont_factor = 1.0 + self.cont_g * self._d_cont
@@ -229,22 +229,22 @@ class Mob(BaseModel):
             self._sv_rv_cum = 0.0
 
         # calculate the pv area of this model step
-        _dV_lv = self._lv.vol_total - self._prev_lv_vol
-        self._pv_area_lv += (_dV_lv * self._prev_lv_pres) + (_dV_lv * (self._lv.pres - self._prev_lv_pres)) / 2.0
+        _dV_lv = self._heart._lv.vol_total - self._prev_lv_vol
+        self._pv_area_lv += (_dV_lv * self._prev_lv_pres) + (_dV_lv * (self._heart._lv.pres - self._prev_lv_pres)) / 2.0
         if _dV_lv > 0:
             self._sv_lv_cum += _dV_lv
 
-        _dV_rv = self._rv.vol_total - self._prev_rv_vol
-        self._pv_area_rv += (_dV_rv * self._prev_rv_pres) + (_dV_rv * (self._rv.pres - self._prev_rv_pres)) / 2.0
+        _dV_rv = self._heart._rv.vol_total - self._prev_rv_vol
+        self._pv_area_rv += (_dV_rv * self._prev_rv_pres) + (_dV_rv * (self._heart._rv.pres - self._prev_rv_pres)) / 2.0
         if _dV_rv > 0:
             self._sv_rv_cum += _dV_rv
 
         # store current volumes and pressures
-        self._prev_lv_vol = self._lv.vol_total
-        self._prev_lv_pres = self._lv.pres
+        self._prev_lv_vol = self._heart._lv.vol_total
+        self._prev_lv_pres = self._heart._lv.pres
         
-        self._prev_rv_vol = self._rv.vol_total
-        self._prev_rv_pres = self._rv.pres
+        self._prev_rv_vol = self._heart._rv.vol_total
+        self._prev_rv_pres = self._heart._rv.pres
 
         # return the total pressure volume area of both ventricles
         return self.stroke_work_lv + self.stroke_work_rv
