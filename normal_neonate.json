@@ -1145,7 +1145,7 @@
       "dependencies": [],
       "thorax_model": "THORAX",
       "chest_comp_freq": 100.0,
-      "chest_comp_pres": 20.0,
+      "chest_comp_pres": 60.0,
       "vent_freq": 30.0,
       "vent_pres": 20.0,
       "vent_fio2": 0.21,
