@@ -1,5 +1,6 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
+from explain_core.base_models.Resistor import Resistor
 from explain_core.base_models.TimeVaryingElastance import TimeVaryingElastance
 from explain_core.core_models.Container import Container
 
@@ -27,11 +28,17 @@ class Heart(BaseModel):
 
     # local variables and state variables
     _la: TimeVaryingElastance = {}
+    _mv: Resistor = {}
     _lv: TimeVaryingElastance = {}
+    _av: Resistor = {}
     _ra: TimeVaryingElastance = {}
+    _tv: Resistor = {}
     _rv: TimeVaryingElastance = {}
+    _pv: Resistor = {}
     _cor: TimeVaryingElastance = {}
     _pc: Container = {}
+    _fo: Resistor = {}
+    _vsd: Resistor = {}
 
     _sa_node_interval: float = 0.0
     _sa_node_timer: float = 0.0
@@ -54,6 +61,12 @@ class Heart(BaseModel):
         self._ra = self._model.models[self.right_atrium]
         self._lv = self._model.models[self.left_ventricle]
         self._rv = self._model.models[self.right_ventricle]
+        self._mv = self._model.models[self.mitral_valve]
+        self._tv = self._model.models[self.tricuspid_valve]
+        self._pv = self._model.models[self.pulmonary_valve]
+        self._av = self._model.models[self.aortic_valve]
+        self._fo = self._model.models[self.foramen_ovale]
+        self._vsd = self._model.models[self.ventricular_septal_defect]
         self._cor = self._model.models[self.coronaries]
         self._pc = self._model.models[self.pericardium]
 
@@ -179,6 +192,66 @@ class Heart(BaseModel):
         if new_qt_time > 0.0:
             self.qt_time = new_qt_time
 
+    def open_foramen_ovale(self, diameter):
+        self._fo.set_diameter(diameter)
+
+    def open_ventricular_septal_defect(self, diameter):
+        self._vsd.set_diameter(diameter)
+
+    def close_foramen_ovale(self):
+        self._fo.close()
+
+    def close_ventricular_septal_defect(self):
+        self._vsd.close()
+
+    def change_mitral_valve_resistance(self, res_change):
+        if res_change > 0.0:
+            self._mv.set_r_for_factor(res_change)
+
+    def change_tricuspid_valve_resistance(self, res_change):
+        if res_change > 0.0:
+            self._tv.set_r_for_factor(res_change)
+
+    def change_aortic_valve_resistance(self, res_change):
+        if res_change > 0.0:
+            self._av.set_r_for_factor (res_change)
+
+    def change_pulmonary_valve_resistance(self, res_change):
+        if res_change > 0.0:
+            self._pv.set_r_for_factor(res_change)
+
+    def change_mitral_valve_regurgitation(self, res_change):
+        if res_change > 0.0:
+            self._mv.set_r_back_factor(res_change)
+            self._mv.allow_backflow()
+        else:
+            self._mv.set_r_back_factor(1.0)
+            self._mv.prevent_backflow()
+
+    def change_tricuspid_valve_regurgitation(self, res_change):
+        if res_change > 0.0:
+            self._tv.set_r_back_factor(res_change)
+            self._tv.allow_backflow()
+        else:
+            self._tv.set_r_back_factor(1.0)
+            self._tv.prevent_backflow()
+
+    def change_aortic_valve_regurgitation(self, res_change):
+        if res_change > 0.0:
+            self._av.set_r_back_factor(res_change)
+            self._av.allow_backflow()
+        else:
+            self._av.set_r_back_factor(1.0)
+            self._av.prevent_backflow()
+
+    def change_pulmonary_valve_regurgitation(self, res_change):
+        if res_change > 0.0:
+            self._pv.set_r_back_factor(res_change)
+            self._pv.allow_backflow()
+        else:
+            self._pv.set_r_back_factor(1.0)
+            self._pv.prevent_backflow()
+    
     def change_contractility(self, cont_change):
         if cont_change > 0.0:
             self._lv.el_max_factor = cont_change
@@ -195,7 +268,6 @@ class Heart(BaseModel):
         if cont_change > 0.0:
             self._rv.el_max_factor = cont_change
             self._ra.el_max_factor = cont_change
-
 
     def change_relaxation(self, relax_change):
         if relax_change > 0.0:
