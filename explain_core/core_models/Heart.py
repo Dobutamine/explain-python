@@ -26,6 +26,7 @@ class Heart(BaseModel):
     aaf: float = 0.0
     vaf: float = 0.0
 
+
     # local variables and state variables
     _la: TimeVaryingElastance = {}
     _mv: Resistor = {}
@@ -39,6 +40,7 @@ class Heart(BaseModel):
     _pc: Container = {}
     _fo: Resistor = {}
     _vsd: Resistor = {}
+    _cor_ra: Resistor = {}
 
     _sa_node_interval: float = 0.0
     _sa_node_timer: float = 0.0
@@ -68,7 +70,10 @@ class Heart(BaseModel):
         self._fo = self._model.models[self.foramen_ovale]
         self._vsd = self._model.models[self.ventricular_septal_defect]
         self._cor = self._model.models[self.coronaries]
+        self._cor_ra = self._model.models[self.coronary_sinus]
         self._pc = self._model.models[self.pericardium]
+
+
 
     def calc_model(self) -> None:
         # calculate the heartrate from the reference value and all other influences
