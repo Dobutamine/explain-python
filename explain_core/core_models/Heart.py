@@ -1,10 +1,12 @@
 import math
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.base_models.TimeVaryingElastance import TimeVaryingElastance
+from explain_core.core_models.Container import Container
 
 
 class Heart(BaseModel):
     # independent variables
+    rhythm_type: int = 0
     heart_rate: float = 120.0
     heart_rate_ref: float = 140.0
     pq_time: float = 0.0
@@ -29,6 +31,7 @@ class Heart(BaseModel):
     _ra: TimeVaryingElastance = {}
     _rv: TimeVaryingElastance = {}
     _cor: TimeVaryingElastance = {}
+    _pc: Container = {}
 
     _sa_node_interval: float = 0.0
     _sa_node_timer: float = 0.0
@@ -52,6 +55,7 @@ class Heart(BaseModel):
         self._lv = self._model.models[self.left_ventricle]
         self._rv = self._model.models[self.right_ventricle]
         self._cor = self._model.models[self.coronaries]
+        self._pc = self._model.models[self.pericardium]
 
     def calc_model(self) -> None:
         # calculate the heartrate from the reference value and all other influences
@@ -125,6 +129,7 @@ class Heart(BaseModel):
         # calculate the varying elastance factor
         self.calc_varying_elastance()
 
+
     def calc_varying_elastance(self) -> None:
         # calculate the atrial activation factor
         if self.ncc_atrial >= 0 and self.ncc_atrial < self.pq_time / self._t:
@@ -154,3 +159,68 @@ class Heart(BaseModel):
             return self.qt_time * math.sqrt(60.0 / hr)
         else:
             return self.qt_time * math.sqrt(6)
+
+    def heart_rate_ref(self, new_hr_ref):
+        if new_hr_ref > 0.0:
+            self.heart_rate_ref = new_hr_ref
+
+    def set_rhythm_type(self, new_rt):
+        self.rhythm_type = new_rt
+
+    def set_pq_time(self, new_pq_time):
+        if new_pq_time > 0.0:
+            self.pq_time = new_pq_time
+    
+    def set_qrs_time(self, new_qrs_time):
+        if new_qrs_time> 0.0:
+            self.qrs_time = new_qrs_time
+
+    def set_qt_time(self, new_qt_time):
+        if new_qt_time > 0.0:
+            self.qt_time = new_qt_time
+
+    def change_contractility(self, cont_change):
+        if cont_change > 0.0:
+            self._lv.el_max_factor = cont_change
+            self._la.el_max_factor = cont_change
+            self._rv.el_max_factor = cont_change
+            self._ra.el_max_factor = cont_change
+    
+    def change_left_heart_contractility(self, cont_change):
+        if cont_change > 0.0:
+            self._lv.el_max_factor = cont_change
+            self._la.el_max_factor = cont_change
+
+    def change_right_heart_contractility(self, cont_change):
+        if cont_change > 0.0:
+            self._rv.el_max_factor = cont_change
+            self._ra.el_max_factor = cont_change
+
+
+    def change_relaxation(self, relax_change):
+        if relax_change > 0.0:
+            self._lv.el_min_factor = relax_change
+            self._la.el_min_factor = relax_change
+            self._rv.el_min_factor = relax_change
+            self._ra.el_min_factor = relax_change
+    
+    def change_left_heart_relaxation(self, relax_change):
+        if relax_change > 0.0:
+            self._lv.el_min_factor = relax_change
+            self._la.el_min_factor = relax_change
+            self._rv.el_min_factor = relax_change
+            self._ra.el_min_factor = relax_change
+
+    def change_right_heart_relaxation(self, relax_change):
+        if relax_change > 0.0:
+            self._rv.el_min_factor = relax_change
+            self._ra.el_min_factor = relax_change
+
+    def change_pericardium_compliance(self, comp_change):
+        if comp_change > 0.0:
+            self._pc.el_base_factor = 1.0 / comp_change
+
+    def set_pericardium_effusion(self, extra_volume):
+        if extra_volume >= 0.0:
+            self._pc.vol_extra = extra_volume
+
