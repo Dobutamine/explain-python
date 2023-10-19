@@ -278,11 +278,12 @@ class Interface:
                     self.y_rt[idx][self.no_dp - 1] = t[parameter]
                     self.y_rt[idx] = np.roll(self.y_rt[idx], -1)
 
+    
     def save_model_state(self, file_name:str = "explain_model.xpl"):
         fn = file_name.split('.')
         if len(fn) == 1:
             file_name += ".xpl"
-            
+
         # Save the object to a file
         with open(file_name, "wb") as f:
             pickle.dump(self.model, f)
