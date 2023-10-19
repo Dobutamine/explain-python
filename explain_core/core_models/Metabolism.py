@@ -4,6 +4,15 @@ from explain_core.base_models.BaseModel import BaseModel
 class Metabolism(BaseModel):
     # independent variables
     vo2_factor: float = 1.0
+    resp_q: float = 0.6
+
+    def change_vo2(self, _vo2_factor):
+        if _vo2_factor >= 0.0:
+            self.vo2_factor = _vo2_factor
+
+    def set_resp_q(self, new_resp_q):
+        if new_resp_q >= 0.0:
+            self.resp_q = new_resp_q
 
     def calc_model(self) -> None:
         super().calc_model()

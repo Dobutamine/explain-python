@@ -100,6 +100,176 @@ class Ans(BaseModel):
         self.init_effectors()
 
         return self._is_initialized
+    
+    def set_map(self, _min, _set, _max):
+        self.min_map = _min
+        self.set_map = _set
+        self.max_map = _max
+
+    def set_pco2(self, _min, _set, _max):
+        self.min_pco2 = _min
+        self.set_pco2 = _set
+        self.max_pco2 = _max
+    
+    def set_ph(self, _min, _set, _max):
+        self.min_ph = _min
+        self.set_ph = _set
+        self.max_ph = _max
+    
+    def set_pco2(self, _min, _set, _max):
+        self.min_po2 = _min
+        self.set_po2 = _set
+        self.max_po2 = _max
+    
+    def set_effects_map_on_hr(self, mxe_low, mxe_high, mxe_tc):
+        self.hr_mxe_map_low = mxe_low
+        self.hr_mxe_map_high = mxe_high
+        self.hr_tc_map = mxe_tc
+        self.init_effectors()
+    
+    def set_effects_pco2_on_hr(self, mxe_low, mxe_high, mxe_tc):
+        self.hr_mxe_pco2_low = mxe_low
+        self.hr_mxe_pco2_high = mxe_high
+        self.hr_tc_pco2 = mxe_tc
+        self.init_effectors()
+
+    def set_effects_ph_on_hr(self, mxe_low, mxe_high, mxe_tc):
+        self.hr_mxe_ph_low = mxe_low
+        self.hr_mxe_ph_high = mxe_high
+        self.hr_tc_ph = mxe_tc
+        self.init_effectors()
+
+    def set_effects_po2_on_hr(self, mxe_low, mxe_high, mxe_tc):
+        self.hr_mxe_po2_low = mxe_low
+        self.hr_mxe_po2_high = mxe_high
+        self.hr_tc_po2 = mxe_tc
+        self.init_effectors()
+
+
+    def set_effects_map_on_mv(self, mxe_low, mxe_high, mxe_tc):
+        self.mv_mxe_map_low = mxe_low
+        self.mv_mxe_map_high = mxe_high
+        self.mv_tc_map = mxe_tc
+        self.init_effectors()
+    
+    def set_effects_pco2_on_mv(self, mxe_low, mxe_high, mxe_tc):
+        self.mv_mxe_pco2_low = mxe_low
+        self.mv_mxe_pco2_high = mxe_high
+        self.mv_tc_pco2 = mxe_tc
+        self.init_effectors()
+
+    def set_effects_ph_on_mv(self, mxe_low, mxe_high, mxe_tc):
+        self.mv_mxe_ph_low = mxe_low
+        self.mv_mxe_ph_high = mxe_high
+        self.mv_tc_ph = mxe_tc
+        self.init_effectors()
+
+    def set_effects_po2_on_mv(self, mxe_low, mxe_high, mxe_tc):
+        self.mv_mxe_po2_low = mxe_low
+        self.mv_mxe_po2_high = mxe_high
+        self.mv_tc_po2 = mxe_tc
+        self.init_effectors()
+
+    
+    def set_effects_map_on_venpool(self, mxe_low, mxe_high, mxe_tc):
+        self.venpool_mxe_map_low = mxe_low
+        self.venpool_mxe_map_high = mxe_high
+        self.venpool_tc_map = mxe_tc
+        self.init_effectors()
+    
+    def set_effects_pco2_on_venpool(self, mxe_low, mxe_high, mxe_tc):
+        self.venpool_mxe_pco2_low = mxe_low
+        self.venpool_mxe_pco2_high = mxe_high
+        self.venpool_tc_pco2 = mxe_tc
+        self.init_effectors()
+
+    def set_effects_ph_on_venpool(self, mxe_low, mxe_high, mxe_tc):
+        self.venpool_mxe_ph_low = mxe_low
+        self.venpool_mxe_ph_high = mxe_high
+        self.venpool_tc_ph = mxe_tc
+        self.init_effectors()
+
+    def set_effects_po2_on_venpool(self, mxe_low, mxe_high, mxe_tc):
+        self.venpool_mxe_po2_low = mxe_low
+        self.venpool_mxe_po2_high = mxe_high
+        self.venpool_tc_po2 = mxe_tc
+        self.init_effectors()
+
+
+    def set_effects_map_on_cont(self, mxe_low, mxe_high, mxe_tc):
+        self.cont_mxe_map_low = mxe_low
+        self.cont_mxe_map_high = mxe_high
+        self.cont_tc_map = mxe_tc
+        self.init_effectors()
+    
+    def set_effects_pco2_on_cont(self, mxe_low, mxe_high, mxe_tc):
+        self.cont_mxe_pco2_low = mxe_low
+        self.cont_mxe_pco2_high = mxe_high
+        self.cont_tc_pco2 = mxe_tc
+        self.init_effectors()
+
+    def set_effects_ph_on_cont(self, mxe_low, mxe_high, mxe_tc):
+        self.cont_mxe_ph_low = mxe_low
+        self.cont_mxe_ph_high = mxe_high
+        self.cont_tc_ph = mxe_tc
+        self.init_effectors()
+
+    def set_effects_po2_on_cont(self, mxe_low, mxe_high, mxe_tc):
+        self.cont_mxe_po2_low = mxe_low
+        self.cont_mxe_po2_high = mxe_high
+        self.cont_tc_po2 = mxe_tc
+        self.init_effectors()
+
+    
+    def set_effects_map_on_svr(self, mxe_low, mxe_high, mxe_tc):
+        self.svr_mxe_map_low = mxe_low
+        self.svr_mxe_map_high = mxe_high
+        self.svr_tc_map = mxe_tc
+        self.init_effectors()
+    
+    def set_effects_pco2_on_svr(self, mxe_low, mxe_high, mxe_tc):
+        self.svr_mxe_pco2_low = mxe_low
+        self.svr_mxe_pco2_high = mxe_high
+        self.svr_tc_pco2 = mxe_tc
+        self.init_effectors()
+
+    def set_effects_ph_on_svr(self, mxe_low, mxe_high, mxe_tc):
+        self.svr_mxe_ph_low = mxe_low
+        self.svr_mxe_ph_high = mxe_high
+        self.svr_tc_ph = mxe_tc
+        self.init_effectors()
+
+    def set_effects_po2_on_svr(self, mxe_low, mxe_high, mxe_tc):
+        self.svr_mxe_po2_low = mxe_low
+        self.svr_mxe_po2_high = mxe_high
+        self.svr_tc_po2 = mxe_tc
+        self.init_effectors()
+
+
+    def set_effects_map_on_pvr(self, mxe_low, mxe_high, mxe_tc):
+        self.pvr_mxe_map_low = mxe_low
+        self.pvr_mxe_map_high = mxe_high
+        self.pvr_tc_map = mxe_tc
+        self.init_effectors()
+    
+    def set_effects_pco2_on_pvr(self, mxe_low, mxe_high, mxe_tc):
+        self.pvr_mxe_pco2_low = mxe_low
+        self.pvr_mxe_pco2_high = mxe_high
+        self.pvr_tc_pco2 = mxe_tc
+        self.init_effectors()
+
+    def set_effects_ph_on_pvr(self, mxe_low, mxe_high, mxe_tc):
+        self.pvr_mxe_ph_low = mxe_low
+        self.pvr_mxe_ph_high = mxe_high
+        self.pvr_tc_ph = mxe_tc
+        self.init_effectors()
+
+    def set_effects_po2_on_pvr(self, mxe_low, mxe_high, mxe_tc):
+        self.pvr_mxe_po2_low = mxe_low
+        self.pvr_mxe_po2_high = mxe_high
+        self.pvr_tc_po2 = mxe_tc
+        self.init_effectors()
+
 
     def calc_model(self) -> None:
         # the ans model is executed at a lower frequency then the model step for performance reasons

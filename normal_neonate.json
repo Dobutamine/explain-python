@@ -838,20 +838,6 @@
       "qrs_time": 0.075,
       "qt_time": 0.25
     },
-    "Lungs": {
-      "name": "Lungs",
-      "description": "lung model",
-      "model_type": "Lungs",
-      "is_enabled": true,
-      "dependencies": [],
-      "alveolar_spaces": ["ALL", "ALR"],
-      "dead_space": ["DS"],
-      "chestwall": ["CHEST_L", "CHEST_R"],
-      "thorax": ["THORAX"],
-      "upper_airways": ["MOUTH_DS"],
-      "lower_airways": ["DS_ALL", "DS_ALR"],
-      "gas_exchangers": ["GASEX_LL", "GASEX_RL"]
-    },
     "Circulation": {
       "name": "Circulation",
       "description": "circulation model",
@@ -871,14 +857,28 @@
       "heart_pulmonary_artery": ["RV_PA"],
       "heart_pulmonary_veins": ["PV_LA"]
     },
+    "Lungs": {
+      "name": "Lungs",
+      "description": "lung model",
+      "model_type": "Lungs",
+      "is_enabled": true,
+      "dependencies": [],
+      "alveolar_spaces": ["ALL", "ALR"],
+      "dead_space": ["DS"],
+      "chestwall": ["CHEST_L", "CHEST_R"],
+      "thorax": ["THORAX"],
+      "upper_airways": ["MOUTH_DS"],
+      "lower_airways": ["DS_ALL", "DS_ALR"],
+      "gas_exchangers": ["GASEX_LL", "GASEX_RL"]
+    },
     "Ans": {
       "name": "Ans",
       "description": "autonomic nervous system model",
       "model_type": "Ans",
       "is_enabled": true,
       "dependencies": ["AA","LV","RV","LA","RA","IVCE", "SVC","AD_INT", "AD_KID","AD_LS", "AAR_RUB", "AD_RLB","PA_LL", "PA_RL", "Breathing", "Heart"],
-      "baroreceptor_location": "AA",
-      "chemoreceptor_location": "AA",
+      "baroreceptor_location": "AAR",
+      "chemoreceptor_location": "AAR",
       "min_map": 20.0,
       "set_map": 57.5,
       "max_map": 100.0,

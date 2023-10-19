@@ -27,6 +27,7 @@ class Ecls(BaseModel):
     drainage_cannula_length: float = 10.0   # length of the drainage cannula in mm
     return_cannula_diameter: float = 3.3    # diameter of the return cannula in mm
     return_cannula_length: float = 10.0     # length of the return cannula in mm
+    clamp: bool = True                      # is there a clamp on the tubing?
 
     tubing_diameter: float = 6.35           # diameter of the ecls tubing in meters
     tubing_elastance: float = 5160          # elastance of the ecls tubing
@@ -71,7 +72,7 @@ class Ecls(BaseModel):
     _pump: BloodPump = {}                   # ecls pump
     _tubing_out: BloodCapacitance = {}      # blood containing ecls tubing between oxygenator and the return site
 
-    _drainage_tubing_in: Resistor = {}            # resistor connecting the umbilical arteries to the ecls tubing
+    _drainage_tubing_in: Resistor = {}      # resistor connecting the umbilical arteries to the ecls tubing
     _tubing_in_pump: Resistor = {}          # resistor connecting the ecls tubing to the pump
     _pump_oxy: Resistor = {}                # resistor connecting the pump to the oxygenator
     _oxy_tubing_out: Resistor = {}          # resistor connecting the oxygenator to the ecls tubing
@@ -112,6 +113,14 @@ class Ecls(BaseModel):
 
     def set_pump_rpm(self, new_rpm):
         self.pump_rpm = new_rpm
+
+    def set_clamp(self, state):
+        if state:
+            self._drainage_tubing_in.close()
+            self._tubing_out_return.close()
+        else:
+            self._drainage_tubing_in.open()
+            self._tubing_out_return.open()
 
     def calc_model(self) -> None:
         if self.ecls_running:
@@ -379,7 +388,7 @@ class Ecls(BaseModel):
         # we cannot intialized the pump yet as it depends on the other components
     
         # drainage cannula resistance
-        self._ua_tubing_in = Resistor(**{
+        self._drainage_tubing_in = Resistor(**{
             "name": "ECLS_DRAINAGE_TUBINGIN",
             "description": "connector between drainage site and tubing in",
             "model_type": "Resistor",
@@ -393,8 +402,8 @@ class Ecls(BaseModel):
             "length": self.drainage_cannula_length,
             "r_k": 0,
         })
-        self._ua_tubing_in.init_model(model)
-        self._ecls_parts.append(self._ua_tubing_in)
+        self._drainage_tubing_in.init_model(model)
+        self._ecls_parts.append(self._drainage_tubing_in)
 
         self._tubing_in_pump = Resistor(**{
             "name": "ECLS_TUBINGIN_PUMP",
@@ -488,3 +497,6 @@ class Ecls(BaseModel):
         self._pump.solutes = _drainage_site.solutes.copy()
         # add to the components
         self._ecls_parts.append(self._pump)
+
+        # clamp the tubing
+        self.set_clamp(True)
