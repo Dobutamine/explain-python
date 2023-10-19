@@ -145,7 +145,6 @@ class Ans(BaseModel):
         self.hr_tc_po2 = mxe_tc
         self.init_effectors()
 
-
     def set_effects_map_on_mv(self, mxe_low, mxe_high, mxe_tc):
         self.mv_mxe_map_low = mxe_low
         self.mv_mxe_map_high = mxe_high
@@ -170,7 +169,6 @@ class Ans(BaseModel):
         self.mv_tc_po2 = mxe_tc
         self.init_effectors()
 
-    
     def set_effects_map_on_venpool(self, mxe_low, mxe_high, mxe_tc):
         self.venpool_mxe_map_low = mxe_low
         self.venpool_mxe_map_high = mxe_high
@@ -194,7 +192,6 @@ class Ans(BaseModel):
         self.venpool_mxe_po2_high = mxe_high
         self.venpool_tc_po2 = mxe_tc
         self.init_effectors()
-
 
     def set_effects_map_on_cont(self, mxe_low, mxe_high, mxe_tc):
         self.cont_mxe_map_low = mxe_low
@@ -245,7 +242,6 @@ class Ans(BaseModel):
         self.svr_tc_po2 = mxe_tc
         self.init_effectors()
 
-
     def set_effects_map_on_pvr(self, mxe_low, mxe_high, mxe_tc):
         self.pvr_mxe_map_low = mxe_low
         self.pvr_mxe_map_high = mxe_high
@@ -269,7 +265,6 @@ class Ans(BaseModel):
         self.pvr_mxe_po2_high = mxe_high
         self.pvr_tc_po2 = mxe_tc
         self.init_effectors()
-
 
     def calc_model(self) -> None:
         # the ans model is executed at a lower frequency then the model step for performance reasons
