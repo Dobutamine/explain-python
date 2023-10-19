@@ -10,8 +10,8 @@ from explain_core.functions.BloodComposition import set_blood_composition
 
 class Ans(BaseModel):
     # independent parameters
-    baroreceptor_location: str = "AA"
-    chemoreceptor_locatio: str = "AA"
+    baroreceptor_location: str = "AAR"
+    chemoreceptor_locatio: str = "AAR"
 
     hr_targets: str = ["Heart"]
     mv_targets: str = ["Breathing"]

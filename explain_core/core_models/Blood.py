@@ -21,3 +21,20 @@ class Blood(BaseModel):
                                        * model.aboxy['so2'] / 100.0) * 10.0) / 25.5
 
         return self._is_initialized
+
+    def set_solute_concentration(self, solute_name: str, solute_conc):
+        self.solutes[solute_name]: float = solute_conc
+
+        for model in self._model.models.values():
+            if model.model_type == "BloodCapacitance" or model.model_type == "BloodTimeVaryingElastance":
+                # fill the solutes
+                model.solutes[solute_name] = solute_conc
+
+    def set_aboxy_concentration(self, solute_name: str, solute_conc):
+        self.aboxy[solute_name]: float = solute_conc
+
+        for model in self._model.models.values():
+            if model.model_type == "BloodCapacitance" or model.model_type == "BloodTimeVaryingElastance":
+                # fill the solutes
+                model.aboxy[solute_name] = solute_conc
+
