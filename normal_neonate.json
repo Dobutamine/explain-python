@@ -1271,6 +1271,13 @@
       "pip_cmh2o_max": 20.0,
       "peep_cmh2o": 3.0,
       "tidal_volume": 0.015
+    },
+    "ExampleCustomModel": {
+      "name": "ExampleCustomModel",
+      "description": "example of a custom model",
+      "model_type": "ExampleCustomModel",
+      "is_enabled": true,
+      "dependencies": []
     }
   }
 }

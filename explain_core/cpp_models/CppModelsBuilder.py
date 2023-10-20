@@ -16,10 +16,10 @@ def compile_modules():
     for module in modules:
         # get the filepaths to the c and h files
         filepath_c_module = os.path.join(
-            cwd, "explain_core", "cpp_modules", module + ".c"
+            cwd, "explain_core", "cpp_models", module + ".c"
         )
         filepath_h_module = os.path.join(
-            cwd, "explain_core", "cpp_modules", module + ".h"
+            cwd, "explain_core", "cpp_models", module + ".h"
         )
 
         # read the header file and inject it into the ffibuilder
@@ -33,7 +33,7 @@ def compile_modules():
         ffibuilder.set_source("_" + module, source)
 
         # set the working directory to make sure the c compiler can find the files
-        os.chdir(cwd + "/explain_core/cpp_modules")
+        os.chdir(cwd + "/explain_core/cpp_models")
 
         # build the module
         output_filename = ffibuilder.compile(verbose=False)

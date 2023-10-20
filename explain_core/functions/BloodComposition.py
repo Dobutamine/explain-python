@@ -1,5 +1,5 @@
 import math
-from explain_core.cpp_modules._blood_composition.lib import GetBloodComposition
+from explain_core.cpp_models._blood_composition.lib import GetBloodComposition
 
 
 def set_blood_composition(bc) -> None:

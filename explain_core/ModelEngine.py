@@ -9,7 +9,7 @@ from time import perf_counter
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
-from explain_core.cpp_modules.ModulesCompiler import compile_modules
+from explain_core.cpp_models.CppModelsBuilder import compile_modules
 
 
 class ModelEngine:
