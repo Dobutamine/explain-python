@@ -6,10 +6,10 @@ import random
 import math
 from time import perf_counter
 
+from explain_core.base_models.BaseModel import BaseModel
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
-from explain_core.base_models.BaseModel import BaseModel
-from explain_core.functions.BloodComposition import set_blood_composition
+
 
 class ModelEngine:
     # define an object holding the entire model and submodels
@@ -34,7 +34,7 @@ class ModelEngine:
     # define an attribute holding the length in meters
     height: float = 0.50
 
-     # define an attribute holding the body surface area in meters (BSA (m2) =(weight(kg) * height(cm)/3600)^0.5
+    # define an attribute holding the body surface area in meters (BSA (m2) =(weight(kg) * height(cm)/3600)^0.5
     bsa: float = 0.214
 
     # define an attribute holding the modeling stepsize
@@ -57,11 +57,7 @@ class ModelEngine:
     initialized: bool = False
 
     # define a status message object
-    status = {
-        "log": [],
-        "error_log": [],
-        "initialized": False
-    }
+    status = {"log": [], "error_log": [], "initialized": False}
 
     # realtime object
     _rt_clock = None
@@ -71,7 +67,6 @@ class ModelEngine:
 
     # define the constructor
     def __init__(self, model_definition_filename: str):
-        
         # initialize all model components with the parameters from the JSON file
         self.initialized = self.init_model(model_definition_filename)
 
@@ -81,11 +76,7 @@ class ModelEngine:
     def init_model(self, model_definition_filename: str):
         # set the error counter = 0
         error_counter = 0
-        self.status = {
-            "log": [],
-            "error_log": [],
-            "initialized": False
-        }
+        self.status = {"log": [], "error_log": [], "initialized": False}
 
         # make sure the objects are empty
         self.models: dict = {}
@@ -103,59 +94,74 @@ class ModelEngine:
             self.model_definition = json.load(json_file)
 
             # get the model attributes
-            self.name = self.model_definition['name']
-            self.description = self.model_definition['description']
-            self.weight = self.model_definition['weight']
-            self.height = self.model_definition['height']
+            self.name = self.model_definition["name"]
+            self.description = self.model_definition["description"]
+            self.weight = self.model_definition["weight"]
+            self.height = self.model_definition["height"]
             self.bsa = math.pow((self.weight * (self.height * 100.0) / 3600.0), 0.5)
-            self.modeling_stepsize = self.model_definition['modeling_stepsize']
-            self.model_time_total = self.model_definition['model_time_total']
+            self.modeling_stepsize = self.model_definition["modeling_stepsize"]
+            self.model_time_total = self.model_definition["model_time_total"]
 
         except:
             # signal that the json file failed to load
-            print(f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!")
+            print(
+                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!"
+            )
             self.update_log(
-                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!", "error")
+                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!",
+                "error",
+            )
             self.initialized = False
 
             # terminate function
             return
 
         # initialize all model components and put a reference to them in the components list
-        for key, model in self.model_definition['models'].items():
+        for key, model in self.model_definition["models"].items():
             # try to find the desired model class from the core_models or custom_models folder
             model_type = model["model_type"]
 
             # try to import the module holding the model class from the core_models folder
             try:
                 model_module = importlib.import_module(
-                    'explain_core.core_models.' + model_type)
+                    "explain_core.core_models." + model_type
+                )
             except:
                 try:
                     model_module = importlib.import_module(
-                        'explain_core.base_models.' + model_type)
+                        "explain_core.base_models." + model_type
+                    )
                 except:
                     try:
                         # try to import the module holding the model class from the custom models folder
                         model_module = importlib.import_module(
-                            'custom_models.' + model_type)
+                            "custom_models." + model_type
+                        )
                     except:
-                        print(f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}")
+                        print(
+                            f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}"
+                        )
                         self.update_log(
-                            f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}", "error")
+                            f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}",
+                            "error",
+                        )
                         error_counter += 1
 
             # get the model class from the module
             model_class = getattr(model_module, model_type)
-            
+
             # instantiate the model class with the properties stored in the model_definition file and a reference to the other components and add it to the components dictionary
             try:
-                self.models[model['name']] = model_class(**model)
+                self.models[model["name"]] = model_class(**model)
             except Exception as error:
-                print(f"Instantiation error: {model_type} model failed to instantiate. Error: {error}")
+                print(
+                    f"Instantiation error: {model_type} model failed to instantiate. Error: {error}"
+                )
                 # a module holding the desired model class is producing an error while instantiating
                 self.update_log(
-                    f"Instantiation error: {model_type} model failed to instantiate. Error: {error}", "error")
+                    f"Instantiation error: {model_type} model failed to instantiate. Error: {error}",
+                    "error",
+                )
                 error_counter += 1
 
         # initialize a datacollector
@@ -168,17 +174,21 @@ class ModelEngine:
         dep_errors: int = self.check_dependencies()
 
         # initialize all the models
-        if (error_counter == 0):
+        if error_counter == 0:
             init_errors = 0
             # initialize all components
             for _, model in self.models.items():
                 try:
                     model.init_model(self)
                 except Exception as error:
-                    print(f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}")
+                    print(
+                        f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}"
+                    )
                     # a module holding the desired model class is producing an error while initiallizing
                     self.update_log(
-                        f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}", "error")
+                        f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}",
+                        "error",
+                    )
                     init_errors += 1
 
             if init_errors > 0 or dep_errors > 0:
@@ -186,13 +196,14 @@ class ModelEngine:
             else:
                 print(f" Model '{self.name}' loaded and initialized correctly.")
                 self.update_log(
-                    f" Model '{self.name}' loaded and initialized correctly.")
+                    f" Model '{self.name}' loaded and initialized correctly."
+                )
                 self.initialized = True
 
         else:
             self.initialized = False
 
-        self.status['initialized'] = self.initialized
+        self.status["initialized"] = self.initialized
 
     def check_dependencies(self) -> int:
         dep_errors = 0
@@ -207,7 +218,9 @@ class ModelEngine:
                         present = True
                 if not present:
                     self.update_log(
-                        f'Dependency error: model {model.name} depends on {dep} which is not present.', "error")
+                        f"Dependency error: model {model.name} depends on {dep} which is not present.",
+                        "error",
+                    )
                     dep_errors += 1
         if dep_errors > 0:
             self.initialized = False
@@ -215,37 +228,36 @@ class ModelEngine:
 
     def update_log(self, message, log_type="log"):
         if log_type == "log":
-            self.status['log'].append(message)
+            self.status["log"].append(message)
 
-        if len(self.status['log']) > 5:
-            self.status['log'].pop(0)
+        if len(self.status["log"]) > 5:
+            self.status["log"].pop(0)
 
         if log_type == "error":
-            self.status['error_log'].append(message)
+            self.status["error_log"].append(message)
 
-        if len(self.status['error_log']) > 5:
-            self.status['error_log'].pop(0)
+        if len(self.status["error_log"]) > 5:
+            self.status["error_log"].pop(0)
 
     def start(self, rt_interval=0.015):
         # set the realtime interval
         self._rt_interval = rt_interval
 
         # calculate the number of steps of the model
-        self._rt_no_of_steps: int = int(
-            self._rt_interval / self.modeling_stepsize)
+        self._rt_no_of_steps: int = int(self._rt_interval / self.modeling_stepsize)
 
         # empty the datacollector
         self._datacollector.clear_data()
 
         # declare the realtime counter
-        self._rt_clock = multitimer.RepeatingTimer(
-            rt_interval, self._calculate_rt)
+        self._rt_clock = multitimer.RepeatingTimer(rt_interval, self._calculate_rt)
 
         # start the realtime clock
         self._rt_clock.start()
         self._rt_running = True
         self.update_log(
-            f"Model '{self.name}' is running in realtime with a {self._rt_interval} sec. resolution.")
+            f"Model '{self.name}' is running in realtime with a {self._rt_interval} sec. resolution."
+        )
 
     def stop(self):
         try:
@@ -273,14 +285,15 @@ class ModelEngine:
             for model in self.models.values():
                 model.step_model()
 
-             # call the task scheduler
+            # call the task scheduler
             run_tasks(model_time_total)
 
             # Increase the model clock
             model_time_total += modeling_stepsize
 
-    def fastforward(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
-
+    def fastforward(
+        self, time_to_calculate: float = 10.0, performance: bool = True
+    ) -> list:
         # no datacollecting or task scheduler
 
         # Cache the attributes for faster access during the model loop
@@ -321,8 +334,9 @@ class ModelEngine:
         self.model_data = self._datacollector.collected_data
         return self.model_data
 
-    def calculate(self, time_to_calculate: float = 10.0, performance: bool = True) -> list:
-
+    def calculate(
+        self, time_to_calculate: float = 10.0, performance: bool = True
+    ) -> list:
         # Cache the attributes for faster access during the model loop
         collect_data = self._datacollector.collect_data
         run_tasks = self._task_scheduler.run_tasks
@@ -375,7 +389,7 @@ class ModelEngine:
         self._datacollector.clear_watchlist()
 
     def add_to_watchlist(self, properties: list):
-        # make sure the properties object is of lilst type
+        # make sure the properties object is of list type
         if isinstance(properties, str):
             properties = [properties]
 
@@ -390,15 +404,20 @@ class ModelEngine:
         # execute function with a custom number of arguments
         f(**kwargs)
 
-    def add_tasks(self, properties: list, new_value: float, in_time: float = 1.0, at_time: float = 0.0):
+    def add_tasks(
+        self,
+        properties: list,
+        new_value: float,
+        in_time: float = 1.0,
+        at_time: float = 0.0,
+    ):
         # make sure the properties are of a list type
         if isinstance(properties, str):
             properties = [properties]
 
         # add the task to the task scheduler
         for p in properties:
-            self.set_property(p, new_value=new_value,
-                              in_time=in_time, at_time=at_time)
+            self.set_property(p, new_value=new_value, in_time=in_time, at_time=at_time)
 
     def get_all_tasks(self):
         return self._task_scheduler.get_all_tasks()
@@ -415,7 +434,13 @@ class ModelEngine:
     def stop_task(self, task_id):
         self._task_scheduler.remove_task(task_id)
 
-    def set_property(self, property: str, new_value: float, in_time: float = 1.0, at_time: float = 0.0) -> str:
+    def set_property(
+        self,
+        property: str,
+        new_value: float,
+        in_time: float = 1.0,
+        at_time: float = 0.0,
+    ) -> str:
         # define some placeholders
         task_id: int = random.randint(0, 1000)
         m: BaseModel = None
@@ -444,7 +469,7 @@ class ModelEngine:
             "prop2": p2,
             "new_value": new_value,
             "in_time": in_time,
-            "at_time": at_time
+            "at_time": at_time,
         }
 
         # pass the task to the scheduler
@@ -456,9 +481,9 @@ class ModelEngine:
     def get_property(self, property: str):
         # declare an object to hold the values
         processed_prop = self._find_model_prop(property)
-        prop1 = processed_prop['prop1']
-        prop2 = processed_prop.get('prop2')
-        value = getattr(processed_prop['model'], prop1)
+        prop1 = processed_prop["prop1"]
+        prop2 = processed_prop.get("prop2")
+        value = getattr(processed_prop["model"], prop1)
         if prop2 is not None:
             value = value.get(prop2, 0)
         return value
@@ -467,12 +492,12 @@ class ModelEngine:
         inspect = {}
         for component_name, component in self.models.items():
             if property is None:
-                inspect[component_name] = self.inspect_model_component(
-                    component_name)
+                inspect[component_name] = self.inspect_model_component(component_name)
             else:
                 try:
                     inspect[component_name] = self.inspect_model_component(
-                        component_name)[property]
+                        component_name
+                    )[property]
                 except:
                     pass
 
@@ -481,21 +506,24 @@ class ModelEngine:
     def inspect_model_component(self, model_component):
         content = {}
         for attribute in dir(self.models[model_component]):
-            if not attribute.startswith('__'):
-                attr_type = type(
-                    getattr(self.models[model_component], attribute))
-                if (attr_type is str) or (attr_type is float) or (attr_type is bool) or (attr_type is int):
+            if not attribute.startswith("__"):
+                attr_type = type(getattr(self.models[model_component], attribute))
+                if (
+                    (attr_type is str)
+                    or (attr_type is float)
+                    or (attr_type is bool)
+                    or (attr_type is int)
+                ):
                     content[attribute] = getattr(
-                        self.models[model_component], attribute)
+                        self.models[model_component], attribute
+                    )
         return content
 
     def enable_model_component(self, model_component, at_time=0):
-        self.set_property(model_component + ".is_enabled",
-                          True, at_time=at_time)
+        self.set_property(model_component + ".is_enabled", True, at_time=at_time)
 
     def disable_model_component(self, model_component, at_time=0):
-        self.set_property(model_component + ".is_enabled",
-                          True, at_time=at_time)
+        self.set_property(model_component + ".is_enabled", True, at_time=at_time)
 
     def save_model_state(self, filename):
         # use the binary mode 'wb' to save the model engine in this current state
@@ -516,21 +544,21 @@ class ModelEngine:
 
         # first copy all main properties
         for key in self.model_definition.keys():
-            if key != 'models':
+            if key != "models":
                 new_model_def[key] = getattr(self, key)
 
         # now process the models
-        for m_name, m in self.model_definition['models'].items():
+        for m_name, m in self.model_definition["models"].items():
             # process the model
             for km in m.keys():
                 # now get the current value in the model
-                value = getattr(self.models[m['name']], km)
+                value = getattr(self.models[m["name"]], km)
                 if isinstance(value, dict) or isinstance(value, list):
                     new_value = value.copy()
                 else:
                     new_value = value
 
-                new_model_def['models'][m_name][km] = value
+                new_model_def["models"][m_name][km] = value
 
         # Convert the python object to a json string
         json_data = json.dumps(new_model_def, indent=4)
@@ -547,46 +575,32 @@ class ModelEngine:
         else:
             self.initialized = self.init_model(filename)
 
-    def get_bloodgas(self, component) -> object:
-        # define a dictionary which is going to hold the bloodgas
-        bg = {}
-
-        # find the component type as we only can calculate the bloodgas in a blood or time-varying elastance component
-        component_type = self.models[component].model_type
-
-        # check whether the desired component is of an appropriate type and contains blood.
-        if (component_type == "BloodCapacitance" or component_type == "BloodTimeVaryingElastance"):
-            # calculate the acidbase and oxygenation
-            set_blood_composition(self.models[component])
-
-            # build the bloodgas dictionnary
-            bg['ph'] = self.models[component].aboxy['ph']
-            bg['po2'] = self.models[component].aboxy['po2']
-            bg['pco2'] = self.models[component].aboxy['pco2']
-            bg['hco3'] = self.models[component].aboxy['hco3']
-            bg['be'] = self.models[component].aboxy['be']
-            bg['so2'] = self.models[component].aboxy['so2']
-
-        return bg
-    
     def _find_model_prop(self, prop):
         # split the model from the prop
         t = prop.split(sep=".")
 
         # if only 1 property is present
-        if (len(t) == 2):
+        if len(t) == 2:
             # try to find the parameter in the model
             if t[0] in self.models:
-                if (hasattr(self.models[t[0]], t[1])):
-                    return {'label': prop, 'model': self.models[t[0]], 'prop1': t[1], 'prop2': None}
+                if hasattr(self.models[t[0]], t[1]):
+                    return {
+                        "label": prop,
+                        "model": self.models[t[0]],
+                        "prop1": t[1],
+                        "prop2": None,
+                    }
 
         # if 2 properties are present
-        if (len(t) == 3):
+        if len(t) == 3:
             # try to find the parameter in the model
             if t[0] in self.models:
-                if (hasattr(self.models[t[0]], t[1])):
-                    return {'label': prop, 'model': self.models[t[0]], 'prop1': t[1], 'prop2': t[2]}
+                if hasattr(self.models[t[0]], t[1]):
+                    return {
+                        "label": prop,
+                        "model": self.models[t[0]],
+                        "prop1": t[1],
+                        "prop2": t[2],
+                    }
 
         return None
-
-
