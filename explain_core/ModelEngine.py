@@ -68,14 +68,14 @@ class ModelEngine:
 
     # define the constructor
     def __init__(self, model_definition_filename: str):
+        # compile the c++ modules
+        compile_modules()
+
         # initialize all model components with the parameters from the JSON file
         self.initialized = self.init_model(model_definition_filename)
 
         # store the current model definition filename
         self.model_definition_filename = model_definition_filename
-
-        # compile the c++ modules
-        compile_modules()
 
     def init_model(self, model_definition_filename: str):
         # set the error counter = 0
