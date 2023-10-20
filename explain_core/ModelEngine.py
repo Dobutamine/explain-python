@@ -9,6 +9,7 @@ from time import perf_counter
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
+from explain_core.cpp_modules.ModulesCompiler import compile_modules
 
 
 class ModelEngine:
@@ -72,6 +73,9 @@ class ModelEngine:
 
         # store the current model definition filename
         self.model_definition_filename = model_definition_filename
+
+        # compile the c++ modules
+        compile_modules()
 
     def init_model(self, model_definition_filename: str):
         # set the error counter = 0
