@@ -779,8 +779,17 @@ class NeoInterface(BaseInterface):
         self.analyze(properties, time_to_calculate, sampleinterval=0.0005)
 
     def get_bloodgas(self, component="AA"):
-        bg = self.model.get_bloodgas(component)
-        return bg
+        bc = self.model.models[component]
+        result = self.model.models["Blood"].set_blood_composition(bc)
+        if result:
+            return {
+                "ph": bc.aboxy["ph"],
+                "po2": bc.aboxy["po2"],
+                "pco2": bc.aboxy["pco2"],
+                "hco3": bc.aboxy["hco3"],
+                "be": bc.aboxy["be"],
+                "so2": bc.aboxy["so2"],
+            }
 
     def get_blood_pressures(self, time_to_calculate=10):
         self.model._datacollector.clear_watchlist()
