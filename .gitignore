@@ -3,3 +3,5 @@ __pycache__
 *.o
 *.so
 *.ipynb
+!normal_neonate.ipynb
+!template.ipynb
