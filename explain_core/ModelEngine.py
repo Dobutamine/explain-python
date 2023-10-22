@@ -72,12 +72,12 @@ class ModelEngine:
         compile_modules()
 
         # initialize all model components with the parameters from the JSON file
-        self.initialized = self.init_model(model_definition_filename)
+        self.initialized = self.load_model_definition(model_definition_filename)
 
         # store the current model definition filename
         self.model_definition_filename = model_definition_filename
 
-    def init_model(self, model_definition_filename: str):
+    def load_model_definition(self, model_definition_filename: str):
         # set the error counter = 0
         error_counter = 0
         self.status = {"log": [], "error_log": [], "initialized": False}
@@ -111,7 +111,7 @@ class ModelEngine:
             print(
                 f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!"
             )
-            self.update_log(
+            self._update_log(
                 f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!",
                 "error",
             )
@@ -145,7 +145,7 @@ class ModelEngine:
                         print(
                             f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}"
                         )
-                        self.update_log(
+                        self._update_log(
                             f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}",
                             "error",
                         )
@@ -162,7 +162,7 @@ class ModelEngine:
                     f"Instantiation error: {model_type} model failed to instantiate. Error: {error}"
                 )
                 # a module holding the desired model class is producing an error while instantiating
-                self.update_log(
+                self._update_log(
                     f"Instantiation error: {model_type} model failed to instantiate. Error: {error}",
                     "error",
                 )
@@ -175,7 +175,7 @@ class ModelEngine:
         self._task_scheduler = TaskScheduler(self)
 
         # check the dependencies
-        dep_errors: int = self.check_dependencies()
+        dep_errors: int = self._check_dependencies()
 
         # initialize all the models
         if error_counter == 0:
@@ -189,7 +189,7 @@ class ModelEngine:
                         f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}"
                     )
                     # a module holding the desired model class is producing an error while initiallizing
-                    self.update_log(
+                    self._update_log(
                         f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}",
                         "error",
                     )
@@ -199,7 +199,7 @@ class ModelEngine:
                 self.initialized = False
             else:
                 print(f" Model '{self.name}' loaded and initialized correctly.")
-                self.update_log(
+                self._update_log(
                     f" Model '{self.name}' loaded and initialized correctly."
                 )
                 self.initialized = True
@@ -209,7 +209,40 @@ class ModelEngine:
 
         self.status["initialized"] = self.initialized
 
-    def check_dependencies(self) -> int:
+    def save_model_definition(self, filename):
+        if ".json" not in filename:
+            filename += ".json"
+
+        new_model_def = self.model_definition.copy()
+
+        # first copy all main properties
+        for key in self.model_definition.keys():
+            if key != "models":
+                new_model_def[key] = getattr(self, key)
+
+        # now process the models
+        for m_name, m in self.model_definition["models"].items():
+            # process the model
+            for km in m.keys():
+                # now get the current value in the model
+                value = getattr(self.models[m["name"]], km)
+                if isinstance(value, dict) or isinstance(value, list):
+                    new_value = value.copy()
+                else:
+                    new_value = value
+
+                new_model_def["models"][m_name][km] = value
+
+        # Convert the python object to a json string
+        json_data = json.dumps(new_model_def, indent=4)
+
+        # Write the JSON data to the file
+        with open(filename, "w") as file:
+            file.write(json_data)
+
+        return new_model_def
+
+    def _check_dependencies(self) -> int:
         dep_errors = 0
         # iterate over all models
         for _, model in self.models.items():
@@ -221,7 +254,7 @@ class ModelEngine:
                     if dep_model.name == dep:
                         present = True
                 if not present:
-                    self.update_log(
+                    self._update_log(
                         f"Dependency error: model {model.name} depends on {dep} which is not present.",
                         "error",
                     )
@@ -230,7 +263,13 @@ class ModelEngine:
             self.initialized = False
         return dep_errors
 
-    def update_log(self, message, log_type="log"):
+    def get_status(self):
+        return self.status
+
+    def get_log(self):
+        return self.status["log"]
+
+    def _update_log(self, message, log_type="log"):
         if log_type == "log":
             self.status["log"].append(message)
 
@@ -243,7 +282,7 @@ class ModelEngine:
         if len(self.status["error_log"]) > 5:
             self.status["error_log"].pop(0)
 
-    def start(self, rt_interval=0.015):
+    def start_rt(self, rt_interval=0.015):
         # set the realtime interval
         self._rt_interval = rt_interval
 
@@ -259,13 +298,13 @@ class ModelEngine:
         # start the realtime clock
         self._rt_clock.start()
         self._rt_running = True
-        self.update_log(
+        self._update_log(
             f"Model '{self.name}' is running in realtime with a {self._rt_interval} sec. resolution."
         )
 
-    def stop(self):
+    def stop_rt(self):
         try:
-            self.update_log(f"Model '{self.name}' is stopped.")
+            self._update_log(f"Model '{self.name}' is stopped.")
             self._rt_clock.stop()
             self._rt_clock = None
             self._rt_running = False
@@ -295,7 +334,7 @@ class ModelEngine:
             # Increase the model clock
             model_time_total += modeling_stepsize
 
-    def fastforward(
+    def fast_forward(
         self, time_to_calculate: float = 10.0, performance: bool = True
     ) -> list:
         # no datacollecting or task scheduler
@@ -423,19 +462,16 @@ class ModelEngine:
         for p in properties:
             self.set_property(p, new_value=new_value, in_time=in_time, at_time=at_time)
 
-    def get_all_tasks(self):
+    def get_tasks(self):
         return self._task_scheduler.get_all_tasks()
 
-    def remove_all_tasks(self):
+    def remove_tasks(self):
         self._task_scheduler.remove_all_tasks()
 
-    def pause_all_tasks(self):
-        self._task_scheduler.pause_all_tasks()
-
-    def restart_all_tasks(self):
+    def start_tasks(self):
         self._task_scheduler.restart_all_tasks()
 
-    def stop_task(self, task_id):
+    def stop_tasks(self, task_id):
         self._task_scheduler.remove_task(task_id)
 
     def set_property(
@@ -507,7 +543,7 @@ class ModelEngine:
 
         return inspect
 
-    def inspect_model_component(self, model_component):
+    def inspect_component(self, model_component):
         content = {}
         for attribute in dir(self.models[model_component]):
             if not attribute.startswith("__"):
@@ -523,12 +559,6 @@ class ModelEngine:
                     )
         return content
 
-    def enable_model_component(self, model_component, at_time=0):
-        self.set_property(model_component + ".is_enabled", True, at_time=at_time)
-
-    def disable_model_component(self, model_component, at_time=0):
-        self.set_property(model_component + ".is_enabled", True, at_time=at_time)
-
     def save_model_state(self, filename):
         # use the binary mode 'wb' to save the model engine in this current state
         filename += ".xpl"
@@ -539,39 +569,6 @@ class ModelEngine:
         # use the binary mode 'rb' to load a model engine state
         with open(filename, "rb") as file:
             return pickle.load(file)
-
-    def save_model_state_json(self, filename):
-        if ".json" not in filename:
-            filename += ".json"
-
-        new_model_def = self.model_definition.copy()
-
-        # first copy all main properties
-        for key in self.model_definition.keys():
-            if key != "models":
-                new_model_def[key] = getattr(self, key)
-
-        # now process the models
-        for m_name, m in self.model_definition["models"].items():
-            # process the model
-            for km in m.keys():
-                # now get the current value in the model
-                value = getattr(self.models[m["name"]], km)
-                if isinstance(value, dict) or isinstance(value, list):
-                    new_value = value.copy()
-                else:
-                    new_value = value
-
-                new_model_def["models"][m_name][km] = value
-
-        # Convert the python object to a json string
-        json_data = json.dumps(new_model_def, indent=4)
-
-        # Write the JSON data to the file
-        with open(filename, "w") as file:
-            file.write(json_data)
-
-        return new_model_def
 
     def restart_model(self, filename=None):
         if filename is None:

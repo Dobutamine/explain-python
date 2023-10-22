@@ -4,3 +4,4 @@ __pycache__
 *.so
 *.ipynb
 !template.ipynb
+!tutorial.ipynb
