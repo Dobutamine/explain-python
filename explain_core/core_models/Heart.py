@@ -38,8 +38,6 @@ class Heart(BaseModel):
     _pv: Resistor = {}
     _cor: TimeVaryingElastance = {}
     _pc: Container = {}
-    _fo: Resistor = {}
-    _vsd: Resistor = {}
     _cor_ra: Resistor = {}
 
     _sa_node_interval: float = 0.0
@@ -67,8 +65,6 @@ class Heart(BaseModel):
         self._tv = self._model.models[self.tricuspid_valve]
         self._pv = self._model.models[self.pulmonary_valve]
         self._av = self._model.models[self.aortic_valve]
-        self._fo = self._model.models[self.foramen_ovale]
-        self._vsd = self._model.models[self.ventricular_septal_defect]
         self._cor = self._model.models[self.coronaries]
         self._cor_ra = self._model.models[self.coronary_sinus]
         self._pc = self._model.models[self.pericardium]
@@ -196,18 +192,6 @@ class Heart(BaseModel):
     def set_qt_time(self, new_qt_time):
         if new_qt_time > 0.0:
             self.qt_time = new_qt_time
-
-    def open_foramen_ovale(self, diameter):
-        self._fo.set_diameter(diameter)
-
-    def open_ventricular_septal_defect(self, diameter):
-        self._vsd.set_diameter(diameter)
-
-    def close_foramen_ovale(self):
-        self._fo.close()
-
-    def close_ventricular_septal_defect(self):
-        self._vsd.close()
 
     def change_mitral_valve_resistance(self, res_change):
         if res_change > 0.0:
