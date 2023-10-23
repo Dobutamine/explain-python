@@ -7,7 +7,6 @@ import numpy as np
 from pathlib import Path
 from explain_core.interfaces.BaseInterface import BaseInterface
 
-
 class NeoInterface(BaseInterface):
     def ans(self, state):
         if type(state) is bool:
