@@ -20,7 +20,7 @@ class BaseModel:
 
     def enable(self):
         self.is_enabled = True
-    
+
     def disable(self):
         self.is_enabled = False
 

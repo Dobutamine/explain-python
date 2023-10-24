@@ -783,20 +783,20 @@
       "comp_from": "AAR",
       "comp_to": "PA",
       "diameter": 1.0,
-      "length": 10,
-      "r_k": 0
+      "length": 100,
+      "r_k": 1000.0
     },
     "FO": {
       "name": "FO",
       "description": "foramen ovale",
       "model_type": "Resistor",
       "is_enabled": true,
-      "no_flow": true,
+      "no_flow": false,
       "no_back_flow": false,
       "comp_from": "LA",
       "comp_to": "RA",
-      "diameter": 1.0,
-      "length": 1.0,
+      "diameter": 1.3,
+      "length": 2.0,
       "r_k": 0
     },
     "VSD": {

@@ -7,10 +7,15 @@ import numpy as np
 from pathlib import Path
 from explain_core.interfaces.BaseInterface import BaseInterface
 
+
 class NeoInterface(BaseInterface):
     def ans(self, state):
         if type(state) is bool:
             self.model.models["Ans"].is_enabled = state
+
+    def pda(self, state):
+        if type(state) is bool:
+            self.model.models["Pda"].is_enabled = state
 
     def mob(self, state):
         if type(state) is bool:

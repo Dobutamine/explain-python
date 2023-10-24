@@ -3,7 +3,6 @@ from explain_core.base_models.BaseModel import BaseModel
 
 
 class Capacitance(BaseModel):
-
     # independent variables
     u_vol: float = 0.0
     u_vol_factor: float = 1.0
@@ -31,22 +30,31 @@ class Capacitance(BaseModel):
 
     # implement the calc_model method
     def calc_model(self) -> None:
-
         # calculate the pressure depending on the volume, unstressed volume, elastance
         _el_base: float = self.el_base * self.el_base_factor
-        el:float = _el_base + (self.el_base_ans_factor * _el_base - _el_base) * self.ans_activity_factor + \
-                              (self.el_base_drug_factor * _el_base - _el_base)
-                              
+        el: float = (
+            _el_base
+            + (self.el_base_ans_factor * _el_base - _el_base) * self.ans_activity_factor
+            + (self.el_base_drug_factor * _el_base - _el_base)
+        )
+
         _u_vol_base: float = self.u_vol * self.u_vol_factor
-        u_vol:float = _u_vol_base + (_u_vol_base * self.u_vol_ans_factor - _u_vol_base) * self.ans_activity_factor
-        vol:float = self.vol - (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
-        
+        u_vol: float = (
+            _u_vol_base
+            + (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
+            * self.ans_activity_factor
+        )
+        vol: float = self.vol - (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
+
         # calculate the total volume in this capacitance
         self.vol_total = vol + u_vol
 
-        self.pres_in = self.el_k * self.el_k_factor * math.pow(vol - u_vol, 2) + \
-            el * (vol - u_vol) + self.pres_atm
-        
+        self.pres_in = (
+            self.el_k * self.el_k_factor * math.pow(vol - u_vol, 2)
+            + el * (vol - u_vol)
+            + self.pres_atm
+        )
+
         # calculate the pressures exerted by the surrounding tissues or other forces
         self.pres_out = self.pres_ext + self.pres_cc + self.pres_mus
 
@@ -55,7 +63,7 @@ class Capacitance(BaseModel):
 
         # calculate the total pressure
         self.pres = self.pres_in + self.pres_out
-           
+
         # reset the pressure which are recalculated every model iterattion
         self.pres_ext = 0.0
         self.pres_cc = 0.0
