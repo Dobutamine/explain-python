@@ -709,18 +709,21 @@ class NeoInterface(BaseInterface):
     def analyze_heart(self, weight_based=True, time_to_calculate=60):
         self.analyze(
             [
+                "AA.pres_in",
+                "PA.pres_in",
                 "LA_LV.flow",
                 "RA_RV.flow",
                 "RV_PA.flow",
                 "LV_AA.flow",
                 "IVCI_RA.flow",
                 "SVC_RA.flow",
+                "Pda.flow",
+                "FO.flow",
                 "LA.pres_in",
                 "RA.pres_in",
                 "LV.pres_in",
                 "RV.pres_in",
-                "AA.pres_in",
-                "IVCI.pres_in",
+                "IVCI.pres",
                 "LA.vol",
                 "RA.vol",
                 "LV.vol",
