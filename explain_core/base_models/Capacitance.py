@@ -50,8 +50,8 @@ class Capacitance(BaseModel):
         self.vol_total = vol + u_vol
 
         self.pres_in = (
-            self.el_k * self.el_k_factor * math.pow(vol - u_vol, 2)
-            + el * (vol - u_vol)
+            el * (vol - u_vol)
+            + self.el_k * self.el_k_factor * math.pow(vol - u_vol, 2)
             + self.pres_atm
         )
 

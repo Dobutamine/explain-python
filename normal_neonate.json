@@ -1,4 +1,10 @@
 {
+  "explain_version": "1.0",
+  "owner": "Timothy Antonius",
+  "date_created": "2023-10-24T11:36:24.098208",
+  "date_modified": "2023-10-24T11:36:24.098208",
+  "shared": true,
+  "protected": false,
   "name": "normal neonate",
   "description": "normal 3.3 kg neonate at an age of 24h with shunts",
   "weight": 3.3,
@@ -773,6 +779,19 @@
       "dif_co2": 0.01,
       "dif_o2": 0.01
     },
+    "IPS": {
+      "name": "IPS",
+      "description": "intrapulmonary shunt",
+      "model_type": "Resistor",
+      "is_enabled": true,
+      "no_flow": true,
+      "no_back_flow": false,
+      "comp_from": "PA",
+      "comp_to": "PV",
+      "r_for": 1000.0,
+      "r_back": 1000.0,
+      "r_k": 1000.0
+    },
     "DA": {
       "name": "DA",
       "description": "ductus arteriosus",
@@ -1103,7 +1122,6 @@
       "model_type": "Mob",
       "is_enabled": true,
       "dependencies": ["Heart", "AA", "AA_COR", "COR"],
-      "vo2_factor": 0.45,
       "heart_model": "Heart",
       "aa_model": "AA",
       "aa_cor_model": "AA_COR",
@@ -1116,6 +1134,7 @@
       "bm_vo2_ref": 0.0001590,
       "bm_vo2_max": 0.0001590,
       "bm_vo2_min": 0.0000318,
+      "vo2_factor": 0.45,
       "bm_po2_tc": 5.0,
       "hr_factor": 1.0,
       "hr_factor_max": 1.0,
