@@ -706,6 +706,20 @@ class NeoInterface(BaseInterface):
         )
 
     # getters
+    def analyze_ventilator(self, weight_based=True, time_to_calculate=60):
+        self.analyze(
+            [
+                "Ventilator.pres",
+                "Ventilator.flow",
+                "Ventilator.vent_rate",
+                "Ventilator.etco2",
+                "Ventilator.tv_kg",
+            ],
+            weight_based=weight_based,
+            sampleinterval=0.0005,
+            time_to_calculate=time_to_calculate,
+        )
+
     def analyze_heart(self, weight_based=True, time_to_calculate=60):
         self.analyze(
             [
@@ -730,7 +744,7 @@ class NeoInterface(BaseInterface):
                 "RA.vol",
                 "LV.vol",
                 "RV.vol",
-                "Heart.heart_rate"
+                "Heart.heart_rate",
             ],
             weight_based=weight_based,
             sampleinterval=0.0005,
@@ -791,8 +805,8 @@ class NeoInterface(BaseInterface):
         if result:
             return {
                 "ph": bc.aboxy["ph"],
-                "po2": bc.aboxy["po2"],
-                "pco2": bc.aboxy["pco2"],
+                "po2": bc.aboxy["po2"] * 0.1333,
+                "pco2": bc.aboxy["pco2"] * 0.1333,
                 "hco3": bc.aboxy["hco3"],
                 "be": bc.aboxy["be"],
                 "so2": bc.aboxy["so2"],

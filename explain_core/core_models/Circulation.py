@@ -29,9 +29,9 @@ class Circulation(BaseModel):
     _heart_aorta: Resistor = []
     _heart_pulmonary_artery: Resistor = []
     _heart_pulmonary_veins: Resistor = []
-    _ofo_targets: Resistor = ["FO"]
-    _vsd_targets: Resistor = ["VSD"]
-    _ips_targets: Resistor = ["IPS"]
+    _ofo_targets: Resistor = []
+    _vsd_targets: Resistor = []
+    _ips_targets: Resistor = []
 
     def init_model(self, model: object) -> bool:
         # initialize the base model

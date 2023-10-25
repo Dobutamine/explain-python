@@ -40,6 +40,7 @@ class Ventilator(BaseModel):
     exp_tidal_volume: float = 0.0
     minute_volume: float = 0.0
     trigger_volume: float = 0.0
+    tv_kg: float = 0.0
     vc_po2 = 0.0
     vc_pco2 = 0.0
 
@@ -156,6 +157,7 @@ class Ventilator(BaseModel):
             self._expiration = True
             self.vol = 0.0
             self._triggered_breath = False
+            self.etco2 = self._model.models["DS"].pco2
 
         # has the expiration time elapsed?
         if self._exp_time_counter > self.exp_time or self._triggered_breath:
@@ -165,6 +167,7 @@ class Ventilator(BaseModel):
             self._expiration = False
             # reset the volume counters
             self.exp_tidal_volume = -self._exp_tidal_volume_counter
+            self.tv_kg = self.exp_tidal_volume * 1000.0 / self._model.weight
 
             if self.exp_tidal_volume > 0:
                 self.elastance = (
