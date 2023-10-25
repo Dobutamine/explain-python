@@ -40,7 +40,7 @@ class Pda(BaseModel):
         self._pda.r_k = self.non_lin_factor
 
         self.velocity = self._pda.velocity
-        self.flow = self._pda.flow * 60.0
+        self.flow = self._pda.flow
 
         if self.no_flow:
             self.flow = 0.0
