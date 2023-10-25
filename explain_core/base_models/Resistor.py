@@ -143,16 +143,19 @@ class Resistor(BaseModel):
         self.no_back_flow = False
 
     def set_diameter(self, new_diameter):
-        self.diameter = new_diameter  # in mm
-        self.calc_resistance()
+        if self.diameter > 0.0:
+            self.diameter = new_diameter  # in mm
+            self.calc_resistance()
 
     def set_length(self, new_length):
-        self.length = new_length  # in mm
-        self.calc_resistance()
+        if self.length > 0.0:
+            self.length = new_length  # in mm
+            self.calc_resistance()
 
     def set_viscosity(self, new_viscosity):
-        self.viscosity = new_viscosity  # in cP
-        self.calc_resistance()
+        if self.viscosity > 0.0:
+            self.viscosity = new_viscosity  # in cP
+            self.calc_resistance()
 
     def set_p1_ext(self, new_p1_ext):
         self.p1_ext = new_p1_ext  # in mmHg

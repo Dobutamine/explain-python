@@ -102,6 +102,7 @@ class Ventilator(BaseModel):
         self, pip=14.0, peep=4.0, rate=40.0, t_in=0.4, insp_flow=10.0
     ):
         self.pip_cmh2o = pip
+        self.pip_cmh2o_max = pip
         self.peep_cmh2o = peep
         self.vent_rate = rate
         self.insp_time = t_in
@@ -114,7 +115,13 @@ class Ventilator(BaseModel):
     def set_ventilator_prvc(
         self, pip_max=18.0, peep=4.0, rate=40.0, tv=15.0, t_in=0.4, insp_flow=10.0
     ):
-        pass
+        self.pip_cmh2o = pip_max
+        self.pip_cmh2o_max = pip_max
+        self.peep_cmh2o = peep
+        self.vent_rate = rate
+        self.insp_time = t_in
+        self.tidal_volume = tv
+        self.insp_flow = insp_flow
 
     def calc_model(self):
         # convert settings to from cmH2o

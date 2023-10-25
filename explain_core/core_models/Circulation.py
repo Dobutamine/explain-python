@@ -2,15 +2,19 @@ from explain_core.base_models.BaseModel import BaseModel
 from explain_core.base_models.Resistor import Resistor
 from explain_core.core_models.BloodCapacitance import BloodCapacitance
 
+
 class Circulation(BaseModel):
     # independent parameters
     systemic_arteries: str = ["AA", "AAR", "AD"]
-    systemic_veins: str = ["IVCI", "IVCE","SVC"]
-    svr_targets: str = ["AD_INT", "AD_KID","AD_LS", "AAR_RUB", "AD_RLB"]
+    systemic_veins: str = ["IVCI", "IVCE", "SVC"]
+    svr_targets: str = ["AD_INT", "AD_KID", "AD_LS", "AAR_RUB", "AD_RLB"]
     pulmonary_arteries: str = ["PA"]
     pulmonary_veins: str = ["PV"]
     pvr_targets: str = ["PA_LL", "PA_RL"]
     venpool_targets: str = ["IVCE", "SVC"]
+    ofo_targets: str = ["FO"]
+    vsd_targets: str = ["VSD"]
+    ips_targets: str = ["IPS"]
 
     # dependent parameters
     _systemic_arteries: BloodCapacitance = []
@@ -25,6 +29,9 @@ class Circulation(BaseModel):
     _heart_aorta: Resistor = []
     _heart_pulmonary_artery: Resistor = []
     _heart_pulmonary_veins: Resistor = []
+    _ofo_targets: Resistor = ["FO"]
+    _vsd_targets: Resistor = ["VSD"]
+    _ips_targets: Resistor = ["IPS"]
 
     def init_model(self, model: object) -> bool:
         # initialize the base model
@@ -60,11 +67,35 @@ class Circulation(BaseModel):
 
         for res in self.heart_pulmonary_veins:
             self._heart_pulmonary_veins.append(self._model.models[res])
-        
+
+        for res in self.ofo_targets:
+            self._ofo_targets.append(self._model.models[res])
+
+        for res in self.vsd_targets:
+            self._vsd_targets.append(self._model.models[res])
+
+        for res in self.ips_targets:
+            self._ips_targets.append(self._model.models[res])
 
         # signal that the ventilator model is initialized and return it
         self._is_initialized = True
         return self._is_initialized
+
+    def set_ofo_diameter(self, new_diameter):
+        if new_diameter >= 0.0:
+            for ofo in self._ofo_targets:
+                ofo.set_diameter(new_diameter)
+
+    def set_vsd_diameter(self, new_diameter):
+        if new_diameter >= 0.0:
+            for vsd in self._vsd_targets:
+                vsd.set_diameter(new_diameter)
+
+    def change_lungshunt(self, ls_change):
+        if ls_change > 0.0:
+            for ips in self._ips_targets:
+                ips.set_r_for_factor(ls_change)
+                ips.set_r_back_factor(ls_change)
 
     def change_pvr(self, pvr_change):
         if pvr_change > 0.0:
