@@ -78,6 +78,7 @@ class BaseInterface:
         sampleinterval=0.005,
         calculate=True,
         weight_based=False,
+        suppress_output=False,
     ):
         # define a result object
         result = {}
@@ -108,8 +109,6 @@ class BaseInterface:
 
             # calculate the model steps
             self.model.calculate(time_to_calculate)
-
-        print("")
 
         no_dp = len(self.model.model_data)
         x = np.zeros(no_dp)
@@ -159,8 +158,10 @@ class BaseInterface:
 
                 # if the modeltype is a blood model type then the unit is mmHg
                 # if the modeltype is a gas model type then the unit is cmH2O
-
-                print("{:<16}: max {:10}, min {:10} mmHg".format(parameter, max, min))
+                if not suppress_output:
+                    print(
+                        "{:<16}: max {:10}, min {:10} mmHg".format(parameter, max, min)
+                    )
                 result[parameter + ".max"] = max
                 result[parameter + ".min"] = min
                 continue
@@ -171,11 +172,19 @@ class BaseInterface:
                 min = round(np.amin(data) * 1000 / weight, 5)
 
                 if weight_based:
-                    print(
-                        "{:<16}: max {:10}, min {:10} ml/kg".format(parameter, max, min)
-                    )
+                    if not suppress_output:
+                        print(
+                            "{:<16}: max {:10}, min {:10} ml/kg".format(
+                                parameter, max, min
+                            )
+                        )
                 else:
-                    print("{:<16}: max {:10}, min {:10} ml".format(parameter, max, min))
+                    if not suppress_output:
+                        print(
+                            "{:<16}: max {:10}, min {:10} ml".format(
+                                parameter, max, min
+                            )
+                        )
 
                 result[parameter + ".max"] = max
                 result[parameter + ".min"] = min
@@ -218,40 +227,45 @@ class BaseInterface:
                         bpm = (heartbeats / (t_end - t_start)) * 60
                     else:
                         if not sv_message:
-                            print(
-                                f"Stroke volume calculation might be inaccurate. Try using a sampleinterval of {self.model.modeling_stepsize}"
-                            )
+                            if not suppress_output:
+                                print(
+                                    f"Stroke volume calculation might be inaccurate. Try using a sampleinterval of {self.model.modeling_stepsize}"
+                                )
                             sv_message = True
                         bpm = self.model.models["Heart"].heart_rate
 
                     sv = round(flow / bpm, 5)
                     if weight_based:
-                        print(
-                            "{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min, stroke volume: {:10} ml/kg, ".format(
-                                parameter, flow, flow_forward, flow_backward, sv
+                        if not suppress_output:
+                            print(
+                                "{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min, stroke volume: {:10} ml/kg, ".format(
+                                    parameter, flow, flow_forward, flow_backward, sv
+                                )
                             )
-                        )
                     else:
-                        print(
-                            "{:16}: net {:10}, forward {:10}, backward {:10} ml/min, stroke volume: {:10} ml, ".format(
-                                parameter, flow, flow_forward, flow_backward, sv
+                        if not suppress_output:
+                            print(
+                                "{:16}: net {:10}, forward {:10}, backward {:10} ml/min, stroke volume: {:10} ml, ".format(
+                                    parameter, flow, flow_forward, flow_backward, sv
+                                )
                             )
-                        )
 
                     result[parameter + ".sv"] = sv
                 else:
                     if weight_based:
-                        print(
-                            "{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min".format(
-                                parameter, flow, flow_forward, flow_backward
+                        if not suppress_output:
+                            print(
+                                "{:16}: net {:10}, forward {:10}, backward {:10} ml/kg/min".format(
+                                    parameter, flow, flow_forward, flow_backward
+                                )
                             )
-                        )
                     else:
-                        print(
-                            "{:16}: net {:10}, forward {:10}, backward {:10} ml/min".format(
-                                parameter, flow, flow_forward, flow_backward
+                        if not suppress_output:
+                            print(
+                                "{:16}: net {:10}, forward {:10}, backward {:10} ml/min".format(
+                                    parameter, flow, flow_forward, flow_backward
+                                )
                             )
-                        )
 
                 result[parameter + ".net"] = flow
                 result[parameter + ".forward"] = flow_forward
@@ -265,7 +279,8 @@ class BaseInterface:
             data = np.array(y[idx])
             max = round(np.amax(data), 5)
             min = round(np.amin(data), 5)
-            print("{:<16}: max {:10} min {:10}".format(parameter, max, min))
+            if not suppress_output:
+                print("{:<16}: max {:10} min {:10}".format(parameter, max, min))
 
         return result
 

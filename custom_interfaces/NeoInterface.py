@@ -752,25 +752,28 @@ class NeoInterface(BaseInterface):
         )
 
     def get_vitals(self, time_to_calculate=10):
-        result = self.analyze(["AAR.pres_in", "PA.pres_in", "IVCI.pres_in"])
+        self.get_bloodgas("AA")
         self.get_bloodgas("AD")
+        result = self.analyze(
+            ["AD.pres_in", "PA.pres_in", "IVCI.pres_in"], suppress_output=True
+        )
 
         vitals = {
             "heartrate": self.model.models["Heart"].heart_rate,
-            "spo2_pre": self.model.models["AAR"].aboxy["so2"],
+            "spo2_pre": self.model.models["AA"].aboxy["so2"],
             "spo2_post": self.model.models["AD"].aboxy["so2"],
-            "abp_systole": result["AAR.pres_in.max"],
-            "abp_diastole": result["AAR.pres_in.min"],
+            "abp_systole": result["AD.pres_in.max"],
+            "abp_diastole": result["AD.pres_in.min"],
             "pap_systole": result["PA.pres_in.max"],
             "pap_diastole": result["PA.pres_in.min"],
             "cvp": result["IVCI.pres_in.min"]
             + 0.3333 * (result["IVCI.pres_in.max"] - result["IVCI.pres_in.min"]),
             "resp_rate": self.model.models["Breathing"].resp_rate,
-            "pH": self.model.models["AAR"].aboxy["ph"],
-            "po2": self.model.models["AAR"].aboxy["po2"],
-            "pco2": self.model.models["AAR"].aboxy["pco2"],
-            "hco3": self.model.models["AAR"].aboxy["hco3"],
-            "be": self.model.models["AAR"].aboxy["be"],
+            "pH": self.model.models["AD"].aboxy["ph"],
+            "po2": self.model.models["AD"].aboxy["po2"] * 0.1333,
+            "pco2": self.model.models["AD"].aboxy["pco2"] * 0.1333,
+            "hco3": self.model.models["AD"].aboxy["hco3"],
+            "be": self.model.models["AD"].aboxy["be"],
         }
 
         return vitals

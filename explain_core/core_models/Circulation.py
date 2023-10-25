@@ -33,6 +33,8 @@ class Circulation(BaseModel):
     _vsd_targets: Resistor = []
     _ips_targets: Resistor = []
 
+    dp: float = 0.0
+
     def init_model(self, model: object) -> bool:
         # initialize the base model
         super().init_model(model)
@@ -80,6 +82,9 @@ class Circulation(BaseModel):
         # signal that the ventilator model is initialized and return it
         self._is_initialized = True
         return self._is_initialized
+
+    def calc_model(self):
+        self.dp = self._model.models["AAR"].pres - self._model.models["PA"].pres
 
     def set_ofo_diameter(self, new_diameter):
         if new_diameter >= 0.0:
