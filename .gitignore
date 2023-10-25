@@ -1,0 +1,9 @@
+__pycache__
+.vscode
+*.o
+*.so
+*.ipynb
+!template.ipynb
+!tutorial.ipynb
+
+
