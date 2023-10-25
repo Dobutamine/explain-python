@@ -1193,6 +1193,13 @@
         }
       }
     },
+    "Drugs": {
+      "name": "Drugs",
+      "description": "drug model",
+      "model_type": "Drugs",
+      "is_enabled": true,
+      "dependencies": []
+    },
     "Resuscitation": {
       "name": "Resuscitation",
       "description": "resuscitation model",

@@ -9,9 +9,9 @@ class BaseModel:
     # non public properties
     _is_initialized: bool = False
 
-    # reference to all models
-    _model: object = {}
-    _t: float = 0.0005
+    # local parameters
+    _model: object = {}  # reference to the current model
+    _t: float = 0.0005  # model stepsize
 
     def __init__(self, **args: dict[str, any]):
         # set the values of the independent properties as arguments of the model
@@ -19,9 +19,11 @@ class BaseModel:
             setattr(self, key, value)
 
     def enable(self):
+        # switch model on
         self.is_enabled = True
 
     def disable(self):
+        # switch model off
         self.is_enabled = False
 
     def init_model(self, model: object) -> bool:
@@ -37,6 +39,7 @@ class BaseModel:
         # return whether or not successful
         return self._is_initialized
 
+    # this method is called during every model step by the model engine
     def step_model(self) -> None:
         if self.is_enabled and self._is_initialized:
             self.calc_model()
