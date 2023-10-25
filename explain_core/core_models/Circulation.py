@@ -94,8 +94,8 @@ class Circulation(BaseModel):
     def change_lungshunt(self, ls_change):
         if ls_change > 0.0:
             for ips in self._ips_targets:
-                ips.set_r_for_factor(ls_change)
-                ips.set_r_back_factor(ls_change)
+                ips.set_r_for_factor(1.0 / ls_change)
+                ips.set_r_back_factor(1.0 / ls_change)
 
     def change_pvr(self, pvr_change):
         if pvr_change > 0.0:
