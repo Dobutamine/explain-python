@@ -106,6 +106,7 @@ class Resistor(BaseModel):
             vol_not_removed: float = self._model_comp_from.volume_out(
                 self.flow * self._t
             )
+
             self._model_comp_to.volume_in(
                 (self.flow * self._t) - vol_not_removed, self._model_comp_from
             )
@@ -116,6 +117,7 @@ class Resistor(BaseModel):
             vol_not_removed: float = self._model_comp_to.volume_out(
                 -self.flow * self._t
             )
+
             self._model_comp_from.volume_in(
                 (-self.flow * self._t) - vol_not_removed, self._model_comp_to
             )

@@ -602,7 +602,7 @@
       "description": "pericardium",
       "model_type": "Container",
       "is_enabled": true,
-      "contained_components": ["RA", "RV", "LA", "LV"],
+      "contained_components": ["RA", "RV", "LA", "LV", "COR"],
       "vol": 0.025,
       "u_vol": 0.0,
       "el_base": 10,
@@ -1204,33 +1204,22 @@
       "name": "Resuscitation",
       "description": "resuscitation model",
       "model_type": "Resuscitation",
-      "thorax_model": "THORAX",
-      "heart_model": "Heart",
       "is_enabled": true,
       "dependencies": [],
       "compressions": 15.0,
       "chest_comp_freq": 100.0,
       "chest_comp_pres": 10.0,
+      "chest_comp_time": 1.0,
+      "chest_comp_targets": {
+        "THORAX": 0.1,
+        "PC": 0.9
+      },
       "ventilations": 2.0,
       "vent_freq": 30.0,
       "vent_pres": 4.0,
       "vent_insp_time": 1.0,
       "vent_fio2": 0.21,
-      "cont_ventilation": false,
-      "comp_targets": {
-        "LV": 1.0,
-        "RV": 1.0,
-        "RA": 1.0,
-        "LA": 1.0,
-        "AA": 1.0,
-        "AAR": 1.0,
-        "PA": 1.0,
-        "LL": 1.0,
-        "RL": 1.0,
-        "PV": 1.0,
-        "ALL": 0.1,
-        "ALR": 0.1
-      }
+      "async_ventilation": false
     },
     "Ecls": {
       "name": "Ecls",

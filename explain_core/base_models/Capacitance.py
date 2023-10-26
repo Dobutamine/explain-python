@@ -87,11 +87,10 @@ class Capacitance(BaseModel):
         if self.vol < 0:
             # so we need to remove more volume then we have which is not possible. Calculate how much volume can be removed
             vol_not_removed = -self.vol
-
             # reset the volume to zero
             self.vol = 0.0
 
         # return the amount of volume out
-        vol_not_removed = 0
+        # vol_not_removed = 0
 
         return vol_not_removed

@@ -8,15 +8,17 @@ class Resuscitation(BaseModel):
     # independent parameters
     chest_comp_freq: float = 100.0  # number of chest compressions per minute
     chest_comp_pres: float = 60.0  # pressure of the chest compressions in mmHg
-    vent_freq: float = 30.0  # number of ventilations per minute
+    chest_comp_time: float = 1.0  # duration of chest compression
+    chest_comp_targets: BaseModel = {}  # targets of the chest compressions with factor
+    compressions: float = 15.0  # number of chest compressions per cycle
+    ventilations: float = 2.0  # number of ventilations per cycle
+    vent_freq: float = 30.0  # number of ventilations per minute during cycle
     vent_pres: float = 5.0  # pressure of the ventilations in mmHg
     vent_fio2: float = 0.21  # fio2 of the ventilations
     vent_insp_time: float = 1.0  # inspiration time of the ventilations
-    ventilations: float = 2.0
-    compressions: float = 15.0
-    cont_ventilation: bool = False
-    thorax_model: str = "PC"
-    heart_model: str = "Heart"
+    async_ventilation: bool = (
+        False  # flag whether the ventilation happen independent of the compressions
+    )
 
     # dependent parameters
     cor_flow: float = 0.0  # coronary flow in l/min
@@ -27,8 +29,6 @@ class Resuscitation(BaseModel):
     rvo: float = 0.0  # right ventricular output in l/min
 
     # local parameters
-    _thorax: BaseModel = {}
-    _heart: Heart = {}
     _cpr_enabled: bool = False
     _comp_interval: float = 0.0
     _comp_duration: float = 0.0
@@ -40,12 +40,11 @@ class Resuscitation(BaseModel):
     _comp_pause_counter: float = 0.0
     _comp_pause_duration = 2.0
     _comp_paused: bool = False
-
+    _comp_targets = {}
     _vent_counter: float = 0.0
     _vent_insp_counter: float = 0.0
     _vent_interval: float = 0.0
     _vent_running: bool = False
-
 
     _x: float = 0.0
     _x_step: float = 0.0
@@ -56,8 +55,8 @@ class Resuscitation(BaseModel):
         super().init_model(model)
 
         # get a reference to the heart
-        self._thorax = self._model.models[self.thorax_model]
-        self._heart = self._model.models[self.heart_model]
+        for name, factor in self.chest_comp_targets.items():
+            self._comp_targets[name] = {"m": self._model.models[name], "f": factor}
 
         # signal that the ventilator model is initialized and return it
         self._is_initialized = True
@@ -65,12 +64,13 @@ class Resuscitation(BaseModel):
 
     def calc_model(self) -> None:
         if not self._cpr_enabled:
-            self._thorax.pres_cc = 0.0
             return
-        
+
         # determine the interval between the breaths in seconds
         self._vent_interval = 60.0 / self.vent_freq
-        self._comp_pause_duration = self._vent_interval * self.ventilations + self.vent_insp_time
+        self._comp_pause_duration = (
+            self._vent_interval * self.ventilations + self.vent_insp_time
+        )
 
         # is it time for a ventilation breath
         if self._vent_counter > self._vent_interval:
@@ -78,7 +78,7 @@ class Resuscitation(BaseModel):
             self._vent_insp_counter = 0.0
             self._vent_running = True
 
-        if self._comp_paused:
+        if self._comp_paused or self.async_ventilation:
             self._vent_counter += self._t
 
         if self._vent_running:
@@ -90,10 +90,11 @@ class Resuscitation(BaseModel):
             self._vent_running = False
             self._model.models["MOUTH"].pres_ext = 0.0
 
-
         # determine the interval between the compressions in seconds
         self._comp_interval = 60.0 / self.chest_comp_freq
-        self._comp_duration = self._comp_interval
+        self._comp_duration = self.chest_comp_time
+        if self._comp_duration > self._comp_interval:
+            self._comp_duration = self._comp_interval
         self._x_step = math.pi / (self._comp_duration / self._t)
         self._comp_pres = 0
 
@@ -129,7 +130,7 @@ class Resuscitation(BaseModel):
             # increase the counter
             self._comp_counter += 1
 
-        if self._comp_counter == self.compressions:
+        if self._comp_counter >= self.compressions and not self.async_ventilation:
             self._comp_counter = 0
             self._comp_paused = True
             self._vent_counter = self._vent_interval / 2.0
@@ -139,20 +140,12 @@ class Resuscitation(BaseModel):
             if self._comp_pause_counter > self._comp_pause_duration:
                 self._comp_paused = False
                 self._comp_pause_counter = 0.0
-
         else:
             self._comp_time_counter += self._t
 
-        # self._thorax.pres_cc = self._comp_pres
-        self._heart._lv.pres_cc = self._comp_pres
-        self._heart._rv.pres_cc = self._comp_pres
-        self._heart._la.pres_cc = self._comp_pres
-        self._heart._ra.pres_cc = self._comp_pres
-        self._heart._cor.pres_cc = self._comp_pres
-        # self._model.models["AA"].pres_cc = self._comp_pres
-        # self._model.models["AAR"].pres_cc = self._comp_pres
-        # self._model.models["PA"].pres_cc = self._comp_pres
-        # self._model.models["PV"].pres_cc = self._comp_pres
+        # apply the pressure to the targets
+        for target in self._comp_targets.values():
+            target["m"].pres_cc += target["f"] * self._comp_pres
 
     def reset_counter(self):
         self._comp_counter = 0.0
@@ -177,17 +170,17 @@ class Resuscitation(BaseModel):
 
     def cardiac_arrest(self, state) -> None:
         if state:
-            self._prev_el_max_factor = self._heart._lv.el_max_factor
+            self._prev_el_max_factor = self._model.models["Heart"]._lv.el_max_factor
             self._model.models["Breathing"].breathing_enabled = False
-            self._heart._lv.el_max_factor = 0.0
-            self._heart._la.el_max_factor = 0.0
-            self._heart._rv.el_max_factor = 0.0
-            self._heart._ra.el_max_factor = 0.0
-            self._heart._cor.el_max_factor = 0.0
+            self._model.models["Heart"]._lv.el_max_factor = 0.0
+            self._model.models["Heart"]._la.el_max_factor = 0.0
+            self._model.models["Heart"]._rv.el_max_factor = 0.0
+            self._model.models["Heart"]._ra.el_max_factor = 0.0
+            self._model.models["Heart"]._cor.el_max_factor = 0.0
         else:
             self._model.models["Breathing"].breathing_enabled = True
-            self._heart._lv.el_max_factor = self._prev_el_max_factor
-            self._heart._la.el_max_factor = self._prev_el_max_factor
-            self._heart._rv.el_max_factor = self._prev_el_max_factor
-            self._heart._ra.el_max_factor = self._prev_el_max_factor
-            self._heart._cor.el_max_factor = self._prev_el_max_factor
+            self._model.models["Heart"]._lv.el_max_factor = self._prev_el_max_factor
+            self._model.models["Heart"]._la.el_max_factor = self._prev_el_max_factor
+            self._model.models["Heart"]._rv.el_max_factor = self._prev_el_max_factor
+            self._model.models["Heart"]._ra.el_max_factor = self._prev_el_max_factor
+            self._model.models["Heart"]._cor.el_max_factor = self._prev_el_max_factor
