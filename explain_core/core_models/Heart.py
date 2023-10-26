@@ -10,6 +10,8 @@ class Heart(BaseModel):
     rhythm_type: int = 0
     heart_rate: float = 120.0
     heart_rate_ref: float = 140.0
+    heart_rate_override: bool = False
+    heart_rate_forced: float = 30.0
     pq_time: float = 0.0
     qrs_time: float = 0.0
     qt_time: float = 0.0
@@ -25,7 +27,6 @@ class Heart(BaseModel):
     ncc_ventricular: int = 0
     aaf: float = 0.0
     vaf: float = 0.0
-
 
     # local variables and state variables
     _la: TimeVaryingElastance = {}
@@ -52,10 +53,9 @@ class Heart(BaseModel):
     _kn: float = 0.579
 
     def init_model(self, model: object) -> bool:
-       
         # init the parent class
         result = super().init_model(model)
-        
+
         # get a reference to the heart models
         self._la = self._model.models[self.left_atrium]
         self._ra = self._model.models[self.right_atrium]
@@ -69,15 +69,19 @@ class Heart(BaseModel):
         self._cor_ra = self._model.models[self.coronary_sinus]
         self._pc = self._model.models[self.pericardium]
 
-
-
     def calc_model(self) -> None:
         # calculate the heartrate from the reference value and all other influences
-        self.heart_rate = self.heart_rate_ref + \
-                          (self.hr_ans_factor * self.heart_rate_ref - self.heart_rate_ref) * self.ans_activity_factor  + \
-                          (self.hr_mob_factor * self.heart_rate_ref - self.heart_rate_ref)  + \
-                          (self.hr_temp_factor * self.heart_rate_ref - self.heart_rate_ref) + \
-                          (self.hr_drug_factor * self.heart_rate_ref - self.heart_rate_ref)
+        self.heart_rate = (
+            self.heart_rate_ref
+            + (self.hr_ans_factor * self.heart_rate_ref - self.heart_rate_ref)
+            * self.ans_activity_factor
+            + (self.hr_mob_factor * self.heart_rate_ref - self.heart_rate_ref)
+            + (self.hr_temp_factor * self.heart_rate_ref - self.heart_rate_ref)
+            + (self.hr_drug_factor * self.heart_rate_ref - self.heart_rate_ref)
+        )
+
+        if self.heart_rate_override:
+            self.heart_rate = self.heart_rate_forced
 
         # calculate the qtc time depending on the heartrate
         self.cqt_time = self.calc_qtc(self.heart_rate)
@@ -143,21 +147,24 @@ class Heart(BaseModel):
         # calculate the varying elastance factor
         self.calc_varying_elastance()
 
-
     def calc_varying_elastance(self) -> None:
         # calculate the atrial activation factor
         if self.ncc_atrial >= 0 and self.ncc_atrial < self.pq_time / self._t:
-            self.aaf = math.sin(
-                math.pi * (self.ncc_atrial / (self.pq_time / self._t)))
+            self.aaf = math.sin(math.pi * (self.ncc_atrial / (self.pq_time / self._t)))
         else:
             self.aaf = 0.0
 
         # calculate the ventricular activation factor
         _ventricular_duration: float = self.qrs_time + self.cqt_time
-        if self.ncc_ventricular >= 0 and self.ncc_ventricular < _ventricular_duration / self._t:
-            self.vaf = (self.ncc_ventricular / (self._kn * (_ventricular_duration / self._t))) * \
-                math.sin(math.pi * (self.ncc_ventricular /
-                         (_ventricular_duration / self._t)))
+        if (
+            self.ncc_ventricular >= 0
+            and self.ncc_ventricular < _ventricular_duration / self._t
+        ):
+            self.vaf = (
+                self.ncc_ventricular / (self._kn * (_ventricular_duration / self._t))
+            ) * math.sin(
+                math.pi * (self.ncc_ventricular / (_ventricular_duration / self._t))
+            )
         else:
             self.vaf = 0.0
 
@@ -184,9 +191,9 @@ class Heart(BaseModel):
     def set_pq_time(self, new_pq_time):
         if new_pq_time > 0.0:
             self.pq_time = new_pq_time
-    
+
     def set_qrs_time(self, new_qrs_time):
-        if new_qrs_time> 0.0:
+        if new_qrs_time > 0.0:
             self.qrs_time = new_qrs_time
 
     def set_qt_time(self, new_qt_time):
@@ -203,7 +210,7 @@ class Heart(BaseModel):
 
     def change_aortic_valve_resistance(self, res_change):
         if res_change > 0.0:
-            self._av.set_r_for_factor (res_change)
+            self._av.set_r_for_factor(res_change)
 
     def change_pulmonary_valve_resistance(self, res_change):
         if res_change > 0.0:
@@ -240,14 +247,14 @@ class Heart(BaseModel):
         else:
             self._pv.set_r_back_factor(1.0)
             self._pv.prevent_backflow()
-    
+
     def change_contractility(self, cont_change):
         if cont_change > 0.0:
             self._lv.el_max_factor = cont_change
             self._la.el_max_factor = cont_change
             self._rv.el_max_factor = cont_change
             self._ra.el_max_factor = cont_change
-    
+
     def change_left_heart_contractility(self, cont_change):
         if cont_change > 0.0:
             self._lv.el_max_factor = cont_change
@@ -264,7 +271,7 @@ class Heart(BaseModel):
             self._la.el_min_factor = relax_change
             self._rv.el_min_factor = relax_change
             self._ra.el_min_factor = relax_change
-    
+
     def change_left_heart_relaxation(self, relax_change):
         if relax_change > 0.0:
             self._lv.el_min_factor = relax_change
@@ -284,4 +291,3 @@ class Heart(BaseModel):
     def set_pericardium_effusion(self, extra_volume):
         if extra_volume >= 0.0:
             self._pc.vol_extra = extra_volume
-

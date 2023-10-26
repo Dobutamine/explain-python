@@ -50,6 +50,10 @@ class Resuscitation(BaseModel):
     _x_step: float = 0.0
     _prev_el_max_factor: float = 0.0
 
+    _flow_timer_counter: float = 0.0
+    _flow_timer: float = 30.0
+    _temp_brain_flow: float = 0.0
+
     def init_model(self, model: object) -> bool:
         # initialize the base model
         super().init_model(model)
@@ -147,6 +151,16 @@ class Resuscitation(BaseModel):
         for target in self._comp_targets.values():
             target["m"].pres_cc += target["f"] * self._comp_pres
 
+        # calculate the flows
+        self._temp_brain_flow += self._model.models["AAR_BR"].flow * self._t
+
+        if self._flow_timer_counter > self._flow_timer:
+            self._flow_timer_counter = 0.0
+            self.brain_flow = (self._temp_brain_flow / self._flow_timer) * 60.0
+            self._temp_brain_flow = 0.0
+
+        self._flow_timer_counter += self._t
+
     def reset_counter(self):
         self._comp_counter = 0.0
         self._comp_duration_counter = 0.0
@@ -159,6 +173,14 @@ class Resuscitation(BaseModel):
         self._x = 0.0
         self._x_step = 0.0
 
+    def set_heartrate(self, new_hr):
+        if new_hr > 0:
+            self._model.models["Heart"].heart_rate_override = True
+            self._model.models["Heart"].heart_rate_forced = new_hr
+
+    def release_heartrate(self):
+        self._model.models["Heart"].heart_rate_override = False
+
     def start_cpr(self) -> None:
         self.cardiac_arrest(True)
         self.reset_counter()
@@ -170,17 +192,6 @@ class Resuscitation(BaseModel):
 
     def cardiac_arrest(self, state) -> None:
         if state:
-            self._prev_el_max_factor = self._model.models["Heart"]._lv.el_max_factor
-            self._model.models["Breathing"].breathing_enabled = False
-            self._model.models["Heart"]._lv.el_max_factor = 0.0
-            self._model.models["Heart"]._la.el_max_factor = 0.0
-            self._model.models["Heart"]._rv.el_max_factor = 0.0
-            self._model.models["Heart"]._ra.el_max_factor = 0.0
-            self._model.models["Heart"]._cor.el_max_factor = 0.0
+            self.set_heartrate(0.1)
         else:
-            self._model.models["Breathing"].breathing_enabled = True
-            self._model.models["Heart"]._lv.el_max_factor = self._prev_el_max_factor
-            self._model.models["Heart"]._la.el_max_factor = self._prev_el_max_factor
-            self._model.models["Heart"]._rv.el_max_factor = self._prev_el_max_factor
-            self._model.models["Heart"]._ra.el_max_factor = self._prev_el_max_factor
-            self._model.models["Heart"]._cor.el_max_factor = self._prev_el_max_factor
+            self.release_heartrate()
