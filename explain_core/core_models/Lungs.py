@@ -1,7 +1,7 @@
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.core_models.GasCapacitance import GasCapacitance
 from explain_core.core_models.GasExchanger import GasExchanger
-from explain_core.core_models.Container import Container
+from explain_core.base_models.Container import Container
 from explain_core.base_models.Resistor import Resistor
 
 class Lungs(BaseModel):

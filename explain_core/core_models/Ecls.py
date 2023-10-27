@@ -99,7 +99,7 @@ class Ecls(BaseModel):
         self._is_initialized = True
         return self._is_initialized
 
-    def switch_aw(self, state): 
+    def switch_ecls(self, state): 
         self.ecls_running = state
 
     def set_fio2(self, new_fio2):
