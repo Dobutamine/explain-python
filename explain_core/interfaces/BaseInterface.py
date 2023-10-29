@@ -548,6 +548,43 @@ class BaseInterface:
                     self.y_rt[idx][self.no_dp - 1] = t[parameter]
                     self.y_rt[idx] = np.roll(self.y_rt[idx], -1)
 
+    # functions to get, set and change model properties
+    def set_model_property(
+        self, prop, new_value, in_time: float = 5.0, at_time: float = 0.0
+    ):
+        # set the model property to a new value in 'in_time' seconds at 'at_time' seconds
+        if prop is not None and new_value is not None:
+            self.model.add_tasks(
+                properties=prop, new_value=new_value, in_time=in_time, at_time=at_time
+            )
+
+    def get_model_property(self, prop):
+        if prop is not None:
+            return self.model.get_property(prop=prop)
+
+    def change_model_property(
+        self, prop, prop_change, in_time: float = 5.0, at_time: float = 0.0
+    ):
+        if prop is not None and prop_change is not None:
+            current_value = self.get_model_property(prop)
+            new_value = current_value * prop_change
+            self.model.add_tasks(
+                properties=prop, new_value=new_value, in_time=in_time, at_time=at_time
+            )
+
+    # functions for inspecting models
+    def inspect_model(self, model_component):
+        return self.model.inspect_component(model_component)
+
+    # functions for saving and loading
+    def save_model_state(self, filename):
+        if filename is not None:
+            self.model.save_model_state(filename)
+
+    def load_model_state(self, filename):
+        if filename is not None:
+            self.model = self.load_model_state(filename)
+
     # functions for plotting time and xy graphs
     def plot_time_graph(
         self,

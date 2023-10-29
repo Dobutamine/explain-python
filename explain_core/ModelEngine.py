@@ -518,9 +518,9 @@ class ModelEngine:
         # return the task id
         return task_id
 
-    def get_property(self, property: str):
+    def get_property(self, prop: str):
         # declare an object to hold the values
-        processed_prop = self._find_model_prop(property)
+        processed_prop = self._find_model_prop(prop)
         prop1 = processed_prop["prop1"]
         prop2 = processed_prop.get("prop2")
         value = getattr(processed_prop["model"], prop1)
@@ -532,12 +532,12 @@ class ModelEngine:
         inspect = {}
         for component_name, component in self.models.items():
             if property is None:
-                inspect[component_name] = self.inspect_model_component(component_name)
+                inspect[component_name] = self.inspect_component(component_name)
             else:
                 try:
-                    inspect[component_name] = self.inspect_model_component(
-                        component_name
-                    )[property]
+                    inspect[component_name] = self.inspect_component(component_name)[
+                        property
+                    ]
                 except:
                     pass
 
@@ -561,12 +561,15 @@ class ModelEngine:
 
     def save_model_state(self, filename):
         # use the binary mode 'wb' to save the model engine in this current state
-        filename += ".xpl"
+        if ".xpl" not in filename:
+            filename += ".xpl"
         with open(filename, "wb") as file:
             pickle.dump(self, file)
 
     def load_model_state(self, filename):
         # use the binary mode 'rb' to load a model engine state
+        if ".xpl" not in filename:
+            filename += ".xpl"
         with open(filename, "rb") as file:
             return pickle.load(file)
 

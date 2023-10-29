@@ -3,6 +3,7 @@ __pycache__
 *.o
 *.so
 *.ipynb
+*.xpl
 !template.ipynb
 !tutorial.ipynb
 !normal_neonate.ipynb
