@@ -4,6 +4,7 @@ from explain_core.core_models.GasExchanger import GasExchanger
 from explain_core.base_models.Container import Container
 from explain_core.base_models.Resistor import Resistor
 
+
 class Lungs(BaseModel):
     # independent parameters
     upper_airways: str = ["MOUTH_DS"]
@@ -13,7 +14,6 @@ class Lungs(BaseModel):
     alveolar_spaces: str = ["ALL", "ALR"]
     lower_airways: str = ["DS_ALL", "DS_ALR"]
     gas_exchangers: str = ["GASEX_LL", "GASEX_RL"]
-    
 
     # local parameters
     _upper_airways: Resistor = []
@@ -31,22 +31,22 @@ class Lungs(BaseModel):
         # get all the model components
         for uaw in self.upper_airways:
             self._upper_airways.append(self._model.models[uaw])
-        
+
         for ds in self.dead_space:
             self._dead_space.append(self._model.models[ds])
 
         for law in self.lower_airways:
             self._lower_airways.append(self._model.models[law])
-        
+
         for alvs in self.alveolar_spaces:
             self._alveolar_spaces.append(self._model.models[alvs])
-        
+
         for th in self.thorax:
             self._thorax.append(self._model.models[th])
-        
+
         for cw in self.chestwall:
             self._chestwall.append(self._model.models[cw])
-        
+
         for gasex in self.gas_exchangers:
             self._gas_exchangers.append(self._model.models[gasex])
 
@@ -56,6 +56,16 @@ class Lungs(BaseModel):
 
     def calc_model(self) -> None:
         pass
+
+    def change_dif_o2(self, dif_o2_change):
+        if dif_o2_change > 0.0:
+            for gasex in self._gas_exchangers:
+                gasex.dif_o2_factor = dif_o2_change
+
+    def change_dif_co2(self, dif_co2_change):
+        if dif_co2_change > 0.0:
+            for gasex in self._gas_exchangers:
+                gasex.dif_co2_factor = dif_co2_change
 
     def change_lung_compliance(self, comp_change):
         if comp_change > 0.0:
@@ -78,6 +88,3 @@ class Lungs(BaseModel):
             for law in self._lower_airways:
                 law.r_for_factor = res_change
                 law.r_back_factor = res_change
-
-
-

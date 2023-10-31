@@ -108,6 +108,7 @@ class Ventilator(BaseModel):
         self.vent_rate = rate
         self.insp_time = t_in
         self.insp_flow = insp_flow
+        self.vent_mode = "PC"
 
     def set_mode(self, new_mode):
         if new_mode == "PRVC" or new_mode == "PC":
@@ -123,6 +124,7 @@ class Ventilator(BaseModel):
         self.insp_time = t_in
         self.tidal_volume = tv
         self.insp_flow = insp_flow
+        self.vent_mode = "PRVC"
 
     def calc_model(self):
         # convert settings to from cmH2o
