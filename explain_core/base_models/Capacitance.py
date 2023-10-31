@@ -15,11 +15,6 @@ class Capacitance(BaseModel):
     el_k_factor: float = 1.0
     fixed_composition: bool = False
     ans_activity_factor: float = 1.0
-
-    # dependent variables
-    vol: float = 0.0
-    vol_total: float = 0.0
-    pres: float = 0.0
     pres_ext: float = 0.0
     pres_cc: float = 0.0
     pres_atm: float = 0.0
@@ -27,6 +22,11 @@ class Capacitance(BaseModel):
     pres_tm: float = 0.0
     pres_in: float = 0.0
     pres_out: float = 0.0
+
+    # dependent variables
+    vol: float = 0.0
+    vol_total: float = 0.0
+    pres: float = 0.0
 
     # implement the calc_model method
     def calc_model(self) -> None:
