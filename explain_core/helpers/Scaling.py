@@ -64,8 +64,8 @@ class Scaling:
         # scale the respiratory system
         self.scale_respiratory_system()
 
-        # # scale the autonomous nervous system
-        # self.scale_ans(target_map)
+        # scale the autonomous nervous system
+        self.scale_ans(target_map)
 
         # the breathing, myocoardial oxygen balance and metabolism model are already weight dependent so no need to scale them
 
