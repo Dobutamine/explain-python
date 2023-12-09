@@ -1069,7 +1069,7 @@
       "breathing_enabled": true,
       "resp_rate": 40.0,
       "minute_volume_ref": 0.200,
-      "vt_rr_ratio": 0.0004,
+      "vt_rr_ratio": 0.0001212,
       "resp_muscle_pressure": 0.0,
       "rmp_gain": 5,
       "rmp_gain_max": 50,
