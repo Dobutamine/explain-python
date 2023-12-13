@@ -285,6 +285,7 @@ class BaseInterface:
                     )
                 result[parameter + ".max"] = max
                 result[parameter + ".min"] = min
+                result[parameter + ".mean"] = round((2 * min + max) / 3, 5)
                 continue
 
             if prop_category[1] == "vol":
@@ -400,6 +401,10 @@ class BaseInterface:
             data = np.array(y[idx])
             max = round(np.amax(data), 5)
             min = round(np.amin(data), 5)
+
+            result[parameter + ".max"] = max
+            result[parameter + ".min"] = min
+
             if not suppress_output:
                 print("{:<16}: max {:10} min {:10}".format(parameter, max, min))
 

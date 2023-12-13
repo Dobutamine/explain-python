@@ -8,10 +8,10 @@ class Scaling:
     el_base_factor_correction = 1.0
 
     resistance_factor = 0.6
-    resistance_factor_correction = 0.6
+    resistance_factor_correction = 1.0  # 0.6
 
     el_max_factor = 0.0
-    el_max_factor_correction = 0.6
+    el_max_factor_correction = 1.0  # 0.6
 
     u_vol_factor = 1.0
     u_vol_factor_correction = 1.0
@@ -47,6 +47,11 @@ class Scaling:
         self.u_vol_factor: float = (
             target_weight / self.model.weight * self.u_vol_factor_correction
         )
+
+        print("el_base_factor: ", self.el_base_factor)
+        print("resistance_factor: ", self.resistance_factor)
+        print("el_max_factor: ", self.el_max_factor)
+        print("u_vol_factor: ", self.u_vol_factor)
 
         # scale the weight and height
         self.model.set_weight(target_weight)  # in kg

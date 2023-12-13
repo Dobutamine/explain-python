@@ -91,6 +91,12 @@ class Resistor(BaseModel):
             + self.r_k * self.r_k_factor * self.r_k_scaling_factor * self.flow**2
         )
 
+        if rfor < 20.0:
+            rfor = 20.0
+
+        if rback < 20.0:
+            rback = 20.0
+
         # calculate the flow
         if self.no_flow or (_p1 <= _p2 and self.no_back_flow):
             self.flow = 0.0
