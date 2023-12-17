@@ -74,7 +74,7 @@ class TimeVaryingElastance(Capacitance):
         # calculate the volume difference
         vol_diff = self.vol - _u_vol
 
-        # calculate the pressure
+        # calculate the end diastolic pressure
         self.pres_ed = (
             _e_min * vol_diff
             + self.el_k
@@ -82,10 +82,13 @@ class TimeVaryingElastance(Capacitance):
             * self.el_k_scaling_factor
             * math.pow(vol_diff, 2)
         )
+
+        # calculaye the maximal systolic pressure
         self.pres_ms = _e_max * vol_diff
         if self.pres_ms < self.pres_ed:
             self.pres_ms = self.pres_ed
 
+        # calculate the recoil pressure
         self.pres_in = (
             self.act_factor * (self.pres_ms - self.pres_ed)
             + self.pres_ed
