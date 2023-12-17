@@ -32,6 +32,9 @@ class Blood(BaseModel):
 
         return self._is_initialized
 
+    def calc_model(self) -> None:
+        pass
+
     def set_total_blood_volume(self, new_blood_volume):
         current_blood_volume = self.get_total_blood_volume(output=False)
         new_blood_volume = new_blood_volume

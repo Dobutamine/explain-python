@@ -45,11 +45,13 @@ class TimeVaryingElastance(Capacitance):
 
     # implement the calc_model method
     def calc_model(self) -> None:
-        # calculate the pressure depending on the volume, unstressed volume, elastance and activation factor
+        # calculate the unstressed volume depending on the activity of the autonomic nervous system and scaling factor
         _u_vol_base: float = self.u_vol * self.u_vol_factor * self.u_vol_scaling_factor
-        u_vol: float = _u_vol_base + (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
-        vol: float = self.vol - (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
-        vol_diff = vol - u_vol
+        _u_vol: float = (
+            _u_vol_base
+            + (_u_vol_base * self.u_vol_ans_factor - _u_vol_base)
+            * self.ans_activity_factor
+        )
 
         _emin_base: float = (
             self.el_min * self.el_min_factor * self.el_min_scaling_factor
@@ -73,6 +75,10 @@ class TimeVaryingElastance(Capacitance):
             + (self.el_max_mob_factor * _emax_base - _emax_base)
         )
 
+        # calculate the volume difference
+        vol_diff = self.vol - _u_vol
+
+        # calculate the pressure
         self.pres_ed = (
             emin * vol_diff
             + self.el_k

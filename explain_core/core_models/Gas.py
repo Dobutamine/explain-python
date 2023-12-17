@@ -4,7 +4,6 @@ from explain_core.functions.GasComposition import calc_gas_composition
 
 
 class Gas(BaseModel):
-
     # local constant
     _gas_constant: float = 62.36367
 
@@ -24,13 +23,17 @@ class Gas(BaseModel):
 
                 # calculate the gas composition
                 result = calc_gas_composition(
-                    model, self.fio2, model.temp, model.humidity)
+                    model, self.fio2, model.temp, model.humidity
+                )
 
                 # process the result
                 for key, value in result.items():
                     setattr(model, key, value)
 
         return self._is_initialized
+
+    def calc_model(self) -> None:
+        pass
 
     def set_atmospheric_pressure(self):
         for model in self._model.models.values():

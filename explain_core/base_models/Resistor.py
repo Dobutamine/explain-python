@@ -65,7 +65,7 @@ class Resistor(BaseModel):
         return self._is_initialized
 
     def calc_model(self) -> None:
-        # get the pressures
+        # get the pressures of the connected model components
         _p1 = self._model_comp_from.pres + self.p1_ext * self.p1_ext_factor
         _p2 = self._model_comp_to.pres + self.p2_ext * self.p2_ext_factor
 
@@ -91,6 +91,7 @@ class Resistor(BaseModel):
             + self.r_k * self.r_k_factor * self.r_k_scaling_factor * self.flow**2
         )
 
+        # check if the resistances are not too small
         if rfor < 20.0:
             rfor = 20.0
 
