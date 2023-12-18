@@ -330,23 +330,23 @@ class Ans(BaseModel):
 
     def init_effectors(self):
         # set the class attributes (so for all classes)
-        AnsTarget.min_map = self.min_map
-        AnsTarget.set_map = self.set_map
-        AnsTarget.max_map = self.max_map
+        AnsEffector.min_map = self.min_map
+        AnsEffector.set_map = self.set_map
+        AnsEffector.max_map = self.max_map
 
-        AnsTarget.min_pco2 = self.min_pco2
-        AnsTarget.set_pco2 = self.set_pco2
-        AnsTarget.max_pco2 = self.max_pco2
+        AnsEffector.min_pco2 = self.min_pco2
+        AnsEffector.set_pco2 = self.set_pco2
+        AnsEffector.max_pco2 = self.max_pco2
 
-        AnsTarget.min_ph = self.min_ph
-        AnsTarget.set_ph = self.set_ph
-        AnsTarget.max_ph = self.max_ph
+        AnsEffector.min_ph = self.min_ph
+        AnsEffector.set_ph = self.set_ph
+        AnsEffector.max_ph = self.max_ph
 
-        AnsTarget.min_po2 = self.min_po2
-        AnsTarget.set_po2 = self.set_po2
-        AnsTarget.max_po2 = self.max_po2
+        AnsEffector.min_po2 = self.min_po2
+        AnsEffector.set_po2 = self.set_po2
+        AnsEffector.max_po2 = self.max_po2
 
-        self._hr_effector = AnsTarget()
+        self._hr_effector = AnsEffector()
         self._hr_effector.factor = self.hr_factor
         self._hr_effector.factor_max = self.hr_factor_max
         self._hr_effector.factor_min = self.hr_factor_min
@@ -364,7 +364,7 @@ class Ans(BaseModel):
         self._hr_effector.tc_po2 = self.hr_tc_po2
         self._hr_effector.calc_gains()
 
-        self._mv_effector = AnsTarget()
+        self._mv_effector = AnsEffector()
         self._mv_effector.factor = self.mv_factor
         self._mv_effector.factor_max = self.mv_factor_max
         self._mv_effector.factor_min = self.mv_factor_min
@@ -382,7 +382,7 @@ class Ans(BaseModel):
         self._mv_effector.tc_po2 = self.mv_tc_po2
         self._mv_effector.calc_gains()
 
-        self._venpool_effector = AnsTarget()
+        self._venpool_effector = AnsEffector()
         self._venpool_effector.factor = self.venpool_factor
         self._venpool_effector.factor_max = self.venpool_factor_max
         self._venpool_effector.factor_min = self.venpool_factor_min
@@ -400,7 +400,7 @@ class Ans(BaseModel):
         self._venpool_effector.tc_po2 = self.venpool_tc_po2
         self._venpool_effector.calc_gains()
 
-        self._cont_effector = AnsTarget()
+        self._cont_effector = AnsEffector()
         self._cont_effector.factor = self.cont_factor
         self._cont_effector.factor_max = self.cont_factor_max
         self._cont_effector.factor_min = self.cont_factor_min
@@ -418,7 +418,7 @@ class Ans(BaseModel):
         self._cont_effector.tc_po2 = self.cont_tc_po2
         self._cont_effector.calc_gains()
 
-        self._svr_effector = AnsTarget()
+        self._svr_effector = AnsEffector()
         self._svr_effector.factor = self.svr_factor
         self._svr_effector.factor_max = self.svr_factor_max
         self._svr_effector.factor_min = self.svr_factor_min
@@ -436,7 +436,7 @@ class Ans(BaseModel):
         self._svr_effector.tc_po2 = self.svr_tc_po2
         self._svr_effector.calc_gains()
 
-        self._pvr_effector = AnsTarget()
+        self._pvr_effector = AnsEffector()
         self._pvr_effector.factor = self.pvr_factor
         self._pvr_effector.factor_max = self.pvr_factor_max
         self._pvr_effector.factor_min = self.pvr_factor_min
@@ -455,7 +455,7 @@ class Ans(BaseModel):
         self._pvr_effector.calc_gains()
 
 
-class AnsTarget:
+class AnsEffector:
     is_enabled: bool = True
 
     min_map: float = 20.0
@@ -609,7 +609,6 @@ class AnsTarget:
         return t * ((1.0 / tc) * (-cv + nv)) + cv
 
     def translate_mxe(self, mxe) -> float:
-        # a mxe of 1.5 that max effect is 1.5 * reference value (hr_ref, mv_ref, venpool_ref, cont_ref, svr_ref, pvr_ref)
         if mxe > 1.0:
             mxe = mxe - 1.0
             return mxe
