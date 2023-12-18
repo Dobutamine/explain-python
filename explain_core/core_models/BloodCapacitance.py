@@ -2,17 +2,10 @@ from explain_core.base_models.Capacitance import Capacitance
 
 
 class BloodCapacitance(Capacitance):
-    # state variables
-    systole: float = 0.0
-    diastole: float = 0.0
-    mean: float = 0.0
-    vol_max: float = 0.0
-    vol_min: float = 0.0
-    stroke_volume: float = 0.0
+    # independent variables
     solutes: dict[str, float] = {}
-    acidbase: dict[str, float] = {}
+    aboxy: dict[str, float] = {}
     drugs: dict[str, float] = {}
-    oxy: dict[str, float] = {}
 
     # override the volume_in method as all the blood solutes have to be changed to
     def volume_in(self, dvol: float, model_from: Capacitance) -> None:
@@ -20,7 +13,7 @@ class BloodCapacitance(Capacitance):
         if self.fixed_composition:
             return
 
-        # execute the parent class method
+        # execute the parent class method of the capacitance model
         super().volume_in(dvol)
 
         # return if the volume is zero

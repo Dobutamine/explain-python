@@ -3,9 +3,9 @@ from explain_core.functions.BloodComposition import set_blood_composition
 
 
 class Blood(BaseModel):
-    # local variables which determine how often the acidbase and oxygenation is calculated. For performance reasons this is less often.
-    _update_counter = 0.0
-    _update_interval = 0.015
+    # independent variables
+    solutes: dict[str, float] = {}
+    aboxy: dict[str, float] = {}
 
     def init_model(self, model: object) -> bool:
         super().init_model(model)
@@ -32,10 +32,12 @@ class Blood(BaseModel):
 
         return self._is_initialized
 
+    # implement the calc_model method as this derives from the BaseModel class
     def calc_model(self) -> None:
         pass
 
-    def set_total_blood_volume(self, new_blood_volume):
+    # reset the total blood volume
+    def set_total_blood_volume(self, new_blood_volume: float) -> None:
         current_blood_volume = self.get_total_blood_volume(output=False)
         new_blood_volume = new_blood_volume
         # divide the new blood volume over all blood holding capacitances
@@ -95,9 +97,7 @@ class Blood(BaseModel):
                     except:
                         current_fraction = 0
 
-        # calculate the current blood volume
-        # current_blood_volume = self.get_total_blood_volume(output=False)
-
+    # return the total blood volume
     def get_total_blood_volume(self, output=True) -> float:
         total_blood_volume: float = 0.0
 
@@ -119,14 +119,13 @@ class Blood(BaseModel):
 
         return total_blood_volume
 
-    def set_blood_composition(self, bc) -> bool:
+    # set the blood composition of a blood containing model
+    def set_blood_composition(self, bc: dict) -> None:
         if "Blood" in bc.model_type:
             set_blood_composition(bc)
-            return True
 
-        return False
-
-    def set_solute_concentration(self, solute_name: str, solute_conc):
+    # set the concentration of a solute in the blood
+    def set_solute_concentration(self, solute_name: str, solute_conc: float) -> None:
         self.solutes[solute_name]: float = solute_conc
 
         for model in self._model.models.values():
@@ -137,7 +136,8 @@ class Blood(BaseModel):
                 # fill the solutes
                 model.solutes[solute_name] = solute_conc
 
-    def set_aboxy_concentration(self, solute_name: str, solute_conc):
+    # set the concentration of a aboxy solute in the blood
+    def set_aboxy_concentration(self, solute_name: str, solute_conc: float) -> None:
         self.aboxy[solute_name]: float = solute_conc
 
         for model in self._model.models.values():

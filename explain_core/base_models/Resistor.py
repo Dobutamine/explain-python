@@ -42,7 +42,7 @@ class Resistor(BaseModel):
     velocity: float = 0.0
     area: float = 0.0
 
-    # define object which hold references to a BloodCapacitance or TimeVaryingElastance
+    # define object which hold references to a model component which derives from the Capacitance class
     _model_comp_from: Capacitance = {}
     _model_comp_to: Capacitance = {}
 
@@ -60,13 +60,11 @@ class Resistor(BaseModel):
         else:
             self._model_comp_to = self.comp_to
 
-        # if a diameter and length are then calculate the resistance by using these parameters
+        # if a diameter and length are set then calculate the resistance by using these parameters
         self.calc_resistance()
 
         # flag that the model is initialized
         self._is_initialized = True
-
-        # return whether or not successful
         return self._is_initialized
 
     def calc_model(self) -> None:
@@ -99,7 +97,7 @@ class Resistor(BaseModel):
             + self.r_k * self.r_k_factor * self.r_scaling_factor * self.flow**2
         )
 
-        # check if the resistances are not too small
+        # check if the resistances are not too small for the current stepsize
         if r_for < 20.0:
             r_for = 20.0
 
@@ -124,7 +122,8 @@ class Resistor(BaseModel):
             vol_not_removed: float = self._model_comp_from.volume_out(
                 self.flow * self._t
             )
-
+            # if not all volume can be removed from the model component then transfer the remaining volume to the other model component
+            # this is undesirable but it is better than having a negative volume
             self._model_comp_to.volume_in(
                 (self.flow * self._t) - vol_not_removed, self._model_comp_from
             )
@@ -136,6 +135,8 @@ class Resistor(BaseModel):
                 -self.flow * self._t
             )
 
+            # if not all volume can be removed from the model component then transfer the remaining volume to the other model component
+            # this is undesirable but it is better than having a negative volume
             self._model_comp_from.volume_in(
                 (-self.flow * self._t) - vol_not_removed, self._model_comp_to
             )
