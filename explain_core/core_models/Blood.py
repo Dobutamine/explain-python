@@ -120,9 +120,12 @@ class Blood(BaseModel):
         return total_blood_volume
 
     # set the blood composition of a blood containing model
-    def set_blood_composition(self, bc: dict) -> None:
+    def set_blood_composition(self, bc: dict) -> bool:
         if "Blood" in bc.model_type:
             set_blood_composition(bc)
+            return True
+
+        return None
 
     # set the concentration of a solute in the blood
     def set_solute_concentration(self, solute_name: str, solute_conc: float) -> None:
