@@ -123,8 +123,6 @@ class Scaling:
         self.model.models["PC"].el_base_scaling_factor = self.el_base_factor_circ
 
     def scale_circulatory_system(self):
-        print(self.res_factor_circ)
-        print(self.el_base_factor_circ)
         # adjust the resistance of the circulation
         for _model in self.model.models.values():
             if _model.is_enabled:
