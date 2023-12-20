@@ -32,6 +32,26 @@ class Gas(BaseModel):
 
         return self._is_initialized
 
+    # return the total blood volume
+    def get_total_gas_volume(self, output=True) -> float:
+        total_gas_volume: float = 0.0
+
+        for model in self._model.models.values():
+            if model.model_type == "GasCapacitance":
+                if model.is_enabled and not model.fixed_composition:
+                    try:
+                        total_gas_volume += model.vol
+                        print(f"{model.name}: {model.vol}")
+                    except:
+                        total_gas_volume += 0.0
+
+        if output:
+            print(
+                f"Total gas volume = {total_gas_volume * 1000.0} ml ({total_gas_volume * 1000.0 / self._model.weight} ml/kg)"
+            )
+
+        return total_gas_volume
+
     def calc_model(self) -> None:
         pass
 

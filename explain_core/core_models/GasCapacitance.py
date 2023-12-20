@@ -69,31 +69,35 @@ class GasCapacitance(Capacitance):
         super().volume_in(dvol)
 
         # change the gas concentrations
-        dco2: float = (model_from.co2 - self.co2) * dvol
-        self.co2 = (self.co2 * self.vol + dco2) / self.vol
+        if self.vol > 0.0:
+            dco2: float = (model_from.co2 - self.co2) * dvol
+            self.co2 = (self.co2 * self.vol + dco2) / self.vol
 
-        dcco2: float = (model_from.cco2 - self.cco2) * dvol
-        self.cco2: float = (self.cco2 * self.vol + dcco2) / self.vol
+            dcco2: float = (model_from.cco2 - self.cco2) * dvol
+            self.cco2: float = (self.cco2 * self.vol + dcco2) / self.vol
 
-        dcn2 = (model_from.cn2 - self.cn2) * dvol
-        self.cn2 = (self.cn2 * self.vol + dcn2) / self.vol
+            dcn2 = (model_from.cn2 - self.cn2) * dvol
+            self.cn2 = (self.cn2 * self.vol + dcn2) / self.vol
 
-        dch2o = (model_from.ch2o - self.ch2o) * dvol
-        self.ch2o = (self.ch2o * self.vol + dch2o) / self.vol
+            dch2o = (model_from.ch2o - self.ch2o) * dvol
+            self.ch2o = (self.ch2o * self.vol + dch2o) / self.vol
 
-        dcother = (model_from.cother - self.cother) * dvol
-        self.cother = (self.cother * self.vol + dcother) / self.vol
+            dcother = (model_from.cother - self.cother) * dvol
+            self.cother = (self.cother * self.vol + dcother) / self.vol
 
-        # change temperature due to influx of gas
-        dtemp = (model_from.temp - self.temp) * dvol
-        self.temp = (self.temp * self.vol + dtemp) / self.vol
+            # change temperature due to influx of gas
+            dtemp = (model_from.temp - self.temp) * dvol
+            self.temp = (self.temp * self.vol + dtemp) / self.vol
+
+    # def is_float_zero(f, tolerance=1e-8):
+    #     return abs(f) < tolerance
 
     def calc_gas_composition(self) -> None:
         # calculate the concentration in mmol/l using the sum of all concentrations
         self.ctotal = self.ch2o + self.co2 + self.cco2 + self.cn2 + self.cother
 
         # protect against division by zero
-        if self.ctotal == 0:
+        if self.ctotal == 0.0:
             return
 
         # calculate the partial pressures
@@ -118,12 +122,16 @@ class GasCapacitance(Capacitance):
         # Calculate water vapour pressure at compliance temperature
         pH2Ot: float = self.calc_watervapour_pressure()
 
+        # if self.is_float_zero(self.vol):
+        #     print("Volume is zero")
+
         # do the diffusion from water vapour depending on the tissue water vapour and gas water vapour pressure
         dH2O: float = 0.00001 * (pH2Ot - self.ph2o) * self._t
-        self.ch2o = (self.ch2o * self.vol + dH2O) / self.vol
+        if self.vol > 0.0:
+            self.ch2o = (self.ch2o * self.vol + dH2O) / self.vol
 
         # as the water vapour also takevol_totals volume this is added to the compliance
-        if self.pres != 0.0 and not self.fixed_composition:
+        if self.pres != 0.0 and self.fixed_composition == False:
             # as dH2O is in mmol/l we have convert it as the gas constant is in mol
             self.vol += ((self._gas_constant * (273.15 + self.temp)) / self.pres) * (
                 dH2O / 1000.0
@@ -135,7 +143,7 @@ class GasCapacitance(Capacitance):
         self.temp += dT
 
         # change the volume as the temperature changes
-        if self.pres != 0.0 and not self.fixed_composition:
+        if self.pres != 0.0 and self.fixed_composition == False:
             # as Ctotal is in mmol/l we have convert it as the gas constant is in mol
             dV: float = (self.ctotal * self.vol * self._gas_constant * dT) / self.pres
             self.vol += dV / 1000.0

@@ -685,7 +685,7 @@
       "fixed_composition": false,
       "vol": 0.005,
       "u_vol": 0.005,
-      "el_base": 40000,
+      "el_base": 6000,
       "el_k": 0
     },
     "ALL": {

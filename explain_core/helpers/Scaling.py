@@ -14,19 +14,29 @@ class Scaling:
     el_base_factor_resp_correction = 1.0
 
     res_factor_circ = 1.0
-    res_factor_circ_correction = 0.6
+    res_factor_circ_correction = 1.0
 
     res_factor_resp = 1.0
-    res_factor_resp_correction = 0.6
+    res_factor_resp_correction = 1.0
 
     el_min_factor = 1.0
-    el_min_factor_correction = 1.0  # 0.6
+    el_min_factor_correction = 1.0
 
     el_max_factor = 1.0
-    el_max_factor_correction = 0.6
+    el_max_factor_correction = 1.0
 
     u_vol_factor = 1.0
     u_vol_factor_correction = 1.0
+
+    hr_ref: float = 140.0
+    mv_ref: float = 0.0
+
+    hr_target: float = 0.0
+    lvo_target: float = 0.0
+    mv_target: float = 0.0
+    resp_rate_target: float = 0.0
+
+    map_ref: float = 50.0
 
     def __init__(self, model):
         # get a reference to the model engine
@@ -137,16 +147,25 @@ class Scaling:
                     _model.el_base_scaling_factor = self.el_base_factor_circ
 
     def scale_respiratory_system(self):
-        # adjust the elastance of the lungs
-        self.model.models["ALL"].u_vol = (
-            self.model.models["ALL"].u_vol * self.u_vol_factor
-        )
-        self.model.models["ALR"].u_vol = (
-            self.model.models["ALR"].u_vol * self.u_vol_factor
-        )
+        # adjust the elastance of the respiratory system
+        for _model in self.model.models.values():
+            if _model.is_enabled:
+                if (
+                    _model.model_type == "GasCapacitance"
+                    and _model.fixed_composition == False
+                ):
+                    _model.el_base_scaling_factor = self.el_base_factor_resp
+                    _model.u_vol_scaling_factor = self.u_vol_factor
 
-        self.model.models["ALL"].el_base_scaling_factor = self.el_base_factor_resp
-        self.model.models["ALR"].el_base_scaling_factor = self.el_base_factor_resp
+        # adjust the elastance of the respiratory system
+        self.model.models["THORAX"].el_base_scaling_factor = self.el_base_factor_resp
+        self.model.models["CHEST_L"].el_base_scaling_factor = self.el_base_factor_resp
+        self.model.models["CHEST_R"].el_base_scaling_factor = self.el_base_factor_resp
+
+        # adjust the unstressed volume of the respiratory system
+        self.model.models["THORAX"].u_vol_scaling_factor = self.u_vol_factor
+        self.model.models["CHEST_L"].u_vol_scaling_factor = self.u_vol_factor
+        self.model.models["CHEST_R"].u_vol_scaling_factor = self.u_vol_factor
 
         # adjust the resistance of the airways
         for _model in self.model.models.values():
@@ -155,12 +174,6 @@ class Scaling:
                     if "Gas" in _model._model_comp_from.model_type:
                         _model.r_for_scaling_factor = self.res_factor_resp
                         _model.r_back_scaling_factor = self.res_factor_resp
-
-        # adjust the thorax
-        self.model.models["THORAX"].u_vol = (
-            self.model.models["THORAX"].u_vol * self.u_vol_factor
-        )
-        self.model.models["THORAX"].el_base_scaling_factor = self.el_base_factor_resp
 
     def scale_ans(self, target_map: float):
         # adjust the baroreceptor
