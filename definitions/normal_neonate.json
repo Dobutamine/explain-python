@@ -9,6 +9,8 @@
   "description": "normal 3.3 kg neonate at an age of 72h without shunts",
   "weight": 3.3,
   "height": 0.5,
+  "gest_age": 39,
+  "postnatal_age": 24,
   "modeling_stepsize": 0.0005,
   "model_time_total": 0.0,
   "models": {
@@ -855,7 +857,7 @@
       "no_back_flow": false,
       "comp_from": "AAR",
       "comp_to": "PA",
-      "diameter": 1.0,
+      "diameter": 2.0,
       "length": 100,
       "r_k": 1.0
     },
@@ -1217,7 +1219,7 @@
       "dependencies": ["DA"],
       "da_model": "DA",
       "no_flow": true,
-      "diameter": 1.0,
+      "diameter": 2.0,
       "length": 10,
       "viscosity": 6.0,
       "non_lin_factor": 1.0

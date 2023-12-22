@@ -14,7 +14,7 @@ class Scaling:
     el_base_factor_resp_correction = 1.0
 
     res_factor_circ = 1.0
-    res_factor_circ_correction = 1.0
+    res_factor_circ_correction = 0.6
 
     res_factor_resp = 1.0
     res_factor_resp_correction = 1.0
@@ -23,7 +23,7 @@ class Scaling:
     el_min_factor_correction = 1.0
 
     el_max_factor = 1.0
-    el_max_factor_correction = 1.0
+    el_max_factor_correction = 0.6
 
     u_vol_factor = 1.0
     u_vol_factor_correction = 1.0
@@ -42,85 +42,93 @@ class Scaling:
         # get a reference to the model engine
         self.model = model
 
-    def scale_patient(
-        self,
-        target_weight: float,
-        target_blood_volume: float,
-        target_hr_ref: float,
-        target_map: float,
-    ):
-        # calculate the scale factor based on the weight change
-        self.scale_factor: float = (
-            self.model.weight / target_weight * self.scale_factor_correction
-        )
+    def scale_to_weight(self, weight: float):
+        pass
 
+    def scale_to_gestation_age(self, gestation_age: float):
+        pass
+
+    def scale_to_postnatal_age(self, postnatal_age: float):
+        pass
+
+    def set_scale_factors(self):
         # calculate the elastance factor based on the weight change. The lower the weight the higher the elastance
         self.el_base_factor_circ: float = (
-            self.model.weight / target_weight * self.el_base_factor_circ_correction
+            self.scale_factor * self.el_base_factor_circ_correction
         )
 
         # calculate the resistance factor based on the weight change. The lower the weight the higher the resistance
         self.res_factor_circ: float = (
-            self.model.weight / target_weight * self.res_factor_circ_correction
+            self.scale_factor * self.res_factor_circ_correction
         )
 
         # calculate the elastance factor based on the weight change. The lower the weight the higher the elastance
         self.el_base_factor_resp: float = (
-            self.model.weight / target_weight * self.el_base_factor_resp_correction
+            self.scale_factor * self.el_base_factor_resp_correction
         )
 
         # calculate the resistance factor based on the weight change. The lower the weight the higher the resistance
         self.res_factor_resp: float = (
-            self.model.weight / target_weight * self.res_factor_resp_correction
+            self.scale_factor * self.res_factor_resp_correction
         )
 
         # calculate the el_max factor based on the weight change. The lower the weight the higher the el_max
-        self.el_min_factor: float = (
-            self.model.weight / target_weight * self.el_min_factor_correction
-        )
+        self.el_min_factor: float = self.scale_factor * self.el_min_factor_correction
 
         # calculate the el_max factor based on the weight change. The lower the weight the higher the el_max
-        self.el_max_factor: float = (
-            self.model.weight / target_weight * self.el_max_factor_correction
-        )
+        self.el_max_factor: float = self.scale_factor * self.el_max_factor_correction
 
         # calculate the u_vol factor based on the weight change. The lower the weight the lower the u_vol
         self.u_vol_factor: float = (
-            target_weight / self.model.weight * self.u_vol_factor_correction
+            1.0 / self.scale_factor * self.u_vol_factor_correction
         )
-
-        # scale the weight and height
-        self.model.set_weight(target_weight)  # in kg
-        # self.model.set_height(target_height)  # in m
-
-        # scale the blood volume
-        self.scale_blood_volume(target_blood_volume * target_weight)
 
         # scale the circulation
         self.scale_circulatory_system()
 
         # scale the heart
-        self.scale_heart(target_hr_ref)
+        self.scale_heart()
 
         # scale the respiratory system
         self.scale_respiratory_system()
 
-        # scale the autonomous nervous system
+    def scale_patient(
+        self,
+        target_weight: float,
+        target_height: float,
+        target_blood_volume: float,
+        target_hr_ref: float,
+        target_map: float,
+    ):
+        # calculate the scale factor based on the weight change
+        self.scale_factor: float = self.model.weight / target_weight
+
+        # set the weight and height
+        self.model.set_weight(target_weight)  # in kg
+        self.model.set_height(target_height)  # in m
+
+        # scale the blood volume
+        self.scale_blood_volume(target_blood_volume * target_weight)
+
+        # set the reference heartrate
+        self.model.models["Heart"].set_heart_rate_ref(target_hr_ref)
+
+        # scale the baroreflex of the autonomous nervous system
         self.scale_ans(target_map)
 
-        # # scale the metabolism
-        # self.scale_metabolism()
+        # scale the metabolism
+        self.scale_metabolism()
 
-        # # scale the myocardial oxygen balance and metabolism
-        # self.scale_mob()
+        # scale the myocardial oxygen balance and metabolism
+        self.scale_mob()
+
+        # set the scaling factors
+        self.set_scale_factors()
 
     def scale_blood_volume(self, new_blood_volume: float):
         self.model.models["Blood"].set_total_blood_volume(new_blood_volume)
 
-    def scale_heart(self, heartrate_ref: float):
-        # adjust the reference heartdate
-        self.model.models["Heart"].set_heart_rate_ref(heartrate_ref)
-
+    def scale_heart(self):
         # adjust the heart elastances
         for _model in self.model.models.values():
             if _model.is_enabled:
