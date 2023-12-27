@@ -728,6 +728,7 @@ class BaseInterface:
         zeroline=False,
         sampleinterval=0.005,
         analyze=True,
+        weight_based=False,
     ):
         # first clear the watchllist and this also clears all data
         self.model.clear_watchlist()
@@ -763,7 +764,13 @@ class BaseInterface:
 
         # analyze
         if analyze:
-            self.analyze(properties, time_to_calculate, sampleinterval, calculate=False)
+            self.analyze(
+                properties,
+                time_to_calculate,
+                sampleinterval,
+                calculate=False,
+                weight_based=weight_based,
+            )
 
     def plot_xy_graph(
         self, property_x, property_y, time_to_calculate=2, sampleinterval=0.0005
