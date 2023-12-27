@@ -14,7 +14,7 @@ class Scaling:
     el_base_factor_resp_correction = 1.0
 
     res_factor_circ = 1.0
-    res_factor_circ_correction = 0.6
+    res_factor_circ_correction = 0.8  # for 1.5 kg and 0.6 for 1.0 kg
 
     res_factor_resp = 1.0
     res_factor_resp_correction = 1.0
@@ -23,7 +23,7 @@ class Scaling:
     el_min_factor_correction = 1.0
 
     el_max_factor = 1.0
-    el_max_factor_correction = 0.6
+    el_max_factor_correction = 0.9  # for 1.5 kg and 0.6 for 1.0 kg
 
     u_vol_factor = 1.0
     u_vol_factor_correction = 1.0
