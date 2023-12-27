@@ -853,11 +853,11 @@
       "model_type": "Resistor",
       "is_enabled": true,
       "dependencies": ["AAR", "PA"],
-      "no_flow": false,
+      "no_flow": true,
       "no_back_flow": false,
       "comp_from": "AAR",
       "comp_to": "PA",
-      "diameter": 2.0,
+      "diameter": 0.0,
       "length": 100,
       "r_k": 1.0
     },
