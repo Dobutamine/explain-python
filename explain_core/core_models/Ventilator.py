@@ -99,6 +99,16 @@ class Ventilator(BaseModel):
             # set the gas composition of the reservoir
             set_gas_composition(self._ventin, self.fio2, self.temp, self.humidity)
 
+    def set_ventilator_cpap(self, peep=4.0, rate=1.0, t_in=0.4, insp_flow=10.0):
+        self.pip_cmh2o = peep + 0.5
+        self.pip_cmh2o_max = peep + 0.5
+        self.peep_cmh2o = peep
+        self.vent_rate = 0.01
+        self.insp_time = t_in
+        self.insp_flow = insp_flow
+        self.synchronized = False
+        self.vent_mode = "CPAP"
+
     def set_ventilator_pc(
         self, pip=14.0, peep=4.0, rate=40.0, t_in=0.4, insp_flow=10.0
     ):
@@ -111,7 +121,7 @@ class Ventilator(BaseModel):
         self.vent_mode = "PC"
 
     def set_mode(self, new_mode):
-        if new_mode == "PRVC" or new_mode == "PC":
+        if new_mode == "PRVC" or new_mode == "PC" or new_mode == "CPAP":
             self.vent_mode = new_mode
 
     def set_ventilator_prvc(
