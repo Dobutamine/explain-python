@@ -883,6 +883,7 @@ class NeoInterface(BaseInterface):
         self.analyze(
             [
                 "AA.pres",
+                "AD.pres",
                 "PA.pres",
                 "LA_LV.flow",
                 "RA_RV.flow",

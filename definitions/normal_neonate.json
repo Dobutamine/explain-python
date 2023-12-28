@@ -22,7 +22,7 @@
       "dependencies": [],
       "vol": 0.007824975926284438,
       "u_vol": 0.0,
-      "el_min": 1200,
+      "el_min": 1260,
       "el_max": 4100,
       "el_k": 0
     },
@@ -34,7 +34,7 @@
       "dependencies": [],
       "vol": 0.007824975926284438,
       "u_vol": 0.0,
-      "el_min": 1200,
+      "el_min": 1260,
       "el_max": 4100,
       "el_k": 0
     },
@@ -46,7 +46,7 @@
       "dependencies": [],
       "vol": 0.0055155539340687116,
       "u_vol": 0.0,
-      "el_min": 920,
+      "el_min": 966,
       "el_max": 27500,
       "el_k": 0
     },
@@ -58,7 +58,7 @@
       "dependencies": [],
       "vol": 0.004032886510701252,
       "u_vol": 0.0,
-      "el_min": 920,
+      "el_min": 966,
       "el_max": 27500,
       "el_k": 0
     },
@@ -234,7 +234,7 @@
       "model_type": "BloodCapacitance",
       "is_enabled": true,
       "dependencies": [],
-      "vol": 0.071,
+      "vol": 0.076,
       "u_vol": 0.05710848,
       "el_base": 146,
       "el_k": 0
