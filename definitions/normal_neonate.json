@@ -250,6 +250,17 @@
       "el_base": 230,
       "el_k": 0
     },
+    "DA": {
+      "name": "DA",
+      "description": "ductus arteriosus",
+      "model_type": "BloodCapacitance",
+      "is_enabled": true,
+      "dependencies": [],
+      "vol": 0.000176,
+      "u_vol": 0.000176,
+      "el_base": 10000,
+      "el_k": 0
+    },
     "LA_LV": {
       "name": "LA_LV",
       "description": "mitral valve",
@@ -642,6 +653,34 @@
       "r_back": 300,
       "r_k": 0
     },
+    "AAR_DA": {
+      "name": "AAR_DA",
+      "description": "aortic arch to ductus arteriosus",
+      "model_type": "Resistor",
+      "is_enabled": true,
+      "dependencies": ["AAR", "DA"],
+      "no_flow": true,
+      "no_back_flow": false,
+      "comp_from": "AAR",
+      "comp_to": "DA",
+      "r_for": 300,
+      "r_back": 300,
+      "r_k": 0
+    },
+    "DA_PA": {
+      "name": "DA_PA",
+      "description": "ductus arteriosus to pulmonary artery",
+      "model_type": "Resistor",
+      "is_enabled": true,
+      "dependencies": ["DA", "PA"],
+      "no_flow": true,
+      "no_back_flow": false,
+      "comp_from": "DA",
+      "comp_to": "PA",
+      "r_for": 3000,
+      "r_back": 3000,
+      "r_k": 0
+    },
     "PC": {
       "name": "PC",
       "description": "pericardium",
@@ -846,20 +885,6 @@
       "r_for": 27500.0,
       "r_back": 27500.0,
       "r_k": 1000.0
-    },
-    "DA": {
-      "name": "DA",
-      "description": "ductus arteriosus",
-      "model_type": "Resistor",
-      "is_enabled": true,
-      "dependencies": ["AAR", "PA"],
-      "no_flow": true,
-      "no_back_flow": false,
-      "comp_from": "AAR",
-      "comp_to": "PA",
-      "diameter": 0.0,
-      "length": 100,
-      "r_k": 1.0
     },
     "FO": {
       "name": "FO",
@@ -1216,8 +1241,9 @@
       "description": "persistent ductus arteriosus model",
       "model_type": "Pda",
       "is_enabled": true,
-      "dependencies": ["DA"],
+      "dependencies": ["DA", "AAR_DA", "DA_PA"],
       "da_model": "DA",
+      "da_connectors": ["AAR_DA", "DA_PA"],
       "no_flow": true,
       "diameter": 2.0,
       "length": 10,

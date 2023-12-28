@@ -113,9 +113,10 @@ class Resistor(BaseModel):
             self.flow = (_p1 - _p2) / r_back
 
         # calculate the velocity = flow_rate (in m^3/s) / (pi * radius^2) in m/s
+        self.area = math.pow((self.diameter * 0.001) / 2.0, 2.0) * math.pi  # in m^2
         # flow is in l/s
         if self.area > 0:
-            self.velocity = self.flow / self.area
+            self.velocity = (self.flow * 0.01) / self.area
 
         # now update the volumes of the model components which are connected by this resistor
         if self.flow > 0:
