@@ -1,5 +1,9 @@
 import math
 
+# blood volume according to gestational age: blood_volume = -1.4 * gest_age + 133.6     (24 weeks = 100 ml/kg and 42 weeks = 75 ml/kg)
+# res and el_min relation with gest_age: factor = 0.0285 * gest_age - 0.085
+# el_base and el_max relation with gest_age: factor = 0.014 * gest_age + 0.46
+
 
 class Scaling:
     model = {}
@@ -41,6 +45,12 @@ class Scaling:
 
     map_ref: float = 50.0
 
+    scaling_dict: dict = {
+        "24": {
+            "weight": 0.75,
+        }
+    }
+
     def __init__(self, model):
         # get a reference to the model engine
         self.model = model
@@ -50,6 +60,15 @@ class Scaling:
 
     def scale_to_gestation_age(self, gestation_age: float):
         pass
+        # # adjust the elastance of the circulation
+        # self.el_base_factor_circ_correction = 1.0
+
+        # # adjust the resistance of the circulation
+        # self.res_factor_circ_correction = 1.0
+
+        # # adjusr the heart function of the circulation
+        # self.el_min_factor_correction = 1.0
+        # self.el_max_factor_correction = 1.0
 
     def scale_to_postnatal_age(self, postnatal_age: float):
         pass
@@ -106,15 +125,6 @@ class Scaling:
         if output:
             print(f"u_vol_factor_resp = {self.u_vol_factor_resp}")
 
-        # scale the circulation
-        self.scale_circulatory_system()
-
-        # scale the heart
-        self.scale_heart()
-
-        # scale the respiratory system
-        self.scale_respiratory_system()
-
     def scale_patient(
         self,
         gest_age: float,
@@ -126,11 +136,10 @@ class Scaling:
         hr_ref: float,
         map: float,
     ):
-        # adjust the corrections depending on the gestational age
-        self.scale_to_gestation_age(gest_age)
-
-        # adjust the corrections depending on the postnatal age
-        self.scale_to_postnatal_age(postnatal_age)
+        self.res_factor_circ_correction = 0.6
+        self.el_base_factor_circ_correction = 0.8
+        self.el_min_factor_correction = 0.6
+        self.el_max_factor_correction = 0.8
 
         # calculate the scale factor based on the weight change
         self.scale_factor: float = (
@@ -150,6 +159,24 @@ class Scaling:
         # set the reference heartrate
         self.model.models["Heart"].set_heart_rate_ref(hr_ref)
 
+        # adjust the corrections depending on the gestational age
+        self.scale_to_gestation_age(gest_age)
+
+        # adjust the corrections depending on the postnatal age
+        self.scale_to_postnatal_age(postnatal_age)
+
+        # set the definitive scaling factors
+        self.set_scale_factors()
+
+        # scale the circulation
+        self.scale_circulatory_system()
+
+        # scale the heart
+        self.scale_heart()
+
+        # scale the respiratory system
+        self.scale_respiratory_system()
+
         # scale the baroreflex of the autonomous nervous system
         self.scale_ans(map)
 
@@ -158,9 +185,6 @@ class Scaling:
 
         # scale the myocardial oxygen balance and metabolism
         self.scale_mob()
-
-        # set the scaling factors
-        self.set_scale_factors()
 
     def get_total_lung_volume(self, output=True) -> float:
         total_gas_volume: float = 0.0
@@ -318,11 +342,16 @@ class Scaling:
                 if "BloodTimeVaryingElastance" in _model.model_type:
                     _model.el_min_scaling_factor = self.el_min_factor
                     _model.el_max_scaling_factor = self.el_max_factor
-                    _model.u_vol_scaling_factor = self.u_vol_factor_circ
 
         # adjust the elastance and unstressed volume of the pericardium
         self.model.models["PC"].u_vol_scaling_factor = self.u_vol_factor_circ
         self.model.models["PC"].el_base_scaling_factor = self.el_base_factor_circ
+
+        # make sure the heart valves are not scaled disproportionally
+        self.model.models["LV_AA"].r_scaling_factor = self.scale_factor
+        self.model.models["RV_PA"].r_scaling_factor = self.scale_factor
+        self.model.models["LA_LV"].r_scaling_factor = self.scale_factor
+        self.model.models["RA_RV"].r_scaling_factor = self.scale_factor
 
     def scale_circulatory_system(self):
         # adjust the resistance of the circulation

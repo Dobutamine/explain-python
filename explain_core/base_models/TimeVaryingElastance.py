@@ -83,7 +83,7 @@ class TimeVaryingElastance(Capacitance):
             * math.pow(vol_diff, 2)
         )
 
-        # calculaye the maximal systolic pressure
+        # calculate the maximal systolic pressure
         self.pres_ms = _e_max * vol_diff
         if self.pres_ms < self.pres_ed:
             self.pres_ms = self.pres_ed
