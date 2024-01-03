@@ -45,6 +45,15 @@ class Breathing(BaseModel):
     def switch_breathing(self, state):
         self.breathing_enabled = state
 
+    def set_resp_rate(self, resp_rate):
+        self.resp_rate = resp_rate
+
+    def set_mv_ref(self, mv_ref):
+        self.minute_volume_ref = mv_ref
+
+    def set_vt_rr_ratio(self, vt_rr_ratio):
+        self.vt_rr_ratio = vt_rr_ratio
+
     def calc_model(self) -> None:
         # get the current model weight
         _weight = self._model.weight
