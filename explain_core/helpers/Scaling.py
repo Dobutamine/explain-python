@@ -43,7 +43,7 @@ class Scaling:
     vt_rr_ratio: float = 0.0001212
     mv_ref: float = 0.0
 
-    heart = ["LA", "RA", "LV", "RV", "COR"]
+    heart_chambers = ["LA", "RA", "LV", "RV", "COR"]
     heart_valves = ["LA_LV", "RA_RV", "LV_AA", "RV_PA", "LV_PA", "RV_AA"]
     pericardium = ["PC"]
     arteries = ["AA", "AAR", "AD", "PA", "DA"]
@@ -84,17 +84,17 @@ class Scaling:
         "22": {
             "weight": 0.496,
             "height": 0.281,
-            "blood_volume": 0.1,
+            "blood_volume": 0.1028,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.542,
+            "el_base_circ_factor": 0.768,
+            "el_min_circ_factor": 0.542,
+            "el_max_circ_factor": 0.768,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 48.0,
             "diast": 22.0,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 30.6,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -103,17 +103,17 @@ class Scaling:
         "23": {
             "weight": 0.571,
             "height": 0.295,
-            "blood_volume": 0.1,
+            "blood_volume": 0.1014,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.5705,
+            "el_base_circ_factor": 0.782,
+            "el_min_circ_factor": 0.5705,
+            "el_max_circ_factor": 0.782,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 50.0,
             "diast": 23.0,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 32.0,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -124,15 +124,15 @@ class Scaling:
             "height": 0.309,
             "blood_volume": 0.1,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.599,
+            "el_base_circ_factor": 0.796,
+            "el_min_circ_factor": 0.599,
+            "el_max_circ_factor": 0.796,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 51.21,
             "diast": 23.07,
-            "hr_ref": 160.0,
+            "hr_ref": 150.0,
             "map": 34.22,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -141,17 +141,17 @@ class Scaling:
         "25": {
             "weight": 0.741,
             "height": 0.323,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0986,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.6275,
+            "el_base_circ_factor": 0.81,
+            "el_min_circ_factor": 0.6275,
+            "el_max_circ_factor": 0.81,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 51.61,
             "diast": 23.36,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 34.79,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -160,17 +160,17 @@ class Scaling:
         "26": {
             "weight": 0.841,
             "height": 0.337,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0972,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.656,
+            "el_base_circ_factor": 0.824,
+            "el_min_circ_factor": 0.656,
+            "el_max_circ_factor": 0.824,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 52.12,
             "diast": 24.3,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 35.71,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -179,17 +179,17 @@ class Scaling:
         "27": {
             "weight": 0.953,
             "height": 0.351,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0958,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.6845,
+            "el_base_circ_factor": 0.838,
+            "el_min_circ_factor": 0.6845,
+            "el_max_circ_factor": 0.838,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 52.69,
             "diast": 26.23,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 37.01,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -198,17 +198,17 @@ class Scaling:
         "28": {
             "weight": 1.079,
             "height": 0.364,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0944,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.713,
+            "el_base_circ_factor": 0.852,
+            "el_min_circ_factor": 0.0,
+            "el_max_circ_factor": 0.852,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 53.53,
             "diast": 28.48,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 38.52,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -217,17 +217,17 @@ class Scaling:
         "29": {
             "weight": 1.223,
             "height": 0.378,
-            "blood_volume": 0.1,
+            "blood_volume": 0.093,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.7415,
+            "el_base_circ_factor": 0.866,
+            "el_min_circ_factor": 0.7415,
+            "el_max_circ_factor": 0.866,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 54.89,
             "diast": 30.1,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 40.03,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -236,17 +236,17 @@ class Scaling:
         "30": {
             "weight": 1.388,
             "height": 0.392,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0916,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.77,
+            "el_base_circ_factor": 0.88,
+            "el_min_circ_factor": 0.77,
+            "el_max_circ_factor": 0.88,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 56.43,
             "diast": 30.93,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 41.28,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -255,17 +255,17 @@ class Scaling:
         "31": {
             "weight": 1.578,
             "height": 0.406,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0902,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.7985,
+            "el_base_circ_factor": 0.894,
+            "el_min_circ_factor": 0.7985,
+            "el_max_circ_factor": 0.894,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 57.48,
             "diast": 31.3,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 42.04,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -274,17 +274,17 @@ class Scaling:
         "32": {
             "weight": 1.790,
             "height": 0.42,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0888,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.827,
+            "el_base_circ_factor": 0.908,
+            "el_min_circ_factor": 0.827,
+            "el_max_circ_factor": 0.908,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 57.9,
             "diast": 31.51,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 42.37,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -293,17 +293,17 @@ class Scaling:
         "33": {
             "weight": 2.018,
             "height": 0.434,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0874,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.8555,
+            "el_base_circ_factor": 0.922,
+            "el_min_circ_factor": 0.8555,
+            "el_max_circ_factor": 0.922,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 58.2,
             "diast": 31.84,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 42.68,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -312,17 +312,17 @@ class Scaling:
         "34": {
             "weight": 2.255,
             "height": 0.447,
-            "blood_volume": 0.1,
+            "blood_volume": 0.086,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.884,
+            "el_base_circ_factor": 0.936,
+            "el_min_circ_factor": 0.884,
+            "el_max_circ_factor": 0.936,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 58.88,
             "diast": 32.54,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 43.35,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -331,17 +331,17 @@ class Scaling:
         "35": {
             "weight": 2.493,
             "height": 0.46,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0846,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.9125,
+            "el_base_circ_factor": 0.95,
+            "el_min_circ_factor": 0.9125,
+            "el_max_circ_factor": 0.95,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 60.28,
             "diast": 33.71,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 44.67,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -350,17 +350,17 @@ class Scaling:
         "36": {
             "weight": 2.726,
             "height": 0.472,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0832,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.941,
+            "el_base_circ_factor": 0.964,
+            "el_min_circ_factor": 0.941,
+            "el_max_circ_factor": 0.964,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 62.51,
             "diast": 35.37,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 46.73,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -369,17 +369,17 @@ class Scaling:
         "37": {
             "weight": 2.947,
             "height": 0.483,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0818,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.9695,
+            "el_base_circ_factor": 0.978,
+            "el_min_circ_factor": 0.9695,
+            "el_max_circ_factor": 0.978,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 64.73,
             "diast": 37.16,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 48.79,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -388,17 +388,17 @@ class Scaling:
         "38": {
             "weight": 3.156,
             "height": 0.493,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0804,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 0.998,
+            "el_base_circ_factor": 0.992,
+            "el_min_circ_factor": 0.998,
+            "el_max_circ_factor": 0.992,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 65.96,
             "diast": 38.62,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 50.03,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -407,17 +407,17 @@ class Scaling:
         "39": {
             "weight": 3.360,
             "height": 0.502,
-            "blood_volume": 0.08,
+            "blood_volume": 0.079,
             "lung_volume": 0.03,
-            "res_circ_factor": 1.0,
-            "el_base_circ_factor": 1.0,
-            "el_min_circ_factor": 1.0,
-            "el_max_circ_factor": 1.0,
+            "res_circ_factor": 1.0265,
+            "el_base_circ_factor": 1.006,
+            "el_min_circ_factor": 1.0265,
+            "el_max_circ_factor": 1.006,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 66.32,
             "diast": 39.63,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 50.62,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -426,17 +426,17 @@ class Scaling:
         "40": {
             "weight": 3.568,
             "height": 0.512,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0776,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 1.055,
+            "el_base_circ_factor": 1.02,
+            "el_min_circ_factor": 1.055,
+            "el_max_circ_factor": 1.02,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 66.44,
             "diast": 40.22,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 51.26,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -445,17 +445,17 @@ class Scaling:
         "41": {
             "weight": 3.785,
             "height": 0.521,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0762,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 1.0835,
+            "el_base_circ_factor": 1.034,
+            "el_min_circ_factor": 1.0835,
+            "el_max_circ_factor": 1.034,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 66.78,
             "diast": 40.51,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 52.29,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -464,17 +464,17 @@ class Scaling:
         "42": {
             "weight": 4.014,
             "height": 0.529,
-            "blood_volume": 0.1,
+            "blood_volume": 0.0748,
             "lung_volume": 0.03,
-            "res_circ_factor": 0.6,
-            "el_base_circ_factor": 0.8,
-            "el_min_circ_factor": 0.6,
-            "el_max_circ_factor": 0.8,
+            "res_circ_factor": 1.112,
+            "el_base_circ_factor": 1.048,
+            "el_min_circ_factor": 1.112,
+            "el_max_circ_factor": 1.048,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
             "syst": 67.12,
             "diast": 40.8,
-            "hr_ref": 140.0,
+            "hr_ref": 150.0,
             "map": 53.32,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -486,10 +486,40 @@ class Scaling:
         # get a reference to the model engine
         self.model = model
 
-    def scale_to_weight(self, weight: float):
-        pass
+    def scale_to_weight(self, weight: float, height: float, output=False):
+        # scale the patient
+        self.scale_patient(
+            weight=weight,
+            height=height,
+            blood_volume=0.08,
+            lung_volume=0.03,
+            res_circ_factor=1.0,
+            el_base_circ_factor=1.0,
+            el_min_circ_factor=1.0,
+            el_max_circ_factor=1.0,
+            res_resp_factor=1.0,
+            el_base_resp_factor=1.0,
+            hr_ref=150.0,
+            syst_ref=67,
+            diast_ref=40,
+            map_ref=53,
+            resp_rate=40.0,
+            vt_rr_ratio=0.0001212,
+            mv_ref=0.2,
+        )
 
-    def scale_to_gestational_age(self, gestation_age: float):
+        if output:
+            print(f"Scaling to weight {weight} kg and height {height} m")
+            self.get_total_blood_volume()
+            self.get_total_lung_volume()
+            print(f"Systole target = {syst} mmHg")
+            print(f"Diastole target = {diast} mmHg")
+            print(f"Mean arterial pressure target = {map_ref} mmHg")
+            print(f"Respiratory rate target = {resp_rate} bpm")
+            print(f"Vt/RR ratio target = {vt_rr_ratio * self.model.weight} L/bpm/kg")
+            print(f"Minute volume target = {mv_ref * self.model.weight} L/min")
+
+    def scale_to_gestational_age(self, gestation_age: float, output=False):
         # get the scaling properties for the gestational age
         ga_props = self.scaling_dict[str(math.floor(gestation_age))]
 
@@ -514,23 +544,60 @@ class Scaling:
             mv_ref=ga_props["minute_volume_ref"],
         )
 
-        print(f"Scaling to gestational age {gestation_age} weeks")
-        print(f"Weight (Fenton p50) = {self.model.weight} kg")
-        print(f"Height (Fenton p50) = {self.model.height} m")
-        self.get_total_blood_volume()
-        self.get_total_lung_volume()
-        print(f"Systole target = {ga_props['syst']} mmHg")
-        print(f"Diastole target = {ga_props['diast']} mmHg")
-        print(f"Mean arterial pressure target = {ga_props['map']} mmHg")
-        print(f"Respiratory rate target = {ga_props['resp_rate']} bpm")
-        print(
-            f"Vt/RR ratio target = {ga_props['vt_rr_ratio'] * self.model.weight} L/bpm/kg"
-        )
-        print(
-            f"Minute volume target = {ga_props['minute_volume_ref'] * self.model.weight} L/min"
-        )
+        if output:
+            print(f"Scaling to gestational age {gestation_age} weeks")
+            print(f"Weight (Fenton p50) = {self.model.weight} kg")
+            print(f"Height (Fenton p50) = {self.model.height} m")
+            self.get_total_blood_volume()
+            self.get_total_lung_volume()
+            print(f"Systole target = {ga_props['syst']} mmHg")
+            print(f"Diastole target = {ga_props['diast']} mmHg")
+            print(f"Mean arterial pressure target = {ga_props['map']} mmHg")
+            print(f"Respiratory rate target = {ga_props['resp_rate']} bpm")
+            print(
+                f"Vt/RR ratio target = {ga_props['vt_rr_ratio'] * self.model.weight} L/bpm/kg"
+            )
+            print(
+                f"Minute volume target = {ga_props['minute_volume_ref'] * self.model.weight} L/min"
+            )
 
-    def set_scale_factors(self, output=False):
+    def set_scale_factors(
+        self,
+        res_circ_factor: float,
+        el_base_circ_factor: float,
+        el_min_circ_factor: float,
+        el_max_circ_factor: float,
+        res_resp_factor: float,
+        el_base_resp_factor: float,
+        output=False,
+    ):
+        if output:
+            print(
+                f"Adjusting res_factor_circ_correction from {self.res_factor_circ_correction} to {res_circ_factor}"
+            )
+            print(
+                f"Adjusting el_base_factor_circ_correction from {self.el_base_factor_circ_correction} to {el_base_circ_factor}"
+            )
+            print(
+                f"Adjusting el_min_factor_circ_correction from {self.el_min_factor_correction} to {el_min_circ_factor}"
+            )
+            print(
+                f"Adjusting el_max_factor_circ_correction from {self.el_max_factor_correction} to {el_max_circ_factor}"
+            )
+            print(
+                f"Adjusting res_factor_resp_correction from {self.res_factor_resp_correction} to {res_resp_factor}"
+            )
+            print(
+                f"Adjusting el_base_factor_resp_correction from {self.el_base_factor_resp_correction} to {el_base_resp_factor}"
+            )
+
+        self.res_factor_circ_correction = res_circ_factor
+        self.el_base_factor_circ_correction = el_base_circ_factor
+        self.el_min_factor_correction = el_min_circ_factor
+        self.el_max_factor_correction = el_max_circ_factor
+        self.res_factor_resp_correction = res_resp_factor
+        self.el_base_factor_resp_correction = el_base_resp_factor
+
         # calculate the elastance factor based on the weight change. The lower the weight the higher the elastance
         self.el_base_factor_circ: float = (
             self.scale_factor * self.el_base_factor_circ_correction
@@ -595,13 +662,6 @@ class Scaling:
         vt_rr_ratio: float,
         mv_ref: float,
     ):
-        self.res_factor_circ_correction = res_circ_factor
-        self.el_base_factor_circ_correction = el_base_circ_factor
-        self.el_min_factor_correction = el_min_circ_factor
-        self.el_max_factor_correction = el_max_circ_factor
-        self.res_factor_resp_correction = res_resp_factor
-        self.el_base_factor_resp_correction = el_base_resp_factor
-
         # calculate the scale factor based on the weight change
         self.scale_factor: float = (
             self.model.weight / weight
@@ -635,7 +695,15 @@ class Scaling:
         self.model.models["Breathing"].set_mv_ref(mv_ref)
 
         # set the definitive scaling factors
-        self.set_scale_factors()
+        self.set_scale_factors(
+            res_circ_factor,
+            el_base_circ_factor,
+            el_min_circ_factor,
+            el_max_circ_factor,
+            res_resp_factor,
+            el_base_resp_factor,
+            False,
+        )
 
         # scale the metabolism
         self.scale_metabolism()
@@ -794,7 +862,7 @@ class Scaling:
 
     def scale_heart(self):
         # adjust the heart elastances
-        for _heart_chamber in self.heart:
+        for _heart_chamber in self.heart_chambers:
             self.model.models[_heart_chamber].el_min_scaling_factor = self.el_min_factor
             self.model.models[_heart_chamber].el_max_scaling_factor = self.el_max_factor
 

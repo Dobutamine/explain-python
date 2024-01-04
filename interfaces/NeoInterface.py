@@ -853,8 +853,8 @@ class NeoInterface(BaseInterface):
             [
                 "Heart.heart_rate",
                 "AA.pres",
-                "LA_LV.flow",
-                "RA_RV.flow",
+                "LV_AA.flow",
+                "RV_PA.flow",
                 "SVC_RA.flow",
                 "AAR_AD.flow",
                 "LV.vol",
@@ -869,8 +869,8 @@ class NeoInterface(BaseInterface):
             [
                 "Heart.heart_rate",
                 "AA.pres",
-                "LA_LV.flow",
-                "RA_RV.flow",
+                "LV_AA.flow",
+                "RV_PA.flow",
                 "SVC_RA.flow",
                 "Pda.flow",
             ],
