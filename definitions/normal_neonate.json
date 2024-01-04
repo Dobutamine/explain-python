@@ -49,8 +49,8 @@
       "dependencies": [],
       "vol": 0.0055155539340687116,
       "u_vol": 0.0,
-      "el_min": 1063,
-      "el_max": 22550,
+      "el_min": 1222,
+      "el_max": 22275,
       "el_k": 0
     },
     "RV": {
@@ -63,7 +63,7 @@
       "vol": 0.004032886510701252,
       "u_vol": 0.0033,
       "el_min": 1159,
-      "el_max": 24200,
+      "el_max": 22990,
       "el_k": 0
     },
     "COR": {
@@ -1031,8 +1031,8 @@
       "tricuspid_valve": "RA_RV",
       "pulmonary_valve": "RV_PA",
       "aortic_valve": "LV_AA",
-      "heart_rate": 140.0,
-      "heart_rate_ref": 140.0,
+      "heart_rate": 110.0,
+      "heart_rate_ref": 110.0,
       "rhythm_type": 0.0,
       "pq_time": 0.1,
       "qrs_time": 0.075,
@@ -1086,7 +1086,7 @@
       "baroreceptor_location": "AAR",
       "chemoreceptor_location": "AAR",
       "min_map": 20.0,
-      "set_map": 57.5,
+      "set_map": 51.26,
       "max_map": 100.0,
       "min_pco2": 15.0,
       "set_pco2": 35,
