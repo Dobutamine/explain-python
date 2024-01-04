@@ -65,9 +65,21 @@ class Heart(BaseModel):
         self._tv = self._model.models[self.tricuspid_valve]
         self._pv = self._model.models[self.pulmonary_valve]
         self._av = self._model.models[self.aortic_valve]
-        self._cor = self._model.models[self.coronaries]
-        self._cor_ra = self._model.models[self.coronary_sinus]
-        self._pc = self._model.models[self.pericardium]
+
+        if self.coronary_sinus == "":
+            self._cor_ra = {}
+        else:
+            self._cor_ra = self._model.models[self.coronary_sinus]
+
+        if self.coronaries == "":
+            self._cor = {}
+        else:
+            self._cor = self._model.models[self.coronaries]
+
+        if self.pericardium == "":
+            self._pc = {}
+        else:
+            self._pc = self._model.models[self.pericardium]
 
     def calc_model(self) -> None:
         # calculate the heartrate from the reference value and all other influences
@@ -173,7 +185,8 @@ class Heart(BaseModel):
         self._ra.act_factor = self.aaf
         self._lv.act_factor = self.vaf
         self._rv.act_factor = self.vaf
-        self._cor.act_factor = self.vaf
+        if self._cor:
+            self._cor.act_factor = self.vaf
 
     def calc_qtc(self, hr: float) -> float:
         if hr > 10:
@@ -285,9 +298,9 @@ class Heart(BaseModel):
             self._ra.el_min_factor = relax_change
 
     def change_pericardium_compliance(self, comp_change):
-        if comp_change > 0.0:
+        if comp_change and self._pc > 0.0:
             self._pc.el_base_factor = 1.0 / comp_change
 
     def set_pericardium_effusion(self, extra_volume):
-        if extra_volume >= 0.0:
+        if extra_volume and self._pc >= 0.0:
             self._pc.vol_extra = extra_volume
