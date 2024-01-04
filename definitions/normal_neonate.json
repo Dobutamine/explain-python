@@ -669,8 +669,8 @@
       "no_back_flow": false,
       "comp_from": "PA",
       "comp_to": "LL",
-      "r_for": 1800,
-      "r_back": 1800,
+      "r_for": 2200,
+      "r_back": 2200,
       "r_k": 0
     },
     "PA_RL": {
@@ -684,8 +684,8 @@
       "no_back_flow": false,
       "comp_from": "PA",
       "comp_to": "RL",
-      "r_for": 1800,
-      "r_back": 1800,
+      "r_for": 2200,
+      "r_back": 2200,
       "r_k": 0
     },
     "LL_PV": {
