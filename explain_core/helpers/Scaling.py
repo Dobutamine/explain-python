@@ -35,6 +35,8 @@ class Scaling:
     u_vol_factor_resp = 1.0
     u_vol_factor_resp_correction = 1.0
 
+    u_vol_ratio_factor = 1.0
+
     hr_ref: float = 140.0
     syst_ref: float = 50.0
     diast_ref: float = 23.0
@@ -202,7 +204,7 @@ class Scaling:
             "lung_volume": 0.03,
             "res_circ_factor": 0.713,
             "el_base_circ_factor": 0.852,
-            "el_min_circ_factor": 0.0,
+            "el_min_circ_factor": 0.713,
             "el_max_circ_factor": 0.852,
             "res_resp_factor": 1.0,
             "el_base_resp_factor": 1.0,
@@ -265,7 +267,7 @@ class Scaling:
             "el_base_resp_factor": 1.0,
             "syst": 57.48,
             "diast": 31.3,
-            "hr_ref": 150.0,
+            "hr_ref": 170.0,
             "map": 42.04,
             "resp_rate": 40.0,
             "vt_rr_ratio": 0.0001212,
@@ -523,19 +525,33 @@ class Scaling:
         # get the scaling properties for the gestational age
         ga_props = self.scaling_dict[str(math.floor(gestation_age))]
 
+        # blood volume according to gestational age: blood_volume = -1.25 * gest_age + 122.5     (22 weeks = 95 ml/kg and 42 weeks = 75 ml/kg)
+        # res and el_min relation with gest_age: factor = 0.0285 * gest_age - 0.085
+        # el_base and el_max relation with gest_age: factor = 0.014 * gest_age + 0.46
+
+        # calculate the blood volume based on the gestational age
+        _bv = 0.080  # -1.25 * gestation_age + 122.5
+        _res_factor = 1.0  # 0.0285 * gestation_age - 0.085
+        _el_base_factor = 1.0  # 0.014 * gestation_age + 0.46
+        _el_min_factor = 1.1  # 0.0285 * gestation_age - 0.085
+        _el_max_factor = 0.8  # 0.014 * gestation_age + 0.60
+        _hr_ref = 100.0
+
+        self.u_vol_ratio_factor = 1.0
+
         # scale the patient
         self.scale_patient(
             weight=ga_props["weight"],
             height=ga_props["height"],
-            blood_volume=ga_props["blood_volume"],
+            blood_volume=_bv,
             lung_volume=ga_props["lung_volume"],
-            res_circ_factor=ga_props["res_circ_factor"],
-            el_base_circ_factor=ga_props["el_base_circ_factor"],
-            el_min_circ_factor=ga_props["el_min_circ_factor"],
-            el_max_circ_factor=ga_props["el_max_circ_factor"],
+            res_circ_factor=_res_factor,
+            el_base_circ_factor=_el_base_factor,
+            el_min_circ_factor=_el_min_factor,
+            el_max_circ_factor=_el_max_factor,
             res_resp_factor=ga_props["res_resp_factor"],
             el_base_resp_factor=ga_props["el_base_resp_factor"],
-            hr_ref=ga_props["hr_ref"],
+            hr_ref=_hr_ref,
             syst_ref=ga_props["syst"],
             diast_ref=ga_props["diast"],
             map_ref=ga_props["map"],
@@ -814,7 +830,9 @@ class Scaling:
                         )
 
                         # determine how much of this total volume is unstressed volume
-                        model.u_vol = model.vol * fraction_unstressed
+                        model.u_vol = (
+                            model.vol * fraction_unstressed * self.u_vol_ratio_factor
+                        )
 
                         # guard for negative volumes
                         if model.vol < 0.0:
@@ -848,7 +866,9 @@ class Scaling:
                         )
 
                         # determine how much of this total volume is unstressed volume
-                        model.u_vol = model.vol * fraction_unstressed
+                        model.u_vol = (
+                            model.vol * fraction_unstressed * self.u_vol_ratio_factor
+                        )
 
                         # guard for negative volumes
                         if model.vol < 0.0:

@@ -853,11 +853,13 @@ class NeoInterface(BaseInterface):
             [
                 "Heart.heart_rate",
                 "AA.pres",
+                "PA.pres",
                 "LV_AA.flow",
                 "RV_PA.flow",
                 "SVC_RA.flow",
                 "AAR_AD.flow",
                 "LV.vol",
+                "RV.vol",
             ],
             weight_based=weight_based,
             sampleinterval=0.0005,
