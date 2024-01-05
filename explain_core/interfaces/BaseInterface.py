@@ -703,6 +703,10 @@ class BaseInterface:
     def inspect_model(self, model_component):
         return self.model.inspect_component(model_component)
 
+    def print_scaling_to_json(self, filename):
+        if filename is not None:
+            self.model.print_scaling_to_json(filename)
+
     def save_model_state_json(self, filename):
         if filename is not None:
             self.model.save_model_state_json(filename)
