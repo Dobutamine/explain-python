@@ -11,7 +11,7 @@ class BloodTimeVaryingElastance(TimeVaryingElastance):
     vol_min: float = 0.0
     stroke_volume: float = 0.0
     solutes: dict[str, float] = {}
-    acidbase: dict[str, float] = {}
+    aboxy: dict[str, float] = {}
     drugs: dict[str, float] = {}
     oxy: dict[str, float] = {}
 

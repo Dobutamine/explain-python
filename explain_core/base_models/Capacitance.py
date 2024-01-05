@@ -98,6 +98,15 @@ class Capacitance(BaseModel):
         self.pres_cc = 0.0
         self.pres_mus = 0.0
 
+    def get_el_base(self) -> float:
+        return self.el_base * self.el_base_scaling_factor
+
+    def get_u_vol(self) -> float:
+        return self.u_vol * self.u_vol_scaling_factor
+    
+    def get_el_k(self) -> float:
+        return self.el_k * self.el_k_scaling_factor
+
     def volume_in(self, dvol: float) -> None:
         # increase the volume
         self.vol += dvol

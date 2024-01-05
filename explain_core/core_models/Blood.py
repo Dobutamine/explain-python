@@ -16,19 +16,22 @@ class Blood(BaseModel):
                 model.model_type == "BloodCapacitance"
                 or model.model_type == "BloodTimeVaryingElastance"
             ):
-                # fill the solutes
-                model.solutes = {**self.solutes}
-                model.aboxy = {**self.aboxy}
-                # calculate the to2 from the spo2 and hemoglobin
-                model.aboxy["to2"] = (
-                    (
-                        1.36
-                        * (model.aboxy["hemoglobin"] / 0.6206)
-                        * model.aboxy["so2"]
-                        / 100.0
-                    )
-                    * 10.0
-                ) / 25.5
+                # check whether the solutes are already set
+                if not model.solutes:
+                    # fill the solutes
+                    model.solutes = {**self.solutes}
+                if not model.aboxy:
+                    model.aboxy = {**self.aboxy}
+                    # calculate the to2 from the spo2 and hemoglobin
+                    model.aboxy["to2"] = (
+                        (
+                            1.36
+                            * (model.aboxy["hemoglobin"] / 0.6206)
+                            * model.aboxy["so2"]
+                            / 100.0
+                        )
+                        * 10.0
+                    ) / 25.5
 
         return self._is_initialized
 

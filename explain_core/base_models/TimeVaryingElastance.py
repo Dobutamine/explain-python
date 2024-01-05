@@ -22,6 +22,18 @@ class TimeVaryingElastance(Capacitance):
     pres_ed: float = 0.0
     pres_ms: float = 0.0
 
+    def get_el_min(self) -> float:
+        return self.el_min * self.el_min_scaling_factor
+
+    def get_el_max(self) -> float:
+        return self.el_min * self.el_min_scaling_factor
+
+    def get_u_vol(self) -> float:
+        return self.u_vol * self.u_vol_scaling_factor
+
+    def get_el_k(self) -> float:
+        return self.el_k * self.el_k_scaling_factor
+
     # implement the calc_model method
     def calc_model(self) -> None:
         # calculate the minimal elastance depending on the scaling factor

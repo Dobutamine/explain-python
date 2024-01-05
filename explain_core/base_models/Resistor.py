@@ -219,6 +219,12 @@ class Resistor(BaseModel):
     def set_r_back_factor(self, new_r_back_factor):
         self.r_back_factor = new_r_back_factor
 
+    def get_r_for(self) -> float:
+        return self.r_for * self.r_scaling_factor
+    
+    def get_r_back(self) -> float:
+        return self.r_back * self.r_scaling_factor
+        
     def calc_resistance(self):
         # set the resistances by calculating the resistance from the diameter and length
         if self.diameter > 0.0 and self.length > 0.0:
