@@ -83,12 +83,13 @@ class Scaling:
     thorax = ["THORAX", "CHEST_L", "CHEST_R"]
 
     scaling_dict: dict = {
+        # "40" is the baseline neonate so no scaling is needed and every scalingsfactor will be 1.0
         "40": {
             "weight": 3.545,
             "height": 0.519,
             "blood_volume": 0.08,
             "lung_volume": 0.03,
-            "res_circ_factor": 1.2,
+            "res_circ_factor": 1.0,
             "el_base_circ_factor": 1.0,
             "el_min_circ_factor": 1.0,
             "el_max_circ_factor": 1.0,
@@ -134,8 +135,8 @@ class Scaling:
             print(f"Scaling to weight {weight} kg and height {height} m")
             self.get_total_blood_volume()
             self.get_total_lung_volume()
-            print(f"Systole target = {syst} mmHg")
-            print(f"Diastole target = {diast} mmHg")
+            print(f"Systole target = {syst_ref} mmHg")
+            print(f"Diastole target = {diast_ref} mmHg")
             print(f"Mean arterial pressure target = {map_ref} mmHg")
             print(f"Respiratory rate target = {resp_rate} bpm")
             print(f"Vt/RR ratio target = {vt_rr_ratio * self.model.weight} L/bpm/kg")
@@ -172,15 +173,15 @@ class Scaling:
             print(f"Height (Fenton p50) = {self.model.height} m")
             self.get_total_blood_volume()
             self.get_total_lung_volume()
-            print(f"Systole target = {ga_props['syst']} mmHg")
-            print(f"Diastole target = {ga_props['diast']} mmHg")
-            print(f"Mean arterial pressure target = {ga_props['map']} mmHg")
+            print(f"Systole target = {ga_props['syst_ref']} mmHg")
+            print(f"Diastole target = {ga_props['diast_ref']} mmHg")
+            print(f"Mean arterial pressure target = {ga_props['map_ref']} mmHg")
             print(f"Respiratory rate target = {ga_props['resp_rate']} bpm")
             print(
                 f"Vt/RR ratio target = {ga_props['vt_rr_ratio'] * self.model.weight} L/bpm/kg"
             )
             print(
-                f"Minute volume target = {ga_props['minute_volume_ref'] * self.model.weight} L/min"
+                f"Minute volume target = {ga_props['mv_ref'] * self.model.weight} L/min"
             )
 
     def set_scale_factors(
