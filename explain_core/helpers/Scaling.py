@@ -539,11 +539,11 @@ class Scaling:
             self.model.models[_thorax].el_base_scaling_factor = self.el_base_factor_resp
             self.model.models[_thorax].u_vol_scaling_factor = self.u_vol_factor_resp
 
-    def scale_ans(self, map: float):
+    def scale_ans(self, map_ref: float):
         # adjust the baroreceptor
-        self.model.models["Ans"].min_map = map / 2.0
-        self.model.models["Ans"].set_map = map
-        self.model.models["Ans"].max_map = map * 2.0
+        self.model.models["Ans"].min_map = map_ref / 2.0
+        self.model.models["Ans"].set_map = map_ref
+        self.model.models["Ans"].max_map = map_ref * 2.0
         self.model.models["Ans"].init_effectors()
 
     def scale_metabolism(self):
