@@ -5,7 +5,7 @@ import math
 # el_base and el_max relation with gest_age: factor = 0.014 * gest_age + 0.46
 
 
-class Scaling:
+class Scaler:
     model = {}
 
     scale_factor: float = 1.0
@@ -45,69 +45,25 @@ class Scaling:
     vt_rr_ratio: float = 0.0001212
     mv_ref: float = 0.0
 
-    heart_chambers = ["LA", "RA", "LV", "RV", "COR"]
-    heart_valves = ["LA_LV", "RA_RV", "LV_AA", "RV_PA", "LV_PA", "RV_AA"]
-    pericardium = ["PC"]
-    arteries = ["AA", "AAR", "AD", "PA", "DA"]
-    veins = ["IVCE", "IVCI", "SVC", "PV"]
-    capillaries = ["LS", "INT", "KID", "RLB", "BR", "RUB", "LL", "RL"]
-    shunts = ["IPS", "FO"]
-    blood_connectors = [
-        "AA_AAR",
-        "AA_COR",
-        "AAR_AD",
-        "AD_INT",
-        "AD_KID",
-        "AD_LS",
-        "AD_RLB",
-        "AAR_RUB",
-        "AAR_BR",
-        "COR_RA",
-        "RUB_SVC",
-        "BR_SVC",
-        "RLB_IVCE",
-        "LS_IVCE",
-        "KID_IVCE",
-        "INT_IVCE",
-        "IVCE_IVCI",
-        "IVCI_RA",
-        "SVC_RA",
-        "PA_LL",
-        "PA_RL",
-        "LL_PV",
-        "RL_PV",
-        "PV_LA",
-    ]
-    lungs = ["ALL", "ALR", "DS"]
-    airways = ["MOUTH_DS", "DS_ALL", "DS_ALR"]
-    thorax = ["THORAX", "CHEST_L", "CHEST_R"]
+    heart_chambers = []
+    heart_valves = []
+    pericardium = []
+    arteries = []
+    veins = []
+    capillaries = []
+    shunts = []
+    blood_connectors = []
+    lungs = []
+    airways = []
+    thorax = []
+    patients: dict = {}
 
-    scaling_dict: dict = {
-        # "40" is the baseline neonate so no scaling is needed and every scalingsfactor will be 1.0
-        "40": {
-            "weight": 3.545,
-            "height": 0.519,
-            "blood_volume": 0.08,
-            "lung_volume": 0.03,
-            "res_circ_factor": 1.0,
-            "el_base_circ_factor": 1.0,
-            "el_min_circ_factor": 1.0,
-            "el_max_circ_factor": 1.0,
-            "res_resp_factor": 1.0,
-            "el_base_resp_factor": 1.0,
-            "hr_ref": 110.0,
-            "syst_ref": 66.0,
-            "diast_ref": 40.0,
-            "map_ref": 51.26,
-            "resp_rate": 40.0,
-            "vt_rr_ratio": 0.0001212,
-            "mv_ref": 0.2,
-        }
-    }
-
-    def __init__(self, model):
-        # get a reference to the model engine
+    def __init__(self, model, **args: dict[str, any]):
+        # set the model
         self.model = model
+        # set the values of the independent properties
+        for key, value in args.items():
+            setattr(self, key, value)
 
     def scale_to_weight(self, weight: float, height: float, output=False):
         # scale the patient
@@ -144,7 +100,7 @@ class Scaling:
 
     def scale_to_gestational_age(self, gestation_age: float, output=False):
         # get the scaling properties for the gestational age
-        ga_props = self.scaling_dict[str(math.floor(gestation_age))]
+        ga_props = self.patients[str(math.floor(gestation_age))]
 
         # scale the patient
         self.scale_patient(

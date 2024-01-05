@@ -11,7 +11,7 @@ from explain_core.base_models.BaseModel import BaseModel
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.cpp_models.CppModelsBuilder import compile_modules
-from explain_core.helpers.Scaling import Scaling
+from explain_core.helpers.Scaler import Scaler
 
 
 class ModelEngine:
@@ -55,8 +55,9 @@ class ModelEngine:
     # define an object holding the task scheduler
     _task_scheduler: dict = {}
 
-    # define a scaling object
-    _scaling: Scaling = None
+    # define a scaler object
+    scaler_settings: dict = {}
+    _scaler: Scaler = None
 
     # performance
     run_duration: float = 0.0
@@ -113,6 +114,7 @@ class ModelEngine:
             self.bsa = math.pow((self.weight * (self.height * 100.0) / 3600.0), 0.5)
             self.modeling_stepsize = self.model_definition["modeling_stepsize"]
             self.model_time_total = self.model_definition["model_time_total"]
+            self.scaler_settings = self.model_definition["scaler_settings"]
 
         except:
             # signal that the json file failed to load
@@ -180,8 +182,8 @@ class ModelEngine:
         # initialize a task scheduler
         self._task_scheduler = TaskScheduler(self)
 
-        # initialize a scaling object
-        self._scaling = Scaling(self)
+        # initialize a scaler object
+        self._scaler = Scaler(self, **self.scaler_settings)
 
         # check the dependencies
         dep_errors: int = self._check_dependencies()
