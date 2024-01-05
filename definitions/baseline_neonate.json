@@ -60,6 +60,7 @@
                 "el_max_circ_factor": 1.0,
                 "res_resp_factor": 1.0,
                 "el_base_resp_factor": 1.0,
+                "u_vol_factor": 1.0,
                 "hr_ref": 110.0,
                 "syst_ref": 66.0,
                 "diast_ref": 40.0,

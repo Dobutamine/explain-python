@@ -61,16 +61,49 @@ class BaseInterface:
         self.fast_analyzer_sample_interval = 0.005
         self.analysis_object = {}
 
+    def scale_to_gestational_age(self, gestational_age: float):
+        self.model.scale_to_gestational_age(gestational_age)
+
     def scale_patient(
         self,
-        target_weight: float,
-        target_height: float,
-        target_blood_volume: float,
-        target_hr_ref,
-        target_map: float,
+        weight: float,
+        height: float,
+        blood_volume: float,
+        lung_volume: float,
+        res_circ_factor: float,
+        el_base_circ_factor: float,
+        el_min_circ_factor: float,
+        el_max_circ_factor: float,
+        res_resp_factor: float,
+        el_base_resp_factor: float,
+        u_vol_factor: float,
+        hr_ref: float,
+        syst_ref: float,
+        diast_ref: float,
+        map_ref: float,
+        resp_rate: float,
+        vt_rr_ratio: float,
+        mv_ref: float,
     ):
         self.model.scale_patient(
-            target_weight, target_height, target_blood_volume, target_hr_ref, target_map
+            weight=weight,
+            height=height,
+            blood_volume=blood_volume,
+            lung_volume=lung_volume,
+            res_circ_factor=res_circ_factor,
+            el_base_circ_factor=el_base_circ_factor,
+            el_min_circ_factor=el_min_circ_factor,
+            el_max_circ_factor=el_max_circ_factor,
+            res_resp_factor=res_resp_factor,
+            el_base_resp_factor=el_base_resp_factor,
+            u_vol_factor=u_vol_factor,
+            hr_ref=hr_ref,
+            syst_ref=syst_ref,
+            diast_ref=diast_ref,
+            map_ref=map_ref,
+            resp_rate=resp_rate,
+            vt_rr_ratio=vt_rr_ratio,
+            mv_ref=mv_ref,
         )
 
     def set_weight(self, weight):

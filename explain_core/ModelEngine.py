@@ -403,16 +403,50 @@ class ModelEngine:
         for m in self.models.values():
             m._mmhg_kpa = self.mmhg_kpa
 
+    def scale_to_gestational_age(self, gestational_age: float):
+        if gestational_age > 21.0 and gestational_age < 45.0:
+            self._scaler.scale_to_gestational_age(gestational_age)
+
     def scale_patient(
         self,
-        target_weight: float,
-        target_height: float,
-        target_blood_volume: float,
-        target_hr_ref,
-        target_map: float,
+        weight: float,
+        height: float,
+        blood_volume: float,
+        lung_volume: float,
+        res_circ_factor: float,
+        el_base_circ_factor: float,
+        el_min_circ_factor: float,
+        el_max_circ_factor: float,
+        res_resp_factor: float,
+        el_base_resp_factor: float,
+        u_vol_factor: float,
+        hr_ref: float,
+        syst_ref: float,
+        diast_ref: float,
+        map_ref: float,
+        resp_rate: float,
+        vt_rr_ratio: float,
+        mv_ref: float,
     ):
-        self._scaling.scale_patient(
-            target_weight, target_height, target_blood_volume, target_hr_ref, target_map
+        self._scaler.scale_patient(
+            weight=weight,
+            height=height,
+            blood_volume=blood_volume,
+            lung_volume=lung_volume,
+            res_circ_factor=res_circ_factor,
+            el_base_circ_factor=el_base_circ_factor,
+            el_min_circ_factor=el_min_circ_factor,
+            el_max_circ_factor=el_max_circ_factor,
+            res_resp_factor=res_resp_factor,
+            el_base_resp_factor=el_base_resp_factor,
+            u_vol_factor=u_vol_factor,
+            hr_ref=hr_ref,
+            syst_ref=syst_ref,
+            diast_ref=diast_ref,
+            map_ref=map_ref,
+            resp_rate=resp_rate,
+            vt_rr_ratio=vt_rr_ratio,
+            mv_ref=mv_ref,
         )
 
     def fast_forward(

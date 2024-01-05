@@ -10,40 +10,30 @@ class Scaler:
 
     scale_factor: float = 1.0
     scale_factor_correction: float = 1.0
-
     el_base_factor_circ = 1.0
     el_base_factor_circ_correction = 1.0
-
     el_base_factor_resp = 1.0
     el_base_factor_resp_correction = 1.0
-
     res_factor_circ = 1.0
-    res_factor_circ_correction = 0.8  # for 1.5 kg and 0.6 for 0.75 kg
-
+    res_factor_circ_correction = 1.0
     res_factor_resp = 1.0
     res_factor_resp_correction = 1.0
-
     el_min_factor = 1.0
     el_min_factor_correction = 1.0
-
     el_max_factor = 1.0
-    el_max_factor_correction = 0.9  # for 1.5 kg and 0.8 for 0.75 kg
-
+    el_max_factor_correction = 1.0
     u_vol_factor_circ = 1.0
     u_vol_factor_circ_correction = 1.0
-
     u_vol_factor_resp = 1.0
     u_vol_factor_resp_correction = 1.0
-
     u_vol_ratio_factor = 1.0
-
-    hr_ref: float = 140.0
-    syst_ref: float = 50.0
-    diast_ref: float = 23.0
-    map_ref: float = 50.0
-    resp_rate: float = 0.0
+    hr_ref: float = 110.0
+    syst_ref: float = 66.0
+    diast_ref: float = 40.0
+    map_ref: float = 51.26
+    resp_rate: float = 40.0
     vt_rr_ratio: float = 0.0001212
-    mv_ref: float = 0.0
+    mv_ref: float = 0.2
 
     heart_chambers = []
     heart_valves = []
@@ -78,6 +68,7 @@ class Scaler:
             el_max_circ_factor=1.0,
             res_resp_factor=1.0,
             el_base_resp_factor=1.0,
+            u_vol_factor=1.0,
             hr_ref=150.0,
             syst_ref=67,
             diast_ref=40,
@@ -114,6 +105,7 @@ class Scaler:
             el_max_circ_factor=ga_props["el_max_circ_factor"],
             res_resp_factor=ga_props["res_resp_factor"],
             el_base_resp_factor=ga_props["el_base_resp_factor"],
+            u_vol_factor=ga_props["u_vol_factor"],
             hr_ref=ga_props["hr_ref"],
             syst_ref=ga_props["syst_ref"],
             diast_ref=ga_props["diast_ref"],
@@ -233,6 +225,7 @@ class Scaler:
         el_max_circ_factor: float,
         res_resp_factor: float,
         el_base_resp_factor: float,
+        u_vol_factor: float,
         hr_ref: float,
         syst_ref: float,
         diast_ref: float,
@@ -249,6 +242,9 @@ class Scaler:
         # set the weight and height
         self.model.set_weight(weight)  # in kg
         self.model.set_height(height)  # in m
+
+        # set the u_vol_ratio_factor
+        self.u_vol_ratio_factor = u_vol_factor
 
         # scale the blood volume
         self.scale_blood_volume(blood_volume * weight)
