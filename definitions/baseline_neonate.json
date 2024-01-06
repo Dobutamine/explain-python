@@ -12,7 +12,8 @@
     "modeling_stepsize": 0.0005,
     "model_time_total": 0.0,
     "scaler_settings":{
-        "heart_chambers": ["LA", "RA", "LV", "RV", "COR"],
+        "heart_chambers": ["LA", "RA", "LV", "RV"],
+        "coronaries": ["COR"],
         "heart_valves": ["LA_LV", "RA_RV", "LV_AA", "RV_PA", "LV_PA", "RV_AA"],
         "pericardium": ["PC", "AA"],
         "arteries": ["AA", "AAR", "AD", "PA", "DA"],

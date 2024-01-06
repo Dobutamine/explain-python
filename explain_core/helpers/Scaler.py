@@ -6,47 +6,119 @@ import math
 
 
 class Scaler:
+    # reference to the entire model
     model = {}
 
-    scale_factor: float = 1.0
-    scale_factor_correction: float = 1.0
-    el_base_factor_circ = 1.0
-    el_base_factor_circ_correction = 1.0
-    el_base_factor_resp = 1.0
-    el_base_factor_resp_correction = 1.0
-    res_factor_circ = 1.0
-    res_factor_circ_correction = 1.0
-    res_factor_resp = 1.0
-    res_factor_resp_correction = 1.0
-    el_min_factor = 1.0
-    el_min_factor_correction = 1.0
-    el_max_factor = 1.0
-    el_max_factor_correction = 1.0
-    u_vol_factor_circ = 1.0
-    u_vol_factor_circ_correction = 1.0
-    u_vol_factor_resp = 1.0
-    u_vol_factor_resp_correction = 1.0
-    u_vol_ratio_factor = 1.0
-    hr_ref: float = 110.0
-    syst_ref: float = 66.0
-    diast_ref: float = 40.0
-    map_ref: float = 51.26
-    resp_rate: float = 40.0
-    vt_rr_ratio: float = 0.0001212
-    mv_ref: float = 0.2
-
+    # model components which need te be scaled
     heart_chambers = []
+    coronaries = []
     heart_valves = []
-    pericardium = []
     arteries = []
     veins = []
     capillaries = []
     shunts = []
     blood_connectors = []
+    pericardium = []
     lungs = []
     airways = []
     thorax = []
+
+    # preprogrammed scaling factors
     patients: dict = {}
+
+    # general scaler
+    scale_factor: float = 1.0
+
+    # scaler based on weight
+    scale_factor_weight: float = 1.0
+
+    # scaler based on gestational age
+    scale_factor_gestational_age: float = 1.0
+
+    # scaler based on age
+    scale_factor_age: float = 1.0
+
+    # blood volume in L/kg
+    blood_volume: float = 0.08
+
+    # lung volume in L/kg
+    lung_volume: float = 0.03
+
+    # reference heartrate in bpm (-1 = no change) neonate = 110.0
+    hr_ref: float = -1.0
+
+    # reference mean arterial pressure in mmHg (-1 = no change) neonate = 51.26
+    map_ref: float = -1.0
+
+    # reference respiratory rate in bpm (-1 = no change) neonate = 40
+    resp_rate_ref: float = -1.0
+
+    # vt/rr ratio in L/bpm/kg (-1 = no change) neonate = 0.0001212
+    vt_rr_ratio: float = -1.0
+
+    # reference minute volume in L/min (-1 = no change) neonate = 0.2
+    mv_ref: float = -1.0
+
+    # oxygen consumption in ml/min/kg (-1 = no change)
+    vo2: float = -1.0
+
+    # respiratory quotient  (-1 = no change)
+    resp_q: float = -1.0
+
+    # heart chamber scalers
+    el_min_ra_factor = 1.0
+    el_max_ra_factor = 1.0
+    u_vol_ra_factor = 1.0
+
+    el_min_rv_factor = 1.0
+    el_max_rv_factor = 1.0
+    u_vol_rv_factor = 1.0
+
+    el_min_la_factor = 1.0
+    el_min_lv_factor = 1.0
+    u_vol_la_factor = 1.0
+
+    el_max_la_factor = 1.0
+    el_max_lv_factor = 1.0
+    u_vol_lv_factor = 1.0
+
+    # coronary scalers
+    el_min_cor_factor = 1.0
+    el_max_cor_factor = 1.0
+    u_vol_cor_factor = 1.0
+
+    # heart valve scalers
+    res_valve_factor = 1.0
+
+    # pericardium scalers
+    el_base_pericardium_factor = 1.0
+    u_vol_pericardium_factor = 1.0
+
+    # arteries
+    el_base_art_factor = 1.0
+    u_vol_art_factor = 1.0
+
+    # veins
+    el_base_ven_factor = 1.0
+    u_vol_ven_factor = 1.0
+
+    # capillaries
+    el_base_cap_factor = 1.0
+    u_vol_cap_factor = 1.0
+
+    # blood connectors
+    res_blood_connectors_factor = 1.0
+
+    # lungs
+    el_base_lungs_factor = 1.0
+    u_vol_lungs_factor = 1.0
+
+    # airways
+    res_airway_factor = 1.0
+
+    # thorax
+    el_base_thorax_factor = 1.0
+    u_vol_thorax_factor = 1.0
 
     def __init__(self, model, **args: dict[str, any]):
         # set the model
@@ -54,6 +126,266 @@ class Scaler:
         # set the values of the independent properties
         for key, value in args.items():
             setattr(self, key, value)
+
+    def scale_patient(
+        self,
+        scale_factor: float = 1.0,
+        blood_volume: float = -1.0,
+        weight: float = -1.0,
+        height: float = -1.0,
+        gestation_age: float = -1.0,
+        age: float = -1.0,
+        hr_ref: float = -1.0,
+        map_ref: float = -1.0,
+        el_min_ra_factor: float = 1.0,
+        el_max_ra_factor: float = 1.0,
+        u_vol_ra_factor: float = 1.0,
+        el_min_rv_factor: float = 1.0,
+        el_max_rv_factor: float = 1.0,
+        u_vol_rv_factor: float = 1.0,
+        el_min_la_factor: float = 1.0,
+        el_max_la_factor: float = 1.0,
+        u_vol_la_factor: float = 1.0,
+        el_min_lv_factor: float = 1.0,
+        el_max_lv_factor: float = 1.0,
+        u_vol_lv_factor: float = 1.0,
+        el_min_cor_factor: float = 1.0,
+        el_max_cor_factor: float = 1.0,
+        u_vol_cor_factor: float = 1.0,
+        res_valve_factor: float = 1.0,
+        el_base_pericardium_factor: float = 1.0,
+        u_vol_pericardium_factor: float = 1.0,
+        el_base_art_factor: float = 1.0,
+        u_vol_art_factor: float = 1.0,
+        el_base_ven_factor: float = 1.0,
+        u_vol_ven_factor: float = 1.0,
+        el_base_cap_factor: float = 1.0,
+        u_vol_cap_factor: float = 1.0,
+        res_blood_connectors_factor: float = 1.0,
+        lung_volume: float = -1.0,
+        el_base_lungs_factor: float = 1.0,
+        u_vol_lungs_factor: float = 1.0,
+        res_airway_factor: float = 1.0,
+        el_base_thorax_factor: float = 1.0,
+        u_vol_thorax_factor: float = 1.0,
+        resp_rate_ref: float = -1.0,
+        vt_rr_ratio: float = -1.0,
+        mv_ref: float = -1.0,
+        vo2: float = -1.0,
+        resp_q: float = -1.0,
+    ):
+        # calculate the scale factor based on the weight change
+        if scale_factor > 0.0:
+            self.scale_factor: float = scale_factor
+
+        # calculate the scale factor based on the weight change
+        self.weight = weight
+        if self.weight > 0.0:
+            self.model.set_weight(weight)
+            self.scale_factor_weight: float = self.model.weight / weight
+        else:
+            self.scale_factor_weight: float = 1.0
+
+        # set the height
+        self.height = height
+        if self.height > 0.0:
+            self.model.set_height(height)
+
+        # set the gestational age
+        self.gestation_age = gestation_age
+        if self.gestation_age > 0.0:
+            self.scale_factor_gestational_age: float = (
+                self.gestation_age / gestation_age
+            )
+
+        # set the age
+        self.age = age
+        if self.age > 0.0:
+            self.scale_factor_age: float = self.age / age
+
+        # scale the blood volume according to weight
+        self.blood_volume = blood_volume
+        if self.blood_volume > 0.0:
+            self.scale_blood_volume(blood_volume * self.weight)
+
+        # scale the lung volume according to weight
+        self.lung_volume = lung_volume
+        if self.lung_volume > 0.0:
+            self.scale_lung_volume(lung_volume * self.weight)
+
+        # scale the baroreflex of the autonomous nervous system
+        self.map_ref = map_ref
+        if self.map_ref > 0.0:
+            self.scale_ans(map_ref)
+
+        # set the reference heartrate
+        self.hr_ref = hr_ref
+        if self.hr_ref > 0.0:
+            self.model.models["Heart"].set_heart_rate_ref(hr_ref)
+
+        # set respiratory system reference values
+        self.resp_rate_ref = resp_rate_ref
+        self.vt_rr_ratio = vt_rr_ratio
+        self.mv_ref = mv_ref
+        if self.resp_rate_ref > 0.0:
+            self.model.models["Breathing"].set_resp_rate(self.resp_rate_ref)
+        if self.vt_rr_ratio > 0.0:
+            self.model.models["Breathing"].set_vt_rr_ratio(self.vt_rr_ratio)
+        if self.mv_ref > 0.0:
+            self.model.models["Breathing"].set_mv_ref(mv_ref)
+
+        # set the definitive scaling factors for the heart chambers
+        self.el_min_ra_factor = scale_factor
+        if el_min_ra_factor > 0.0:
+            self.el_min_ra_factor = scale_factor * el_min_ra_factor
+
+        self.el_max_ra_factor = scale_factor
+        if el_max_ra_factor > 0.0:
+            self.el_max_ra_factor = scale_factor * el_max_ra_factor
+
+        self.u_vol_ra_factor = 1.0
+        if u_vol_ra_factor > 0.0:
+            self.u_vol_ra_factor = u_vol_ra_factor
+
+        self.el_min_rv_factor = scale_factor
+        if el_min_rv_factor > 0.0:
+            self.el_min_rv_factor = scale_factor * el_min_rv_factor
+
+        self.el_max_rv_factor = scale_factor
+        if el_max_rv_factor > 0.0:
+            self.el_max_rv_factor = scale_factor * el_max_rv_factor
+
+        self.u_vol_rv_factor = 1.0
+        if u_vol_rv_factor > 0.0:
+            self.u_vol_rv_factor = u_vol_rv_factor
+
+        self.el_min_la_factor = scale_factor
+        if el_min_la_factor > 0.0:
+            self.el_min_la_factor = scale_factor * el_min_la_factor
+
+        self.el_max_la_factor = scale_factor
+        if el_max_la_factor > 0.0:
+            self.el_max_la_factor = scale_factor * el_max_la_factor
+
+        self.u_vol_la_factor = 1.0
+        if u_vol_la_factor > 0.0:
+            self.u_vol_la_factor = u_vol_la_factor
+
+        self.el_min_lv_factor = scale_factor
+        if el_min_lv_factor > 0.0:
+            self.el_min_lv_factor = scale_factor * el_min_lv_factor
+
+        self.el_max_lv_factor = scale_factor
+        if el_max_lv_factor > 0.0:
+            self.el_max_lv_factor = scale_factor * el_max_lv_factor
+
+        self.u_vol_lv_factor = 1.0
+        if u_vol_lv_factor > 0.0:
+            self.u_vol_lv_factor = u_vol_lv_factor
+
+        # set the definitive scaling factors for the coronary circulation
+        self.el_min_cor_factor = scale_factor
+        if el_min_cor_factor > 0.0:
+            self.el_min_cor_factor = scale_factor * el_min_cor_factor
+
+        self.el_max_cor_factor = scale_factor
+        if el_max_cor_factor > 0.0:
+            self.el_max_cor_factor = scale_factor * el_max_cor_factor
+
+        self.u_vol_cor_factor = 1.0
+        if u_vol_cor_factor > 0.0:
+            self.u_vol_cor_factor = u_vol_cor_factor
+
+        # set the definitive scaling factors for the arteries
+        self.el_base_art_factor = scale_factor
+        if el_base_art_factor > 0.0:
+            self.el_base_art_factor = scale_factor * el_base_art_factor
+
+        self.u_vol_art_factor = 1.0
+        if u_vol_art_factor > 0.0:
+            self.u_vol_art_factor = u_vol_art_factor
+
+        # set the definitive scaling factors for the veins
+        self.el_base_ven_factor = scale_factor
+        if el_base_ven_factor > 0.0:
+            self.el_base_ven_factor = scale_factor * el_base_ven_factor
+
+        self.u_vol_ven_factor = 1.0
+        if u_vol_ven_factor > 0.0:
+            self.u_vol_ven_factor = u_vol_ven_factor
+
+        # set the definitive scaling factors for the capillaries
+        self.el_base_cap_factor = scale_factor
+        if el_base_cap_factor > 0.0:
+            self.el_base_cap_factor = scale_factor * el_base_cap_factor
+
+        self.u_vol_cap_factor = 1.0
+        if u_vol_cap_factor > 0.0:
+            self.u_vol_cap_factor = u_vol_cap_factor
+
+        # set the definitive scaling factors for the blood connectors
+        self.res_blood_connectors_factor = scale_factor
+        if res_blood_connectors_factor > 0.0:
+            self.res_blood_connectors_factor = (
+                scale_factor * res_blood_connectors_factor
+            )
+
+        # set the definitive scaling factors for the heart valves
+        self.res_valve_factor = scale_factor
+        if res_valve_factor > 0.0:
+            self.res_valve_factor = scale_factor * res_valve_factor
+
+        # set the definitive scaling factors for the pericardium
+        self.el_base_pericardium_factor = scale_factor
+        if el_base_pericardium_factor > 0.0:
+            self.el_base_pericardium_factor = scale_factor * el_base_pericardium_factor
+
+        self.u_vol_pericardium_factor = 1.0
+        if u_vol_pericardium_factor > 0.0:
+            self.u_vol_pericardium_factor = u_vol_pericardium_factor
+
+        # set the definitive scaling factors for the lungs
+        self.el_base_lungs_factor = scale_factor
+        if el_base_lungs_factor > 0.0:
+            self.el_base_lungs_factor = scale_factor * el_base_lungs_factor
+
+        self.u_vol_lungs_factor = 1.0
+        if u_vol_lungs_factor > 0.0:
+            self.u_vol_lungs_factor = u_vol_lungs_factor
+
+        # set the definitive scaling factors for the airways
+        self.res_airway_factor = scale_factor
+        if res_airway_factor > 0.0:
+            self.res_airway_factor = scale_factor * res_airway_factor
+
+        # set the definitive scaling factors for the thorax
+        self.el_base_thorax_factor = scale_factor
+        if el_base_thorax_factor > 0.0:
+            self.el_base_thorax_factor = scale_factor * el_base_thorax_factor
+
+        self.u_vol_thorax_factor = 1.0
+        if u_vol_thorax_factor > 0.0:
+            self.u_vol_thorax_factor = u_vol_thorax_factor
+
+        # set the definitive scaling factors for the shunts
+        self.res_shunt_factor = scale_factor
+        if res_shunt_factor > 0.0:
+            self.res_shunt_factor = scale_factor * res_shunt_factor
+
+        # scale the heart
+        self.scale_heart()
+
+        # scale the circulation
+        self.scale_circulatory_system()
+
+        # scale the respiratory system
+        self.scale_respiratory_system()
+
+        # scale the metabolism
+        self.scale_metabolism()
+
+        # scale the myocardial oxygen balance and metabolism
+        self.scale_mob()
 
     def scale_to_weight(self, weight: float, height: float, output=False):
         # scale the patient
@@ -212,79 +544,6 @@ class Scaler:
 
         # scale the respiratory system
         self.scale_respiratory_system()
-
-    def scale_patient(
-        self,
-        weight: float,
-        height: float,
-        blood_volume: float,
-        lung_volume: float,
-        res_circ_factor: float,
-        el_base_circ_factor: float,
-        el_min_circ_factor: float,
-        el_max_circ_factor: float,
-        res_resp_factor: float,
-        el_base_resp_factor: float,
-        u_vol_factor: float,
-        hr_ref: float,
-        syst_ref: float,
-        diast_ref: float,
-        map_ref: float,
-        resp_rate: float,
-        vt_rr_ratio: float,
-        mv_ref: float,
-    ):
-        # calculate the scale factor based on the weight change
-        self.scale_factor: float = (
-            self.model.weight / weight
-        ) * self.scale_factor_correction
-
-        # set the weight and height
-        self.model.set_weight(weight)  # in kg
-        self.model.set_height(height)  # in m
-
-        # set the u_vol_ratio_factor
-        self.u_vol_ratio_factor = u_vol_factor
-
-        # scale the blood volume
-        self.scale_blood_volume(blood_volume * weight)
-
-        # scale the gas volume
-        self.scale_lung_volume(lung_volume * weight)
-
-        # set circulatory system reference values
-        self.syst_ref = syst_ref
-        self.diast_ref = diast_ref
-        self.map_ref = map_ref
-        # set the reference heartrate
-        self.model.models["Heart"].set_heart_rate_ref(hr_ref)
-        # scale the baroreflex of the autonomous nervous system
-        self.scale_ans(map_ref)
-
-        # set respiratory system reference values
-        self.resp_rate_ref = resp_rate
-        self.vt_rr_ratio_ref = vt_rr_ratio
-        self.mv_ref = mv_ref
-        self.model.models["Breathing"].set_resp_rate(self.resp_rate)
-        self.model.models["Breathing"].set_vt_rr_ratio(self.vt_rr_ratio)
-        self.model.models["Breathing"].set_mv_ref(mv_ref)
-
-        # set the definitive scaling factors
-        self.set_scale_factors(
-            res_circ_factor,
-            el_base_circ_factor,
-            el_min_circ_factor,
-            el_max_circ_factor,
-            res_resp_factor,
-            el_base_resp_factor,
-            False,
-        )
-
-        # scale the metabolism
-        self.scale_metabolism()
-
-        # scale the myocardial oxygen balance and metabolism
-        self.scale_mob()
 
     def get_total_lung_volume(self, output=True) -> float:
         total_gas_volume: float = 0.0
