@@ -239,9 +239,12 @@ class ModelEngine:
             "description": self.description,
             "weight": self.weight,
             "height": self.height,
+            "gestational_age": self.gestational_age,
+            "age": self.age,
             "modeling_stepsize": self.modeling_stepsize,
             "model_time_total": self.model_time_total,
             "models": {},
+            "scaler_settings": self.model_definition["scaler_settings"],
         }
         # process the model definition file to find the necessary properties
         for model_name, model in self.models.items():
@@ -291,9 +294,12 @@ class ModelEngine:
             "description": self.description,
             "weight": self.weight,
             "height": self.height,
+            "gestational_age": self.gestational_age,
+            "age": self.age,
             "modeling_stepsize": self.modeling_stepsize,
             "model_time_total": self.model_time_total,
             "models": {},
+            "scaler_settings": self.model_definition["scaler_settings"],
         }
         # process the model definition file to find the necessary properties
         for model_name, model in self.models.items():
