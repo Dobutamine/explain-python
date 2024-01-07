@@ -10,6 +10,8 @@ class Scaler:
     model = {}
 
     reference_weight: float = 3.545
+    reference_gestational_age: float = 40.0
+    reference_age: float = 0.0
 
     # model components which need te be scaled
     left_atrium = []
@@ -135,7 +137,10 @@ class Scaler:
 
         # set the reference weight
         self.reference_weight = self.model.weight
+        self.reference_age = self.model.age
+        self.reference_gestational_age = self.model.gestational_age
 
+    # general scaling function
     def scale_patient(
         self,
         scale_factor: float = 1.0,
@@ -145,7 +150,7 @@ class Scaler:
         blood_volume: float = -1.0,
         weight: float = -1.0,
         height: float = -1.0,
-        gestation_age: float = -1.0,
+        gestational_age: float = -1.0,
         age: float = -1.0,
         hr_ref: float = -1.0,
         map_ref: float = -1.0,
@@ -189,6 +194,8 @@ class Scaler:
     ):
         # get the current weight
         current_weight = self.model.weight
+        current_age = self.model.age
+        current_gestational_age = self.model.gestational_age
 
         # calculate the scale factor based on the weight change
         self.weight = self.model.weight
@@ -212,17 +219,19 @@ class Scaler:
             self.height = self.model.height
 
         # set the gestational age
-        self.gestation_age = gestation_age
-        if gestation_age > 0.0:
+        self.gestational_age = gestational_age
+        if gestational_age > 0.0:
             if output:
                 print(
-                    f"Adjusted gestational age from {self.gestation_age} to {gestation_age}"
+                    f"Adjusted gestational age from {self.gestational_age} to {gestational_age}"
                 )
             if scale_by_gestational_age:
                 print(f"Scaling by gestational age")
-                self.scale_factor_gestational_age = self.gestation_age / gestation_age
+                self.scale_factor_gestational_age = (
+                    self.gestational_age / gestational_age
+                )
             self.scale_factor_gestational_age: float = (
-                self.gestation_age / gestation_age
+                self.gestational_age / gestational_age
             )
 
         # set the age

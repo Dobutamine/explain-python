@@ -34,6 +34,12 @@ class ModelEngine:
     # define an attribute holding the weight
     weight: float = 3.3
 
+    # define a gestational age attribute
+    gestational_age: float = 40.0
+
+    # define a age attribute
+    age: float = 0.0
+
     # define an attribute holding the length in meters
     height: float = 0.50
 
