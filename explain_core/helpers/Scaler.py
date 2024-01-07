@@ -256,6 +256,10 @@ class Scaler:
 
         # scale the blood volume according to weight
         self.blood_volume = self.get_total_blood_volume(output=False) / current_weight
+        # if scaled by weight and the bloodvolume is not explicitely set, scale the blood volume according to new weight
+        if scale_by_weight and blood_volume < 0.0:
+            blood_volume = self.blood_volume
+
         if blood_volume > 0.0:
             if output:
                 print(
@@ -265,10 +269,14 @@ class Scaler:
 
         # scale the lung volume according to weight
         self.lung_volume = self.get_total_lung_volume(output=False) / current_weight
+        # if scaled by weight and the lung volume is not explicitely set, scale the lung volume according to new weight
+        if scale_by_weight and lung_volume < 0.0:
+            lung_volume = self.lung_volume
+
         if lung_volume > 0.0:
             if output:
                 print(
-                    f"Adjusted lung volume from {self.lung_volume * 1000.0} ml/kg to {lung_volume * 1000.0} ml/kg"
+                    f"Adjusted lung volume from {self.lung_volume * 1000.0 * current_weight} ml ({self.lung_volume * 1000.0} ml/kg) to {lung_volume * 1000.0 * weight} ml  ({lung_volume * 1000.0} ml/kg)"
                 )
             self.scale_lung_volume(lung_volume * self.weight)
 
