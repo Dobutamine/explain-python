@@ -890,7 +890,7 @@ class NeoInterface(BaseInterface):
         self, new_diameter: float, in_time: float = 10.0, at_time: float = 0.0
     ):
         self.model.models["Pda"].open_ductus(
-            new_diameter=3.5, in_time=10.0, at_time=0.0
+            new_diameter=new_diameter, in_time=in_time, at_time=at_time
         )
 
     def close_ductus_arteriosus(self, in_time: float = 10.0, at_time: float = 0.0):
