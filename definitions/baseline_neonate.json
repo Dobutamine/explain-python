@@ -68,9 +68,9 @@
                 "u_vol_ra_factor": 1.0,
                 "u_vol_la_factor": 1.0,
                 "el_min_rv_factor": 1.5,
-                "el_max_rv_factor": 0.73,
+                "el_max_rv_factor": 0.75,
                 "el_min_lv_factor": 1.5,
-                "el_max_lv_factor": 0.73,
+                "el_max_lv_factor": 0.75,
                 "u_vol_rv_factor": 1.0,
                 "u_vol_lv_factor": 1.0,
                 "el_min_cor_factor": 1.0,
@@ -1269,7 +1269,7 @@
             "comp_from": "LA",
             "comp_to": "RA",
             "diameter": 1.0,
-            "length": 3.0
+            "length": 2.0
         },
         "VSD": {
             "name": "VSD",

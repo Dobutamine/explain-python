@@ -886,6 +886,16 @@ class NeoInterface(BaseInterface):
         )
         return result
 
+    def open_ductus(
+        self, new_diameter: float, in_time: float = 10.0, at_time: float = 0.0
+    ):
+        self.model.models["Pda"].open_ductus(
+            new_diameter=3.5, in_time=10.0, at_time=0.0
+        )
+
+    def close_ductus_arteriosus(self, in_time: float = 10.0, at_time: float = 0.0):
+        self.model.models["Pda"].close_ductus(in_time=in_time, at_time=at_time)
+
     def analyze_heart(self, weight_based=True, time_to_calculate=60):
         self.analyze(
             [

@@ -117,7 +117,7 @@ class Resistor(BaseModel):
         # flow is in l/s
         if self.area > 0:
             self.velocity = (self.flow * 0.001) / self.area
-            self.velocity = self.velocity * 2.0
+            self.velocity = self.velocity * 4.0
 
         # now update the volumes of the model components which are connected by this resistor
         if self.flow > 0:
@@ -221,10 +221,10 @@ class Resistor(BaseModel):
 
     def get_r_for(self) -> float:
         return self.r_for * self.r_scaling_factor
-    
+
     def get_r_back(self) -> float:
         return self.r_back * self.r_scaling_factor
-        
+
     def calc_resistance(self):
         # set the resistances by calculating the resistance from the diameter and length
         if self.diameter > 0.0 and self.length > 0.0:

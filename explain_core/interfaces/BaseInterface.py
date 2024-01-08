@@ -773,6 +773,8 @@ class BaseInterface:
         sampleinterval=0.005,
         analyze=True,
         weight_based=False,
+        fig_size_x=14,
+        fig_size_y=2,
     ):
         # first clear the watchllist and this also clears all data
         self.model.clear_watchlist()
@@ -804,6 +806,8 @@ class BaseInterface:
             fill,
             fill_between,
             zeroline,
+            fig_size_x,
+            fig_size_y,
         )
 
         # analyze
@@ -817,7 +821,13 @@ class BaseInterface:
             )
 
     def plot_xy_graph(
-        self, property_x, property_y, time_to_calculate=2, sampleinterval=0.0005
+        self,
+        property_x,
+        property_y,
+        time_to_calculate=2,
+        sampleinterval=0.0005,
+        fig_size_x=2,
+        fig_size_y=2,
     ):
         # first clear the watchllist and this also clears all data
         self.model.clear_watchlist()
@@ -832,9 +842,13 @@ class BaseInterface:
         # calculate the model steps
         collected_data = self.model.calculate(time_to_calculate)
 
-        self.draw_xy_graph(collected_data, property_x, property_y)
+        self.draw_xy_graph(
+            collected_data, property_x, property_y, fig_size_x, fig_size_y
+        )
 
-    def draw_xy_graph(self, collected_data, property_x, property_y):
+    def draw_xy_graph(
+        self, collected_data, property_x, property_y, fig_size_x=2, fig_size_y=2
+    ):
         no_dp = len(collected_data)
         x = np.zeros(no_dp)
         y = np.zeros(no_dp)
@@ -848,7 +862,7 @@ class BaseInterface:
             plt.style.use("dark_background")
 
         plt.figure(
-            figsize=(2, 2),
+            figsize=(fig_size_x, fig_size_y),
             dpi=self.plot_dpi / 1.5,
             facecolor=self.plot_background_color,
             tight_layout=True,
@@ -880,6 +894,8 @@ class BaseInterface:
         fill=True,
         fill_between=False,
         zeroline=False,
+        fig_size_x=14,
+        fig_size_y=3,
     ):
         parameters = properties
         no_parameters = 0
@@ -912,7 +928,7 @@ class BaseInterface:
             fig, axs = plt.subplots(
                 nrows=no_parameters,
                 ncols=1,
-                figsize=(14, self.plot_height * 0.75 * no_parameters),
+                figsize=(fig_size_x, fig_size_y * 0.75 * no_parameters),
                 sharex=True,
                 sharey=sharey,
                 constrained_layout=True,
@@ -947,7 +963,7 @@ class BaseInterface:
 
         if combined:
             fig = plt.figure(
-                figsize=(14, self.plot_height),
+                figsize=(fig_size_x, fig_size_y),
                 dpi=self.plot_dpi / 3,
                 facecolor=self.plot_background_color,
                 tight_layout=True,
