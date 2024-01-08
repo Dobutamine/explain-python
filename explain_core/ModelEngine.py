@@ -415,9 +415,10 @@ class ModelEngine:
         for m in self.models.values():
             m._mmhg_kpa = self.mmhg_kpa
 
-    def scale_to_gestational_age(self, gestational_age: float):
-        if gestational_age > 21.0 and gestational_age < 45.0:
-            self._scaler.scale_to_gestational_age(gestational_age)
+    def scale_patient_by_gestational_age(
+        self, gestational_age: float, output: bool = False
+    ):
+        self._scaler.scale_patient_by_gestational_age(gestational_age, output)
 
     def scale_patient(
         self,

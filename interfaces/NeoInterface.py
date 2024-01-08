@@ -870,7 +870,7 @@ class NeoInterface(BaseInterface):
         )
 
     def validate_pda(self, weight_based=True, time_to_calculate=60):
-        self.analyze(
+        result = self.analyze(
             [
                 "Heart.heart_rate",
                 "AA.pres",
@@ -882,7 +882,9 @@ class NeoInterface(BaseInterface):
             weight_based=weight_based,
             sampleinterval=0.0005,
             time_to_calculate=time_to_calculate,
+            suppress_output=True,
         )
+        return result
 
     def analyze_heart(self, weight_based=True, time_to_calculate=60):
         self.analyze(

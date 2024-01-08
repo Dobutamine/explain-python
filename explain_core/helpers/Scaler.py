@@ -150,7 +150,7 @@ class Scaler:
 
     def scale_patient_by_gestational_age(self, gestational_age: float, output=False):
         pat_settings = self.patients[str(gestational_age)]
-        config = {"scale_by_weight": True, "output": True}
+        config = {"scale_by_weight": True, "output": output}
 
         for key, value in pat_settings.items():
             config[key] = value
@@ -230,7 +230,7 @@ class Scaler:
                 print(f"Adjusted weight from {self.weight} to {weight}")
             if scale_by_weight:
                 print(
-                    f"Scaling by weight {weight} to reference weight {self.reference_weight} kg"
+                    f"Scaling {self.model.name} with reference weight of {self.reference_weight} kg to weight {weight} kg."
                 )
                 self.scale_factor_weight = self.reference_weight / weight
             self.model.set_weight(weight)

@@ -987,3 +987,6 @@ class BaseInterface:
                 plt.fill_between(x, y[0], y[1], color="blue", alpha=0.1)
 
         plt.show()
+
+    def scale_patient_by_gestational_age(self, gestational_age: float, output=False):
+        self.model.scale_patient_by_gestational_age(gestational_age, output=output)
