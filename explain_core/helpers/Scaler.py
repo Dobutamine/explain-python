@@ -116,6 +116,7 @@ class Scaler:
 
     # blood connectors
     res_blood_connectors_factor = 1.0
+    res_shunts_factor = 1.0
 
     # lungs
     el_base_lungs_factor = 1.0
@@ -140,13 +141,37 @@ class Scaler:
         self.reference_age = self.model.age
         self.reference_gestational_age = self.model.gestational_age
 
+    def scale_patient_by_weight(self, weight: float, output=False):
+        self.scale_patient(
+            scale_by_weight=True,
+            weight=weight,
+            output=output,
+        )
+
+    def scale_patient_by_gestational_age(self, gestational_age: float, output=False):
+        pat_settings = self.patients[str(gestational_age)]
+        config = {"scale_by_weight": True, "output": True}
+
+        for key, value in pat_settings.items():
+            config[key] = value
+
+        self.scale_patient(**config)
+
+    # except:
+    #     print(f"Patient with  gestational age {gestational_age} not found")
+
+    def scale_patient_by_age(self, age: float, output=False):
+        self.scale_patient(
+            scale_by_age=True,
+            age=age,
+            output=output,
+        )
+
     # general scaling function
     def scale_patient(
         self,
         scale_factor: float = 1.0,
         scale_by_weight: bool = False,
-        scale_by_gestational_age: bool = False,
-        scale_by_age: bool = False,
         blood_volume: float = -1.0,
         weight: float = -1.0,
         height: float = -1.0,
@@ -179,6 +204,7 @@ class Scaler:
         el_base_cap_factor: float = 1.0,
         u_vol_cap_factor: float = 1.0,
         res_blood_connectors_factor: float = 1.0,
+        res_shunts_factor: float = 1.0,
         lung_volume: float = -1.0,
         el_base_lungs_factor: float = 1.0,
         u_vol_lungs_factor: float = 1.0,
@@ -218,31 +244,9 @@ class Scaler:
             self.model.set_height(height)
             self.height = self.model.height
 
-        # set the gestational age
-        self.gestational_age = gestational_age
-        if gestational_age > 0.0:
-            if output:
-                print(
-                    f"Adjusted gestational age from {self.gestational_age} to {gestational_age}"
-                )
-            if scale_by_gestational_age:
-                print(f"Scaling by gestational age")
-                self.scale_factor_gestational_age = (
-                    self.gestational_age / gestational_age
-                )
-            self.scale_factor_gestational_age: float = (
-                self.gestational_age / gestational_age
-            )
-
-        # set the age
-        self.age = age
-        if age > 0.0:
-            if output:
-                print(f"Adjusted age from {self.age} to {age}")
-            if scale_by_age:
-                print(f"Scaling by age")
-                self.scale_factor_age = self.age / age
-            self.scale_factor_age: float = self.age / age
+        # disable the age and gest age factors as they are not implemented yet
+        self.scale_factor_age = 1.0
+        self.scale_factor_gestational_age = 1.0
 
         # calculate the definitive scale factor
         self.scale_factor = (
@@ -332,7 +336,7 @@ class Scaler:
         if mv_ref > 0.0:
             if output:
                 print(
-                    f"Adjusted minute volume from {self.mv_ref} L/min to {mv_ref} L/min"
+                    f"Adjusted minute volume from {self.mv_ref} L/min/kg to {mv_ref} L/min/kg"
                 )
             self.model.models["Breathing"].set_mv_ref(mv_ref)
             self.mv_ref = mv_ref
@@ -595,13 +599,13 @@ class Scaler:
             self.u_vol_thorax_factor = 1.0 / (self.scale_factor * u_vol_thorax_factor)
 
         # set the definitive scaling factors for the shunts
-        self.res_shunt_factor = self.scale_factor
-        if res_blood_connectors_factor != 1.0:
+        self.res_shunts_factor = self.scale_factor
+        if res_shunts_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted shunt resistance scaling factor to {res_blood_connectors_factor * self.scale_factor}"
+                    f"Adjusted shunt resistance scaling factor to {res_shunts_factor * self.scale_factor}"
                 )
-            self.res_shunt_factor = self.scale_factor * res_blood_connectors_factor
+            self.res_shunts_factor = self.scale_factor * res_shunts_factor
 
         # scale the heart
         self.scale_heart()
@@ -846,7 +850,7 @@ class Scaler:
 
         # scale the shunts
         for _shunt in self.shunts:
-            self.model.models[_shunt].res_scaling_factor = self.res_shunt_factor
+            self.model.models[_shunt].r_scaling_factor = self.res_shunts_factor
 
         # scale the blood connectors
         for _blood_connector in self.blood_connectors:
@@ -862,7 +866,7 @@ class Scaler:
 
         # scale the airways
         for _airway in self.airways:
-            self.model.models[_airway].res_scaling_factor = self.res_airway_factor
+            self.model.models[_airway].r_scaling_factor = self.res_airway_factor
 
         # scale the thorax
         for _thorax in self.thorax:

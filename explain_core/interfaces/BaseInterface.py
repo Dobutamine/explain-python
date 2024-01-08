@@ -309,12 +309,15 @@ class BaseInterface:
                 data = np.array(y[idx])
                 max = round(np.amax(data), 5)
                 min = round(np.amin(data), 5)
+                mean = round((2 * min + max) / 3, 5)
 
                 # if the modeltype is a blood model type then the unit is mmHg
                 # if the modeltype is a gas model type then the unit is cmH2O
                 if not suppress_output:
                     print(
-                        "{:<16}: max {:10}, min {:10} mmHg".format(parameter, max, min)
+                        "{:<16}: max {:10}, min {:10}, mean {:10} mmHg".format(
+                            parameter, max, min, mean
+                        )
                     )
                 result[parameter + ".max"] = max
                 result[parameter + ".min"] = min
