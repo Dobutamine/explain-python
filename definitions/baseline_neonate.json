@@ -1224,9 +1224,8 @@
             "no_back_flow": false,
             "comp_from": "LA",
             "comp_to": "RA",
-            "diameter": 0.5,
-            "length": 2.0,
-            "r_k": 0
+            "diameter": 1.0,
+            "length": 3.0
         },
         "VSD": {
             "name": "VSD",
