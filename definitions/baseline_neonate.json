@@ -1649,7 +1649,7 @@
             "category": "general_models",
             "is_enabled": true,
             "dependencies": [],
-            "vo2": 5.5,
+            "vo2": 5.0,
             "resp_q": 0.7,
             "body_temp": 37,
             "metabolic_active_models": {
