@@ -3,6 +3,7 @@ import pickle
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
+import pandas as pd
 
 from pathlib import Path
 
@@ -819,6 +820,8 @@ class BaseInterface:
                 calculate=False,
                 weight_based=weight_based,
             )
+
+        return collected_data
 
     def plot_xy_graph(
         self,

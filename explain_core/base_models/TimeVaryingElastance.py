@@ -21,6 +21,7 @@ class TimeVaryingElastance(Capacitance):
     # dependent variables
     pres_ed: float = 0.0
     pres_ms: float = 0.0
+    el: float = 0.0
 
     def get_el_min(self) -> float:
         return self.el_min * self.el_min_scaling_factor
@@ -94,6 +95,8 @@ class TimeVaryingElastance(Capacitance):
             * self.el_k_scaling_factor
             * math.pow(vol_diff, 2)
         )
+
+        self.el = (_e_max - _e_min) * self.act_factor / 1000.0
 
         # calculate the maximal systolic pressure
         self.pres_ms = _e_max * vol_diff

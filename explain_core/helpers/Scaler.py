@@ -158,7 +158,7 @@ class Scaler:
         self.scale_patient(**config)
 
     # except:
-    #     print(f"Patient with  gestational age {gestational_age} not found")
+    #     print(f" Patient with  gestational age {gestational_age} not found")
 
     def scale_patient_by_age(self, age: float, output=False):
         self.scale_patient(
@@ -227,10 +227,10 @@ class Scaler:
         self.weight = self.model.weight
         if weight > 0.0:
             if output:
-                print(f"Adjusted weight from {self.weight} to {weight}")
+                print(f" Adjusted weight from {self.weight} to {weight}")
             if scale_by_weight:
                 print(
-                    f"Scaling {self.model.name} with reference weight of {self.reference_weight} kg to weight {weight} kg."
+                    f" Scaling {self.model.name} with reference weight of {self.reference_weight} kg to weight {weight} kg."
                 )
                 self.scale_factor_weight = self.reference_weight / weight
             self.model.set_weight(weight)
@@ -240,7 +240,7 @@ class Scaler:
         self.height = self.model.height
         if height > 0.0:
             if output:
-                print(f"Adjusted height from {self.height} to {height}")
+                print(f" Adjusted height from {self.height} to {height}")
             self.model.set_height(height)
             self.height = self.model.height
 
@@ -265,7 +265,7 @@ class Scaler:
             )
 
         if output:
-            print(f"Global scaling factor = {self.scale_factor}")
+            print(f" Global scaling factor = {self.scale_factor}")
 
         # scale the blood volume according to weight
         self.blood_volume = self.get_total_blood_volume(output=False) / current_weight
@@ -276,7 +276,7 @@ class Scaler:
         if blood_volume > 0.0:
             if output:
                 print(
-                    f"Adjusted blood volume from {self.blood_volume * 1000.0 * current_weight} ml ({self.blood_volume * 1000.0} ml/kg) to {blood_volume * 1000.0 * weight} ml  ({blood_volume * 1000.0} ml/kg)"
+                    f" Adjusted blood volume from {self.blood_volume * 1000.0 * current_weight} ml ({self.blood_volume * 1000.0} ml/kg) to {blood_volume * 1000.0 * weight} ml  ({blood_volume * 1000.0} ml/kg)"
                 )
             self.scale_blood_volume(blood_volume * self.weight)
 
@@ -289,7 +289,7 @@ class Scaler:
         if lung_volume > 0.0:
             if output:
                 print(
-                    f"Adjusted lung volume from {self.lung_volume * 1000.0 * current_weight} ml ({self.lung_volume * 1000.0} ml/kg) to {lung_volume * 1000.0 * weight} ml  ({lung_volume * 1000.0} ml/kg)"
+                    f" Adjusted lung volume from {self.lung_volume * 1000.0 * current_weight} ml ({self.lung_volume * 1000.0} ml/kg) to {lung_volume * 1000.0 * weight} ml  ({lung_volume * 1000.0} ml/kg)"
                 )
             self.scale_lung_volume(lung_volume * self.weight)
 
@@ -298,7 +298,7 @@ class Scaler:
         if map_ref > 0.0:
             if output:
                 print(
-                    f"Adjusted mean arterial pressure from {self.map_ref} to {map_ref}"
+                    f" Adjusted mean arterial pressure from {self.map_ref} to {map_ref}"
                 )
             self.scale_ans(map_ref)
             self.map_ref = map_ref
@@ -307,7 +307,7 @@ class Scaler:
         self.hr_ref = self.model.models["Heart"].heart_rate_ref
         if hr_ref > 0.0:
             if output:
-                print(f"Adjusted heart rate from {self.hr_ref} bpm to {hr_ref} bpm")
+                print(f" Adjusted heart rate from {self.hr_ref} bpm to {hr_ref} bpm")
             self.model.models["Heart"].set_heart_rate_ref(hr_ref)
             self.hr_ref = hr_ref
 
@@ -316,7 +316,7 @@ class Scaler:
         if resp_rate_ref > 0.0:
             if output:
                 print(
-                    f"Adjusted respiratory rate from {self.resp_rate_ref} bpm to {resp_rate_ref} bpm"
+                    f" Adjusted respiratory rate from {self.resp_rate_ref} bpm to {resp_rate_ref} bpm"
                 )
             self.model.models["Breathing"].set_resp_rate(self.resp_rate_ref)
             self.resp_rate_ref = resp_rate_ref
@@ -326,7 +326,7 @@ class Scaler:
         if vt_rr_ratio > 0.0:
             if output:
                 print(
-                    f"Adjusted vt/rr ratio from {self.vt_rr_ratio} L/bpm/kg to {vt_rr_ratio} L/bpm/kg"
+                    f" Adjusted vt/rr ratio from {self.vt_rr_ratio} L/bpm/kg to {vt_rr_ratio} L/bpm/kg"
                 )
             self.model.models["Breathing"].set_vt_rr_ratio(self.vt_rr_ratio)
             self.vt_rr_ratio = vt_rr_ratio
@@ -336,7 +336,7 @@ class Scaler:
         if mv_ref > 0.0:
             if output:
                 print(
-                    f"Adjusted minute volume from {self.mv_ref} L/min/kg to {mv_ref} L/min/kg"
+                    f" Adjusted minute volume from {self.mv_ref} L/min/kg to {mv_ref} L/min/kg"
                 )
             self.model.models["Breathing"].set_mv_ref(mv_ref)
             self.mv_ref = mv_ref
@@ -346,7 +346,7 @@ class Scaler:
         if el_min_ra_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted minimum right atrial elastance scaling factor to {el_min_ra_factor * self.scale_factor}"
+                    f" Adjusted minimum right atrial elastance scaling factor to {el_min_ra_factor * self.scale_factor}"
                 )
             self.el_min_ra_factor = self.scale_factor * el_min_ra_factor
 
@@ -354,7 +354,7 @@ class Scaler:
         if el_max_ra_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted maximum right atrial elastance scaling factor to {el_max_ra_factor * self.scale_factor}"
+                    f" Adjusted maximum right atrial elastance scaling factor to {el_max_ra_factor * self.scale_factor}"
                 )
             self.el_max_ra_factor = self.scale_factor * el_max_ra_factor
 
@@ -362,7 +362,7 @@ class Scaler:
         if u_vol_ra_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted right atrial unstressed volume scaling factor to {u_vol_ra_factor}"
+                    f" Adjusted right atrial unstressed volume scaling factor to {u_vol_ra_factor}"
                 )
             self.u_vol_ra_factor = u_vol_ra_factor
 
@@ -370,7 +370,7 @@ class Scaler:
         if el_min_rv_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted minimum right ventricular elastance scaling factor to {el_min_rv_factor * self.scale_factor}"
+                    f" Adjusted minimum right ventricular elastance scaling factor to {el_min_rv_factor * self.scale_factor}"
                 )
             self.el_min_rv_factor = self.scale_factor * el_min_rv_factor
 
@@ -378,7 +378,7 @@ class Scaler:
         if el_max_rv_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted maximum right ventricular elastance scaling factor to {el_max_rv_factor * self.scale_factor}"
+                    f" Adjusted maximum right ventricular elastance scaling factor to {el_max_rv_factor * self.scale_factor}"
                 )
             self.el_max_rv_factor = self.scale_factor * el_max_rv_factor
 
@@ -386,7 +386,7 @@ class Scaler:
         if u_vol_rv_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted right ventricular unstressed volume scaling factor to {u_vol_rv_factor}"
+                    f" Adjusted right ventricular unstressed volume scaling factor to {u_vol_rv_factor}"
                 )
             self.u_vol_rv_factor = u_vol_rv_factor
 
@@ -394,7 +394,7 @@ class Scaler:
         if el_min_la_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted minimum left atrial elastance scaling factor to {el_min_la_factor * self.scale_factor}"
+                    f" Adjusted minimum left atrial elastance scaling factor to {el_min_la_factor * self.scale_factor}"
                 )
             self.el_min_la_factor = self.scale_factor * el_min_la_factor
 
@@ -402,7 +402,7 @@ class Scaler:
         if el_max_la_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted maximum left atrial elastance scaling factor to {el_max_la_factor * self.scale_factor}"
+                    f" Adjusted maximum left atrial elastance scaling factor to {el_max_la_factor * self.scale_factor}"
                 )
             self.el_max_la_factor = self.scale_factor * el_max_la_factor
 
@@ -410,7 +410,7 @@ class Scaler:
         if u_vol_la_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted left atrial unstressed volume scaling factor to {u_vol_la_factor}"
+                    f" Adjusted left atrial unstressed volume scaling factor to {u_vol_la_factor}"
                 )
             self.u_vol_la_factor = u_vol_la_factor
 
@@ -418,7 +418,7 @@ class Scaler:
         if el_min_lv_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted minimum left ventricular elastance scaling factor to {el_min_lv_factor * self.scale_factor}"
+                    f" Adjusted minimum left ventricular elastance scaling factor to {el_min_lv_factor * self.scale_factor}"
                 )
             self.el_min_lv_factor = self.scale_factor * el_min_lv_factor
 
@@ -426,7 +426,7 @@ class Scaler:
         if el_max_lv_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted maximum left ventricular elastance scaling factor to {el_max_lv_factor * self.scale_factor}"
+                    f" Adjusted maximum left ventricular elastance scaling factor to {el_max_lv_factor * self.scale_factor}"
                 )
             self.el_max_lv_factor = self.scale_factor * el_max_lv_factor
 
@@ -434,7 +434,7 @@ class Scaler:
         if u_vol_lv_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted left ventricular unstressed volume scaling factor to {u_vol_lv_factor}"
+                    f" Adjusted left ventricular unstressed volume scaling factor to {u_vol_lv_factor}"
                 )
             self.u_vol_lv_factor = u_vol_lv_factor
 
@@ -443,7 +443,7 @@ class Scaler:
         if el_min_cor_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted minimum coronary elastance scaling factor to {el_min_cor_factor * self.scale_factor}"
+                    f" Adjusted minimum coronary elastance scaling factor to {el_min_cor_factor * self.scale_factor}"
                 )
             self.el_min_cor_factor = self.scale_factor * el_min_cor_factor
 
@@ -451,7 +451,7 @@ class Scaler:
         if el_max_cor_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted maximum coronary elastance scaling factor to {el_max_cor_factor * self.scale_factor}"
+                    f" Adjusted maximum coronary elastance scaling factor to {el_max_cor_factor * self.scale_factor}"
                 )
             self.el_max_cor_factor = self.scale_factor * el_max_cor_factor
 
@@ -459,7 +459,7 @@ class Scaler:
         if u_vol_cor_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted coronary unstressed volume scaling factor to {u_vol_cor_factor}"
+                    f" Adjusted coronary unstressed volume scaling factor to {u_vol_cor_factor}"
                 )
             self.u_vol_cor_factor = u_vol_cor_factor
 
@@ -468,7 +468,7 @@ class Scaler:
         if el_base_art_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted arterial elastance scaling factor to {el_base_art_factor * self.scale_factor}"
+                    f" Adjusted arterial elastance scaling factor to {el_base_art_factor * self.scale_factor}"
                 )
             self.el_base_art_factor = self.scale_factor * el_base_art_factor
 
@@ -476,7 +476,7 @@ class Scaler:
         if u_vol_art_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted arterial unstressed volume scaling factor to {u_vol_art_factor}"
+                    f" Adjusted arterial unstressed volume scaling factor to {u_vol_art_factor}"
                 )
             self.u_vol_art_factor = u_vol_art_factor
 
@@ -485,7 +485,7 @@ class Scaler:
         if el_base_ven_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted venous elastance scaling factor to {el_base_ven_factor * self.scale_factor}"
+                    f" Adjusted venous elastance scaling factor to {el_base_ven_factor * self.scale_factor}"
                 )
             self.el_base_ven_factor = self.scale_factor * el_base_ven_factor
 
@@ -493,7 +493,7 @@ class Scaler:
         if u_vol_ven_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted venous unstressed volume scaling factor to {u_vol_ven_factor}"
+                    f" Adjusted venous unstressed volume scaling factor to {u_vol_ven_factor}"
                 )
             self.u_vol_ven_factor = u_vol_ven_factor
 
@@ -502,7 +502,7 @@ class Scaler:
         if el_base_cap_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted capillary elastance scaling factor to {el_base_cap_factor * self.scale_factor}"
+                    f" Adjusted capillary elastance scaling factor to {el_base_cap_factor * self.scale_factor}"
                 )
             self.el_base_cap_factor = self.scale_factor * el_base_cap_factor
 
@@ -510,7 +510,7 @@ class Scaler:
         if u_vol_cap_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted capillary unstressed volume scaling factor to {u_vol_cap_factor}"
+                    f" Adjusted capillary unstressed volume scaling factor to {u_vol_cap_factor}"
                 )
             self.u_vol_cap_factor = u_vol_cap_factor
 
@@ -519,7 +519,7 @@ class Scaler:
         if res_blood_connectors_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted blood connector resistance scaling factor to {res_blood_connectors_factor * self.scale_factor}"
+                    f" Adjusted blood connector resistance scaling factor to {res_blood_connectors_factor * self.scale_factor}"
                 )
             self.res_blood_connectors_factor = (
                 self.scale_factor * res_blood_connectors_factor
@@ -530,7 +530,7 @@ class Scaler:
         if res_valve_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted heart valve resistance scaling factor to {res_valve_factor * self.scale_factor}"
+                    f" Adjusted heart valve resistance scaling factor to {res_valve_factor * self.scale_factor}"
                 )
             self.res_valve_factor = self.scale_factor * res_valve_factor
 
@@ -539,7 +539,7 @@ class Scaler:
         if el_base_pericardium_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted pericardium elastance scaling factor to {el_base_pericardium_factor * self.scale_factor}"
+                    f" Adjusted pericardium elastance scaling factor to {el_base_pericardium_factor * self.scale_factor}"
                 )
             self.el_base_pericardium_factor = (
                 self.scale_factor * el_base_pericardium_factor
@@ -549,7 +549,7 @@ class Scaler:
         if u_vol_pericardium_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted pericardium unstressed volume scaling factor to {1.0 / (u_vol_pericardium_factor * self.scale_factor)}"
+                    f" Adjusted pericardium unstressed volume scaling factor to {1.0 / (u_vol_pericardium_factor * self.scale_factor)}"
                 )
             self.u_vol_pericardium_factor = 1.0 / (
                 self.scale_factor * u_vol_pericardium_factor
@@ -560,7 +560,7 @@ class Scaler:
         if el_base_lungs_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted lung elastance scaling factor to {el_base_lungs_factor * self.scale_factor}"
+                    f" Adjusted lung elastance scaling factor to {el_base_lungs_factor * self.scale_factor}"
                 )
             self.el_base_lungs_factor = self.scale_factor * el_base_lungs_factor
 
@@ -568,7 +568,7 @@ class Scaler:
         if u_vol_lungs_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted lung unstressed volume scaling factor to {u_vol_lungs_factor}"
+                    f" Adjusted lung unstressed volume scaling factor to {u_vol_lungs_factor}"
                 )
             self.u_vol_lungs_factor = u_vol_lungs_factor
 
@@ -577,7 +577,7 @@ class Scaler:
         if res_airway_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted airway resistance scaling factor to {res_airway_factor * self.scale_factor}"
+                    f" Adjusted airway resistance scaling factor to {res_airway_factor * self.scale_factor}"
                 )
             self.res_airway_factor = self.scale_factor * res_airway_factor
 
@@ -586,7 +586,7 @@ class Scaler:
         if el_base_thorax_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted thorax elastance scaling factor to {el_base_thorax_factor * self.scale_factor}"
+                    f" Adjusted thorax elastance scaling factor to {el_base_thorax_factor * self.scale_factor}"
                 )
             self.el_base_thorax_factor = self.scale_factor * el_base_thorax_factor
 
@@ -594,7 +594,7 @@ class Scaler:
         if u_vol_thorax_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted thorax unstressed volume scaling factor to {1.0 / (u_vol_thorax_factor * self.scale_factor)}"
+                    f" Adjusted thorax unstressed volume scaling factor to {1.0 / (u_vol_thorax_factor * self.scale_factor)}"
                 )
             self.u_vol_thorax_factor = 1.0 / (self.scale_factor * u_vol_thorax_factor)
 
@@ -603,7 +603,7 @@ class Scaler:
         if res_shunts_factor != 1.0:
             if output:
                 print(
-                    f"Adjusted shunt resistance scaling factor to {res_shunts_factor * self.scale_factor}"
+                    f" Adjusted shunt resistance scaling factor to {res_shunts_factor * self.scale_factor}"
                 )
             self.res_shunts_factor = self.scale_factor * res_shunts_factor
 
@@ -637,7 +637,7 @@ class Scaler:
                     total_gas_volume += 0.0
         if output:
             print(
-                f"Total gas volume = {total_gas_volume * 1000.0} ml ({total_gas_volume * 1000.0 / self.model.weight} ml/kg)"
+                f" Total gas volume = {total_gas_volume * 1000.0} ml ({total_gas_volume * 1000.0 / self.model.weight} ml/kg)"
             )
 
         return total_gas_volume
@@ -666,7 +666,7 @@ class Scaler:
                     total_blood_volume += 0.0
         if output:
             print(
-                f"Total blood volume = {total_blood_volume * 1000.0} ml ({total_blood_volume * 1000.0 / self.model.weight} ml/kg)"
+                f" Total blood volume = {total_blood_volume * 1000.0} ml ({total_blood_volume * 1000.0 / self.model.weight} ml/kg)"
             )
 
         return total_blood_volume
@@ -686,7 +686,7 @@ class Scaler:
                     current_fraction = model.vol / current_gas_volume
                     if output:
                         print(
-                            f"{model.name} volume = {model.vol * 1000.0} ml -> ",
+                            f" {model.name} volume = {model.vol * 1000.0} ml -> ",
                             end="",
                         )
                     # calculate the fraction of the unstressed volume of the current volume
@@ -708,7 +708,7 @@ class Scaler:
 
                     if output:
                         print(
-                            f"{model.vol * 1000.0} ml = ({current_fraction * 100}% of total gas volume)"
+                            f" {model.vol * 1000.0} ml = ({current_fraction * 100}% of total gas volume)"
                         )
                 except:
                     current_fraction = 0
@@ -739,7 +739,7 @@ class Scaler:
                     current_fraction = model.vol / current_blood_volume
                     if output:
                         print(
-                            f"{model.name} volume = {model.vol * 1000.0} ml -> ",
+                            f" {model.name} volume = {model.vol * 1000.0} ml -> ",
                             end="",
                         )
                     # calculate the fraction of the unstressed volume of the current volume
@@ -761,7 +761,7 @@ class Scaler:
 
                     if output:
                         print(
-                            f"{model.vol * 1000.0} ml = ({current_fraction * 100}% of total blood volume)"
+                            f" {model.vol * 1000.0} ml = ({current_fraction * 100}% of total blood volume)"
                         )
                 except:
                     current_fraction = 0

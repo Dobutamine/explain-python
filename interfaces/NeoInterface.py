@@ -869,6 +869,65 @@ class NeoInterface(BaseInterface):
             time_to_calculate=time_to_calculate,
         )
 
+    def validate_baseline(self, weight_based=True, time_to_calculate=60):
+        result = self.analyze(
+            [
+                "Heart.heart_rate",
+                "AA.pres",
+                "PA.pres",
+                "LV_AA.flow",
+                "RV_PA.flow",
+                "LV.vol",
+                "RV.vol",
+                "AAR_AD.flow",
+                "SVC_RA.flow",
+            ],
+            weight_based=weight_based,
+            sampleinterval=0.0005,
+            time_to_calculate=time_to_calculate,
+            suppress_output=True,
+        )
+
+        vitals = self.get_vitals()
+
+        # print the validation data
+        print("")
+        print(
+            f" Model validation data for '{self.model.name}', weight: {self.model.weight} kg, gestational age: {self.model.gestational_age} wks"
+        )
+        print("")
+        print(
+            f" Heartrate      : {(result['Heart.heart_rate.max'] + result['Heart.heart_rate.min']) / 2.0:<0.0f} bpm"
+        )
+        print(
+            f" Art pressure   : {result['AA.pres.max']:<0.0f}/{result['AA.pres.min']:<0.0f} ({result['AA.pres.mean']:<0.0f}) mmHg"
+        )
+        print(
+            f" Pulm pressure  : {result['PA.pres.max']:<0.0f}/{result['PA.pres.min']:<0.0f} ({result['PA.pres.mean']:<0.0f}) mmHg"
+        )
+        print(f" LVOCO          : {result['LV_AA.flow.net']:<0.1f} ml/kg/min")
+        print(f" LVEDV          : {result['LV.vol.max']:<0.1f} ml/kg")
+        print(f" LVESV          : {result['LV.vol.min']:<0.1f} ml/kg")
+        print(f" LVSV           : {result['LV_AA.flow.sv']:<0.1f} ml/kg")
+        print(f" RVOCO          : {result['RV_PA.flow.net']:<0.1f} ml/kg/min")
+        print(f" RVEDV          : {result['RV.vol.max']:<0.1f} ml/kg")
+        print(f" RVESV          : {result['RV.vol.min']:<0.1f} ml/kg")
+        print(f" RVSV           : {result['RV_PA.flow.sv']:<0.1f} ml/kg")
+        print(f" DAo flow       : {result['AAR_AD.flow.net']:<0.1f} ml/kg/min")
+        print(f" SVC flow       : {result['SVC_RA.flow.net']:<0.1f} ml/kg/min")
+        print(f" Resp rate      : {vitals['resp_rate']:<0.0f} bpm")
+        print(f" SpO2 pre       : {vitals['spo2_pre']:<0.0f} %")
+        print(f" SpO2 post      : {vitals['spo2_post']:<0.0f} %")
+        print(f" SpO2 ven       : {vitals['spo2_ven']:<0.0f} %")
+        print(f" pH             : {vitals['pH']:<0.2f}")
+        print(f" pCO2           : {vitals['pco2']:<0.1f} mmHg")
+        print(f" pO2            : {vitals['po2']:<0.1f} mmHg")
+        print(f" HCO3           : {vitals['hco3']:<0.1f} mmol/l")
+        print(f" BE             : {vitals['be']:<0.1f} mmol/l")
+        print("")
+
+        return result
+
     def validate_pda(self, weight_based=True, time_to_calculate=60):
         result = self.analyze(
             [
@@ -884,6 +943,26 @@ class NeoInterface(BaseInterface):
             time_to_calculate=time_to_calculate,
             suppress_output=True,
         )
+
+        # print the validation data
+        print("")
+        print(" Model validation data:")
+        print(" ----------------------")
+        print(
+            f" Heart rate max : {result['Heart.heart_rate.max']:<10.0f} bpm, min: {result['Heart.heart_rate.min']:<10.0f} bpm."
+        )
+        print(
+            f" Bloodpressure  : {result['AA.pres.max']:<0.0f}/{result['AA.pres.min']:<0.0f} ({result['AA.pres.mean']:<0.0f}) mmHg"
+        )
+        print(f" LVO            : {result['LV_AA.flow.net']:<0.1f} ml/kg/min")
+        print(f" RVO            : {result['RV_PA.flow.net']:<0.1f} ml/kg/min")
+        print(f" SVC flow       : {result['SVC_RA.flow.net']:<0.1f} ml/kg/min")
+        print(f" PDA flow       : {result['Pda.flow.net']:<0.1f} ml/kg/min")
+        print(
+            f" LVO/RVO ratio  : {round(result['LV_AA.flow.net']/result['RV_PA.flow.net'], 2)}"
+        )
+        print("")
+
         return result
 
     def open_ductus(
@@ -932,12 +1011,14 @@ class NeoInterface(BaseInterface):
     def get_vitals(self, time_to_calculate=10):
         self.get_bloodgas("AA")
         self.get_bloodgas("AD")
+        self.get_bloodgas("RA")
         result = self.analyze(["AA.pres", "PA.pres", "IVCI.pres"], suppress_output=True)
 
         vitals = {
             "heartrate": self.model.models["Heart"].heart_rate,
             "spo2_pre": self.model.models["AA"].aboxy["so2"],
             "spo2_post": self.model.models["AD"].aboxy["so2"],
+            "spo2_ven": self.model.models["RA"].aboxy["so2"],
             "abp_systole": result["AA.pres.max"],
             "abp_diastole": result["AA.pres.min"],
             "abp_mean": result["AA.pres.mean"],
@@ -1075,34 +1156,34 @@ class NeoInterface(BaseInterface):
         syst_blood_volume = total_volume - pulm_blood_volume
 
         print(
-            f"Total blood volume: {total_volume * 1000 / self.model.weight} ml/kg = {total_volume / total_volume * 100}%"
+            f" Total blood volume: {total_volume * 1000 / self.model.weight} ml/kg = {total_volume / total_volume * 100}%"
         )
         print(
-            f"Systemic blood volume: {syst_blood_volume * 1000 / self.model.weight} ml/kg = {syst_blood_volume / total_volume * 100}%"
+            f" Systemic blood volume: {syst_blood_volume * 1000 / self.model.weight} ml/kg = {syst_blood_volume / total_volume * 100}%"
         )
         print(
-            f"Pulmonary total blood volume: {pulm_blood_volume * 1000 / self.model.weight} ml/kg = {pulm_blood_volume / total_volume * 100}%"
+            f" Pulmonary total blood volume: {pulm_blood_volume * 1000 / self.model.weight} ml/kg = {pulm_blood_volume / total_volume * 100}%"
         )
         print(
-            f"Pulmonary capillary blood volume: {pulm_cap_volume * 1000 / self.model.weight} ml/kg = {pulm_cap_volume / pulm_blood_volume * 100}% of total pulmonary blood volume"
+            f" Pulmonary capillary blood volume: {pulm_cap_volume * 1000 / self.model.weight} ml/kg = {pulm_cap_volume / pulm_blood_volume * 100}% of total pulmonary blood volume"
         )
         print(
-            f"Heart blood volume: {heart_volume * 1000 / self.model.weight} ml/kg = {heart_volume / total_volume * 100}%"
+            f" Heart blood volume: {heart_volume * 1000 / self.model.weight} ml/kg = {heart_volume / total_volume * 100}%"
         )
         print(
-            f"Capillary blood volume: {cap_volume * 1000 / self.model.weight} ml/kg = {cap_volume / total_volume * 100}%"
+            f" Capillary blood volume: {cap_volume * 1000 / self.model.weight} ml/kg = {cap_volume / total_volume * 100}%"
         )
         print(
-            f"Venous blood volume: {ven_volume * 1000 / self.model.weight} ml/kg = {ven_volume / total_volume * 100}%"
+            f" Venous blood volume: {ven_volume * 1000 / self.model.weight} ml/kg = {ven_volume / total_volume * 100}%"
         )
         print(
-            f"Arterial blood volume: {art_volume * 1000 / self.model.weight} ml/kg = {art_volume / total_volume * 100}%"
+            f" Arterial blood volume: {art_volume * 1000 / self.model.weight} ml/kg = {art_volume / total_volume * 100}%"
         )
         print(
-            f"Upper body blood volume: {upper_body * 1000 / self.model.weight} ml/kg = {upper_body / total_volume * 100}%"
+            f" Upper body blood volume: {upper_body * 1000 / self.model.weight} ml/kg = {upper_body / total_volume * 100}%"
         )
         print(
-            f"Lower body blood volume: {lower_body * 1000 / self.model.weight} ml/kg = {lower_body / total_volume * 100}%"
+            f" Lower body blood volume: {lower_body * 1000 / self.model.weight} ml/kg = {lower_body / total_volume * 100}%"
         )
 
         return total_volume
