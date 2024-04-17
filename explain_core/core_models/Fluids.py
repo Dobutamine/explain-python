@@ -160,6 +160,27 @@ class Fluids(BaseModel):
             print(f"Total blood volume = {total_blood_volume * 1000.0} ml ({total_blood_volume * 1000.0 / self._model.weight} ml/kg)")
         
         return total_blood_volume
+    
+    def get_total_volume(self, output = True) -> float:
+        total_blood_volume: float = 0.0
+
+        for model in self._model.models.values():
+            if model.model_type == 'BloodCapacitance' or model.model_type == 'BloodTimeVaryingElastance' or model.model_type == 'LymphCapacitance':
+                if model.is_enabled:
+                    try:
+                        total_blood_volume += model.vol
+                    except:
+                        total_blood_volume += 0.0
+
+            # if "Blood" in model.model_type and model.is_enabled:
+            #     total_blood_volume += model.vol
+        
+        bv = self.get_total_blood_volume(True)
+        if output:
+            print(f"Total volume = {total_blood_volume * 1000.0} ml ({total_blood_volume * 1000.0 / self._model.weight} ml/kg)")
+        
+        return total_blood_volume
+
 
 
 

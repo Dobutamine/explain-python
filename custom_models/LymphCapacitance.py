@@ -1,7 +1,11 @@
 from explain_core.base_models.Capacitance import Capacitance
 
 
-class BloodCapacitance(Capacitance):
+class LymphCapacitance(Capacitance):
+    # independent variables
+    t_start: float = 0.0
+    pacemaker: bool = False
+    
     # state variables
     systole: float = 0.0
     diastole: float = 0.0
@@ -13,6 +17,15 @@ class BloodCapacitance(Capacitance):
     acidbase: dict[str, float] = {}
     drugs: dict[str, float] = {}
     oxy: dict[str, float] = {}
+
+    activator: Capacitance = {}
+    contraction_timer: float = 0.0
+    interval_timer: float = 0.0
+    contraction_running: bool = False
+    interval_running: bool = False
+
+    contraction_interval: float = 12.0
+     
 
     # override the volume_in method as all the blood solutes have to be changed to
     def volume_in(self, dvol: float, model_from: Capacitance) -> None:
@@ -26,8 +39,8 @@ class BloodCapacitance(Capacitance):
         # return if the volume is zero
         if self.vol <= 0:
             return
-
-       # process the solutes
+            
+        # process the solutes
         vol: float = self.vol + self.u_vol
         for solute, conc in self.solutes.items():
             conc_from = model_from.solutes[solute]
@@ -40,47 +53,35 @@ class BloodCapacitance(Capacitance):
             d_drug = (conc_from - conc) * dvol
             self.drugs[drug] += d_drug / vol
 
-        if model_from.model_type != "LymphCapacitance":
-            for solute in ["to2", "tco2", "hemoglobin", "albumin"]:
-                d_solute = (model_from.aboxy[solute] - self.aboxy[solute]) * dvol
-                self.aboxy[solute] += d_solute / vol
-            
+        # if model_from.model_type != "LymphCapacitance":
+        #     d_aboxy = (model_from.aboxy["albumin"] - self.aboxy["albumin"]) * dvol
+        #     self.aboxy["albumin"] += d_aboxy / vol
 
-#       # process the to2 and tco2, hemoglobin and albumin
-#        if model_from == BloodCapacitance:
-#            for solute in ["to2", "tco2", "hemoglobin", "albumin"]:
-#                d_solute = (model_from.aboxy[solute] - self.aboxy[solute]) * dvol
-#                self.aboxy[solute] += d_solute / vol
-#        # in case of SVC
-#        elif model_from != BloodCapacitance and self.transport_solutes == True:
+#        # process the proteins
+#        if model_from == LymphCapacitance:
 #            for solute in ["albumin"]:
 #                d_solute = (model_from.aboxy[solute] - self.aboxy[solute]) * dvol
 #                self.aboxy[solute] += d_solute / vol
-#        # in case of IVCE
-#        elif model_from != BloodCapacitance and self.transport_solutes == False:
+#        elif model_from != LymphCapacitance:
 #            for solute in ["albumin"]:
 #                d_solute = (conc_new - self.aboxy[solute]) * dvol
 #                self.aboxy[solute] += d_solute / vol            
 
 
-#        if model_from == BloodCapacitance:
+#        if model_from == LymphCapacitance:
 #            # process the to2 and tco2, hemoglobin and albumin
-#            for solute in ["to2", "tco2", "hemoglobin", "albumin"]:
-#                d_solute = (model_from.aboxy[solute] - self.aboxy[solute]) * dvol
-#                self.aboxy[solute] += d_solute / vol            
-#        elif model_from != BloodCapacitance and self.transport_solutes == True:
 #            for solute in ["albumin"]:
 #                d_solute = (model_from.aboxy[solute] - self.aboxy[solute]) * dvol
 #                self.aboxy[solute] += d_solute / vol
-#            for solute in ["to2", "tco2", "hemoglobin"]:
+#        elif model_from != LymphCapacitance:
+#            for solute in ["albumin"]:
 #                d_solute = 0
-#                self.aboxy[solute] += d_solute / vol  
-#        elif model_from != BloodCapacitance and self.transport_solutes == False:
-#            for solute in ["to2", "tco2", "hemoglobin", "albumin"]:
-#                d_solute = 0
-#                self.aboxy[solute] += d_solute / vol                        
+#                self.aboxy[solute] += d_solute / vol
+#                self.aboxy[solute] = self.aboxy[solute]*vol /(vol+dvol) 
 
 
-#                self.aboxy[solute] = self.aboxy[solute]*vol /(vol+dvol)
-                
+
+          
+
+
 

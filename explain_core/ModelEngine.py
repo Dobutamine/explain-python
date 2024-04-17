@@ -608,3 +608,36 @@ class ModelEngine:
                     }
 
         return None
+
+    def save_model_state_json_exp(self, filename):
+        # create basic json object
+        new_json = {
+        "explain_version": self.model_definition["explain_version"],
+        "owner": self.model_definition["owner"],
+        "date_created": self.model_definition["date_created"],
+        "date_modified": "",
+        "shared": self.model_definition["shared"],
+        "protected": self.model_definition["protected"],
+        "name": self.name,
+        "description": self.description,
+        "weight": self.weight,
+        "height": self.height,
+        "modeling_stepsize": self.modeling_stepsize,
+        "model_time_total": self.model_time_total,
+        "models": {},
+        }
+        # process the model definition file to find the necessary properties
+        for model_name, model in self.models.items():
+            # iterate over all attributes of the model
+            new_json["models"][model_name] = {}
+            for prop_name, prop in model.__dict__.items():
+                if not prop_name.startswith("_"):
+                    if (isinstance(prop, str) or isinstance(prop, float) or isinstance(prop, bool) or isinstance(prop, dict) or isinstance(prop, list) or isinstance(prop, int)):
+                        new_json["models"][model_name][prop_name] = prop
+                    else:
+                        new_json["models"][model_name][prop_name] = prop.name
+
+        # save the json file
+        with open(filename, "w") as file:
+            # Write the dictionary to the file as JSON
+            json.dump(new_json, file, indent=4)

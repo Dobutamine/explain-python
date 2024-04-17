@@ -3,6 +3,8 @@ import math
 from explain_core.base_models.BaseModel import BaseModel
 from explain_core.base_models.Capacitance import Capacitance
 from explain_core.functions.TubeResistance import calc_resistance_tube
+from explain_core.core_models.BloodCapacitance import BloodCapacitance
+from custom_models.LymphCapacitance import LymphCapacitance
 
 
 class Resistor(BaseModel):
@@ -28,6 +30,14 @@ class Resistor(BaseModel):
     length: float = 0.0  # in mm
     diameter: float = 0.0  # in mm
     viscosity: float = 6.0  # in cP
+
+    # R_valve: float = 1.0
+    # R_valve_min: float = 600            # dyn cm-2 / ml s-1
+    # R_valve_max: float  = 1.2e7         # dyn cm-2 / ml s-1
+    # s_open: float = 0.04                # cm2 dyn-1
+    # p_open: float = -70                 # dyn cm-2
+    # s_fail: float = 4.9e-2              # cm2 dyn-1
+    # p_fail: float = -1.8e4              # dyn cm-2
 
     # dependent variables
     flow: float = 0.0
@@ -71,6 +81,12 @@ class Resistor(BaseModel):
         self.p2_ext = 0
 
         # calculate the resistances
+        # if self._model_comp_from == LymphCapacitance:
+        #     self.dP = _p1 - _p2
+        #     self.R_valve = self.R_valve_min + self.R_valve_max * (1/(1+math.exp(self.s_open*(self.dP-self.p_open))) + 1/(1+math.exp(-self.s_fail*(self.dP-self.p_fail))) - 1)
+        #     self.r_for = self.R_valve * 0.00075006157584566 /  60e-3
+        #     self.r_back = self.R_valve * 0.00075006157584566 /  60e-3
+
         _rfor_base = self.r_for * self.r_for_factor
         rfor: float = (
             _rfor_base
