@@ -7,8 +7,6 @@ __pycache__
 *.xpl
 !template.ipynb
 !template.json
-!tutorial.ipynb
-!tutorial.json
 !normal_neonate.ipynb
 !normal_neonate.json
 !baseline_neonate.json
