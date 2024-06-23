@@ -2,149 +2,17 @@
     "explain_version": "1.0",
     "owner": "Timothy Antonius",
     "date_created": "2023-10-24T11:36:24.098208",
-    "date_modified": "2024-01-05T15:33:20",
+    "date_modified": "2024-01-16T11:02:07",
     "shared": true,
     "protected": false,
     "name": "normal neonate",
-    "description": "normal 3.545 kg neonate at an age of 24h without shunts",
+    "description": "normal 3.3 kg neonate at an age of 72h without shunts",
     "weight": 3.545,
     "height": 0.519,
     "gestational_age": 40.0,
     "age": 0.0,
     "modeling_stepsize": 0.0005,
     "model_time_total": 0.0,
-    "scaler_settings":{
-        "left_atrium": ["LA"],
-        "right_atrium": ["RA"],
-        "left_ventricle": ["LV"],
-        "right_ventricle": ["RV"],
-        "coronaries": ["COR"],
-        "heart_valves": ["LA_LV", "RA_RV", "LV_AA", "RV_PA", "LV_PA", "RV_AA"],
-        "pericardium": ["PC", "AA"],
-        "arteries": ["AA", "AAR", "AD", "PA", "DA"],
-        "veins": ["IVCE", "IVCI", "SVC", "PV"],
-        "capillaries": ["LS", "INT", "KID", "RLB", "BR", "RUB", "LL", "RL"],
-        "shunts": ["IPS", "FO", "DA_PA", "AAR_DA"],
-        "blood_connectors":  [
-            "AA_AAR",
-            "AA_COR",
-            "AAR_AD",
-            "AD_INT",
-            "AD_KID",
-            "AD_LS",
-            "AD_RLB",
-            "AAR_RUB",
-            "AAR_BR",
-            "COR_RA",
-            "RUB_SVC",
-            "BR_SVC",
-            "RLB_IVCE",
-            "LS_IVCE",
-            "KID_IVCE",
-            "INT_IVCE",
-            "IVCE_IVCI",
-            "IVCI_RA",
-            "SVC_RA",
-            "PA_LL",
-            "PA_RL",
-            "LL_PV",
-            "RL_PV",
-            "PV_LA"
-        ],
-        "lungs": ["ALL", "ALR", "DS"],
-        "airways": ["MOUTH_DS", "DS_ALL", "DS_ALR"],
-        "thorax": ["THORAX", "CHEST_L", "CHEST_R"],
-        "patients": {
-            "25wks_no_pda": {
-                "weight": 0.826,
-                "height": 0.335,
-                "blood_volume": 0.08,
-                "hr_ref": 155.0,
-                "map_ref": 34.8,
-                "el_min_ra_factor": 1.0,
-                "el_max_ra_factor": 1.15,
-                "el_min_la_factor": 1.0,
-                "el_max_la_factor": 1.15,
-                "u_vol_ra_factor": 1.0,
-                "u_vol_la_factor": 1.0,
-                "el_min_rv_factor": 1.5,
-                "el_max_rv_factor": 0.75,
-                "el_min_lv_factor": 1.5,
-                "el_max_lv_factor": 0.75,
-                "u_vol_rv_factor": 1.0,
-                "u_vol_lv_factor": 1.0,
-                "el_min_cor_factor": 1.0,
-                "el_max_cor_factor": 1.0,
-                "u_vol_cor_factor": 1.0,
-                "res_valve_factor": 1.0,
-                "el_base_pericardium_factor": 1.0,
-                "u_vol_pericardium_factor": 1.0,
-                "el_base_art_factor": 1.0,
-                "u_vol_art_factor": 1.0,
-                "el_base_ven_factor": 1.0,
-                "u_vol_ven_factor": 1.0,
-                "el_base_cap_factor": 1.0,
-                "u_vol_cap_factor": 1.0,
-                "res_blood_connectors_factor": 0.73,
-                "res_shunts_factor": 1.0,
-                "lung_volume": 0.030,
-                "el_base_lungs_factor": 1.0,
-                "u_vol_lungs_factor": 1.0,
-                "res_airway_factor": 1.0,
-                "el_base_thorax_factor": 1.0,
-                "u_vol_thorax_factor": 1.0,
-                "resp_rate_ref": -1.0,
-                "vt_rr_ratio": -1.0,
-                "mv_ref": 0.2,
-                "vo2": -1.0,
-                "resp_q": -1.0
-            },
-            "40": {
-                "weight": 3.545,
-                "height": 0.519,
-                "blood_volume":  -1.0,
-                "hr_ref":  -1.0,
-                "map_ref":  -1.0,
-                "el_min_ra_factor":  1.0,
-                "el_max_ra_factor":  1.0,
-                "u_vol_ra_factor":  1.0,
-                "el_min_rv_factor":  1.0,
-                "el_max_rv_factor":  1.0,
-                "u_vol_rv_factor":  1.0,
-                "el_min_la_factor":  1.0,
-                "el_max_la_factor":  1.0,
-                "u_vol_la_factor":  1.0,
-                "el_min_lv_factor":  1.0,
-                "el_max_lv_factor":  1.0,
-                "u_vol_lv_factor":  1.0,
-                "el_min_cor_factor":  1.0,
-                "el_max_cor_factor":  1.0,
-                "u_vol_cor_factor":  1.0,
-                "res_valve_factor":  1.0,
-                "el_base_pericardium_factor":  1.0,
-                "u_vol_pericardium_factor":  1.0,
-                "el_base_art_factor":  1.0,
-                "u_vol_art_factor":  1.0,
-                "el_base_ven_factor":  1.0,
-                "u_vol_ven_factor":  1.0,
-                "el_base_cap_factor":  1.0,
-                "u_vol_cap_factor":  1.0,
-                "res_blood_connectors_factor":  1.0,
-                "res_shunts_factor":  1.0,
-                "lung_volume":  -1.0,
-                "el_base_lungs_factor":  1.0,
-                "u_vol_lungs_factor":  1.0,
-                "res_airway_factor":  1.0,
-                "el_base_thorax_factor":  1.0,
-                "u_vol_thorax_factor":  1.0,
-                "resp_rate_ref":  -1.0,
-                "vt_rr_ratio":  -1.0,
-                "mv_ref":  -1.0,
-                "vo2":  -1.0,
-                "resp_q":  -1.0
-            }
-        }
-    },
     "models": {
         "LA": {
             "name": "LA",
@@ -153,11 +21,48 @@
             "category": "heart_chambers",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.003927222414591505,
+            "vol": 0.0032937363154100408,
             "u_vol": 0.0,
             "el_min": 1172.919605077574,
             "el_max": 3053.3145275035263,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.30499628005125,
+                "to2": 6.682431380531195,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_ed": 3.8592557648081414,
+            "el": 1.6478026316424244,
+            "pres_ms": 10.046316594103734,
+            "pres_in": 9.281018499357595,
+            "pres_out": -4.171516139289633,
+            "pres_tm": 13.452534638647228,
+            "pres": 5.109502360067962,
+            "pres_ext": -4.178098250901543,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "act_factor": 0.8686315144381912,
+            "el_max_ans_factor": 1.0
         },
         "RA": {
             "name": "RA",
@@ -166,11 +71,48 @@
             "category": "heart_chambers",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.0034817925413570565,
+            "vol": 0.0027340229264089092,
             "u_vol": 0.0,
             "el_min": 1172.919605077574,
             "el_max": 3053.3145275035263,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.513476730169188,
+                "to2": 4.631362969345226,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_ed": 3.2069073013054084,
+            "el": 1.6478026316424244,
+            "pres_ms": 8.348139641493445,
+            "pres_in": 7.7122035446697295,
+            "pres_out": -4.171516139289633,
+            "pres_tm": 11.883719683959363,
+            "pres": 3.5406874053800967,
+            "pres_ext": -4.178098250901543,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "act_factor": 0.8686315144381912,
+            "el_max_ans_factor": 1.0
         },
         "LV": {
             "name": "LV",
@@ -179,11 +121,48 @@
             "category": "heart_chambers",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.009434556849286114,
+            "vol": 0.008886144883218922,
             "u_vol": 0.0007331884230545161,
             "el_min": 1137.5458392101552,
             "el_max": 26955.74047954866,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.313773820311063,
+                "to2": 6.677807289138398,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_ed": 9.274293212685633,
+            "el": 0.0,
+            "pres_ms": 219.7673556135334,
+            "pres_in": 9.274293212685633,
+            "pres_out": -4.171516139289633,
+            "pres_tm": 13.445809351975265,
+            "pres": 5.102777073396,
+            "pres_ext": -4.178098250901543,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "act_factor": 0.0,
+            "el_max_ans_factor": 1.0
         },
         "RV": {
             "name": "RV",
@@ -192,11 +171,48 @@
             "category": "heart_chambers",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.011552598443089025,
+            "vol": 0.010641473800068017,
             "u_vol": 0.0032829332375575344,
             "el_min": 1078.8998589562764,
             "el_max": 21829.337094499293,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.457358059872274,
+                "to2": 4.667955708139178,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_ed": 7.939128375016598,
+            "el": 0.0,
+            "pres_ms": 160.63206246258778,
+            "pres_in": 7.939128375016598,
+            "pres_out": -4.171516139289633,
+            "pres_tm": 12.11064451430623,
+            "pres": 3.7676122357269657,
+            "pres_ext": -4.178098250901543,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "act_factor": 0.0,
+            "el_max_ans_factor": 1.0
         },
         "COR": {
             "name": "COR",
@@ -205,11 +221,47 @@
             "category": "coronaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.0003320304365011546,
+            "vol": 0.00032885617514688786,
             "u_vol": 0.0002816756717824365,
             "el_min": 302236.24823695346,
             "el_max": 651622.0028208744,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.116584637703223,
+                "to2": 5.151159138325774,
+                "ph": 7.2884884233189515,
+                "po2": 41.138719370213494,
+                "pco2": 55.72119329742919,
+                "hco3": 26.376830463983577,
+                "be": -1.3330352969117079,
+                "so2": 74.11170830548076,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_ed": 14.256413294229848,
+            "el": 0.0,
+            "pres_ms": 30.73685779921735,
+            "pres_in": 14.256413294229848,
+            "pres_out": -4.171516139289633,
+            "pres_tm": 18.42792943351948,
+            "pres": 10.084897154940215,
+            "pres_ext": -4.178098250901543,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "act_factor": 0.0
         },
         "LL": {
             "name": "LL",
@@ -218,10 +270,42 @@
             "category": "capillaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.005928356844665125,
+            "vol": 0.005825329276834775,
             "u_vol": 0.0012431702152874951,
             "el_base": 4380.631311706629,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.24381673353116,
+                "to2": 6.825553486480748,
+                "ph": 7.408352098125118,
+                "po2": 91.70938801106077,
+                "pco2": 41.56463595376374,
+                "hco3": 25.92924404612118,
+                "be": 0.8545427866643799,
+                "so2": 97.4589047891018,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 20.07616720463744,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 24.512755563663987,
+            "pres": 15.63957884561089,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "RL": {
             "name": "RL",
@@ -230,10 +314,42 @@
             "category": "capillaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.005928356844665125,
+            "vol": 0.005825329276834775,
             "u_vol": 0.0012431702152874951,
             "el_base": 4380.631311706629,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.24381673353116,
+                "to2": 6.825553486480748,
+                "ph": 7.408352098125118,
+                "po2": 91.70938801106077,
+                "pco2": 41.56463595376374,
+                "hco3": 25.92924404612118,
+                "be": 0.8545427866643799,
+                "so2": 97.4589047891018,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 20.07616720463744,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 24.512755563663987,
+            "pres": 15.63957884561089,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "PV": {
             "name": "PV",
@@ -242,10 +358,42 @@
             "category": "veins",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.008296398319197018,
+            "vol": 0.008353779194528456,
             "u_vol": 0.00563081048728314,
             "el_base": 4517.090267983075,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.302880939899378,
+                "to2": 6.687435059829266,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 12.299974329042513,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 16.736562688069064,
+            "pres": 7.863385970015964,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "PA": {
             "name": "PA",
@@ -254,10 +402,42 @@
             "category": "arteries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.007052329315412448,
+            "vol": 0.007476091975070672,
             "u_vol": 0.002245854627813109,
             "el_base": 4980.253878702398,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.399846843006614,
+                "to2": 4.719563596294406,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 26.060514617416516,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 30.497102976443067,
+            "pres": 21.623926258389965,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "AA": {
             "name": "AA",
@@ -266,10 +446,42 @@
             "category": "arteries",
             "is_enabled": true,
             "dependencies": [],
+            "vol": 0.005372913812013095,
             "u_vol": 0.0032829332375575344,
-            "vol": 0.005338089111304872,
             "el_base": 22909.16784203103,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.342074771277733,
+                "to2": 6.659205413956333,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 47.894515942082094,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 52.331104301108645,
+            "pres": 43.45792758305554,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "AAR": {
             "name": "AAR",
@@ -278,10 +490,42 @@
             "category": "arteries",
             "is_enabled": true,
             "dependencies": [],
+            "vol": 0.00521617855119285,
             "u_vol": 0.003501795453394704,
-            "vol": 0.005186780991541622,
             "el_base": 27889.42172073343,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.348252235356586,
+                "to2": 6.663018869800707,
+                "ph": 7.3931271813755535,
+                "po2": 74.27186770213535,
+                "pco2": 43.14242670762263,
+                "hco3": 25.98636459927357,
+                "be": 0.576898971071213,
+                "so2": 95.41309011418309,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 47.82791147280322,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 52.264499831829774,
+            "pres": 43.39132311377667,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "AD": {
             "name": "AD",
@@ -290,10 +534,42 @@
             "category": "arteries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.023992962328177863,
+            "vol": 0.024056415011507935,
             "u_vol": 0.019697599425345207,
             "el_base": 9960.507757404795,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.353710903531457,
+                "to2": 6.654262538940829,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 43.43740886644,
+            "pres_out": 0.0,
+            "pres_tm": 43.43740886644,
+            "pres": 43.43740886644,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "RLB": {
             "name": "RLB",
@@ -302,10 +578,42 @@
             "category": "capillaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.002325633186020705,
+            "vol": 0.0023529025196036175,
             "u_vol": 0.0010943110791858449,
             "el_base": 25024.77968970381,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.48266818644678,
+                "to2": 5.0359976130571695,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 31.505652605936415,
+            "pres_out": 0.0,
+            "pres_tm": 31.505652605936415,
+            "pres": 31.505652605936415,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "LS": {
             "name": "LS",
@@ -314,10 +622,42 @@
             "category": "capillaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.0023701354847007,
+            "vol": 0.0023764990689261454,
             "u_vol": 0.0010943110791858449,
             "el_base": 25024.77968970381,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 29.11108576795901,
+                "to2": 4.112619373523761,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 32.091135503809525,
+            "pres_out": 0.0,
+            "pres_tm": 32.091135503809525,
+            "pres": 32.091135503809525,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "KID": {
             "name": "KID",
@@ -326,10 +666,42 @@
             "category": "capillaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.002368096253536356,
+            "vol": 0.0023759789894989224,
             "u_vol": 0.0010943110791858449,
             "el_base": 25024.77968970381,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 29.01046203303232,
+                "to2": 4.259726174371157,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 32.078391326854046,
+            "pres_out": 0.0,
+            "pres_tm": 32.078391326854046,
+            "pres": 32.078391326854046,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "INT": {
             "name": "INT",
@@ -338,10 +710,42 @@
             "category": "capillaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.0023430797965217727,
+            "vol": 0.0023644794540220266,
             "u_vol": 0.0010943110791858449,
             "el_base": 25024.77968970381,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.827978914079424,
+                "to2": 4.538597699743019,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 31.793589239907316,
+            "pres_out": 0.0,
+            "pres_tm": 31.793589239907316,
+            "pres": 31.793589239907316,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "RUB": {
             "name": "RUB",
@@ -350,10 +754,42 @@
             "category": "capillaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.0018046259717627137,
+            "vol": 0.0018448806392606563,
             "u_vol": 0.001149026633145137,
             "el_base": 25024.77968970381,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.67446361557546,
+                "to2": 4.7936301366660965,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 17.418578591781486,
+            "pres_out": 0.0,
+            "pres_tm": 17.418578591781486,
+            "pres": 17.418578591781486,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "BR": {
             "name": "BR",
@@ -362,10 +798,42 @@
             "category": "capillaries",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.0023063832038465065,
+            "vol": 0.0023412448907799196,
             "u_vol": 0.001149026633145137,
             "el_base": 25024.77968970381,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 29.82662473949995,
+                "to2": 3.1371698089681064,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 29.84757971819406,
+            "pres_out": 0.0,
+            "pres_tm": 29.84757971819406,
+            "pres": 29.84757971819406,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "IVCI": {
             "name": "IVCI",
@@ -374,10 +842,42 @@
             "category": "veins",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.02137782921512524,
+            "vol": 0.021734260339272223,
             "u_vol": 0.012018161996050623,
             "el_base": 776.9196050775741,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.1550097419689,
+                "to2": 4.997770472857288,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 7.5428089897569475,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 11.979397348783497,
+            "pres": 3.106220630730398,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "IVCE": {
             "name": "IVCE",
@@ -386,10 +886,43 @@
             "category": "veins",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.08449092496558971,
+            "vol": 0.08760690910355957,
             "u_vol": 0.06249444237946325,
             "el_base": 145.42341325811003,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.24788135353964,
+                "to2": 4.9431553155214365,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 3.3933319665128345,
+            "pres_out": 0.0,
+            "pres_tm": 3.3933319665128345,
+            "pres": 3.3933319665128345,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "u_vol_ans_factor": 1.028525281479868
         },
         "SVC": {
             "name": "SVC",
@@ -398,22 +931,87 @@
             "category": "veins",
             "is_enabled": true,
             "dependencies": [],
-            "vol": 0.07356921873316936,
+            "vol": 0.07239997504690288,
             "u_vol": 0.039659934586967045,
             "el_base": 229.0916784203103,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 28.931598996630953,
+                "to2": 4.115542172085458,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 7.240683076601199,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 11.677271435627748,
+            "pres": 2.8040947175746496,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "u_vol_ans_factor": 1.028525281479868
         },
         "DA": {
             "name": "DA",
             "description": "ductus arteriosus",
             "model_type": "BloodCapacitance",
-            "is_enabled": true,
             "category": "arteries",
+            "is_enabled": true,
             "dependencies": [],
             "vol": 0.0001925987499367087,
             "u_vol": 0.0001925987499367087,
-            "el_base": 50000,
-            "el_k": 0.0
+            "el_base": 9960.507757404795,
+            "el_k": 0.0,
+            "solutes": {
+                "na": 138.0,
+                "k": 3.5,
+                "ca": 1.0,
+                "cl": 108.0,
+                "lact": 1.0,
+                "mg": 0.75
+            },
+            "aboxy": {
+                "tco2": 27.18,
+                "to2": 6.737565796540982,
+                "ph": 7.4,
+                "po2": 0.0,
+                "pco2": 35.0,
+                "hco3": 25.0,
+                "be": 0.0,
+                "so2": 98.0,
+                "sid": 35.9,
+                "albumin": 25.0,
+                "phosphates": 1.64,
+                "uma": 0.0,
+                "dpg": 5.0,
+                "hemoglobin": 8.0,
+                "temp": 37.0
+            },
+            "pres_in": 0.0,
+            "pres_out": 0.0,
+            "pres_tm": 0.0,
+            "pres": 0.0,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "LA_LV": {
             "name": "LA_LV",
@@ -428,7 +1026,11 @@
             "comp_to": "LV",
             "r_for": 55.85331452750353,
             "r_back": 55.85331452750353,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.00012040980430356276,
+            "area": 0.0
         },
         "LV_AA": {
             "name": "LV_AA",
@@ -446,7 +1048,11 @@
             "comp_to": "AA",
             "r_for": 16.75599435825106,
             "r_back": 16.75599435825106,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0,
+            "area": 0.0
         },
         "LV_PA": {
             "name": "LV_PA",
@@ -464,7 +1070,11 @@
             "comp_to": "PA",
             "r_for": 16.75599435825106,
             "r_back": 16.75599435825106,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0,
+            "area": 0.0
         },
         "RA_RV": {
             "name": "RA_RV",
@@ -482,7 +1092,11 @@
             "comp_to": "RV",
             "r_for": 55.85331452750353,
             "r_back": 55.85331452750353,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0,
+            "area": 0.0
         },
         "RV_PA": {
             "name": "RV_PA",
@@ -500,7 +1114,11 @@
             "comp_to": "PA",
             "r_for": 16.75599435825106,
             "r_back": 16.75599435825106,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0,
+            "area": 0.0
         },
         "RV_AA": {
             "name": "RV_AA",
@@ -518,7 +1136,11 @@
             "comp_to": "AA",
             "r_for": 16.75599435825106,
             "r_back": 16.75599435825106,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0,
+            "area": 0.0
         },
         "AA_AAR": {
             "name": "AA_AAR",
@@ -536,7 +1158,11 @@
             "comp_to": "AAR",
             "r_for": 55.85331452750353,
             "r_back": 55.85331452750353,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0011924891090585859,
+            "area": 0.0
         },
         "AA_COR": {
             "name": "AA_COR",
@@ -554,7 +1180,11 @@
             "comp_to": "COR",
             "r_for": 335119.88716502115,
             "r_back": 335119.88716502115,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 9.958534753170777e-05,
+            "area": 0.0
         },
         "COR_RA": {
             "name": "COR_RA",
@@ -572,7 +1202,11 @@
             "comp_to": "RA",
             "r_for": 83779.97179125529,
             "r_back": 83779.97179125529,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 7.811186384575967e-05,
+            "area": 0.0
         },
         "AAR_AD": {
             "name": "AAR_AD",
@@ -590,7 +1224,11 @@
             "comp_to": "AD",
             "r_for": 55.85331452750353,
             "r_back": 55.85331452750353,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": -0.0008251211777348816,
+            "area": 0.0
         },
         "AD_RLB": {
             "name": "AD_RLB",
@@ -608,7 +1246,12 @@
             "comp_to": "RLB",
             "r_for": 8827.057827926657,
             "r_back": 8827.057827926657,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0013496324990113562,
+            "area": 0.0,
+            "r_ans_factor": 1.0015505502179347
         },
         "AD_LS": {
             "name": "AD_LS",
@@ -626,7 +1269,12 @@
             "comp_to": "LS",
             "r_for": 20946.11001410437,
             "r_back": 20946.11001410437,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0005408501924659791,
+            "area": 0.0,
+            "r_ans_factor": 1.0015505502179347
         },
         "AD_KID": {
             "name": "AD_KID",
@@ -644,7 +1292,12 @@
             "comp_to": "KID",
             "r_for": 19731.858956276446,
             "r_back": 19731.858956276446,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0005747776783086965,
+            "area": 0.0,
+            "r_ans_factor": 1.0015505502179347
         },
         "AD_INT": {
             "name": "AD_INT",
@@ -662,7 +1315,12 @@
             "comp_to": "INT",
             "r_for": 11567.22143864598,
             "r_back": 11567.22143864598,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0010050636025202336,
+            "area": 0.0,
+            "r_ans_factor": 1.0015505502179347
         },
         "AAR_RUB": {
             "name": "AAR_RUB",
@@ -680,7 +1338,12 @@
             "comp_to": "RUB",
             "r_for": 24575.45839210155,
             "r_back": 24575.45839210155,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0010552207983557332,
+            "area": 0.0,
+            "r_ans_factor": 1.0015505502179347
         },
         "AAR_BR": {
             "name": "AAR_BR",
@@ -698,7 +1361,11 @@
             "comp_to": "BR",
             "r_for": 6702.397743300424,
             "r_back": 6702.397743300424,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.002020731074803887,
+            "area": 0.0
         },
         "RUB_SVC": {
             "name": "RUB_SVC",
@@ -716,7 +1383,11 @@
             "comp_to": "SVC",
             "r_for": 10053.596614950635,
             "r_back": 10053.596614950635,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0014536572764888675,
+            "area": 0.0
         },
         "BR_SVC": {
             "name": "BR_SVC",
@@ -734,7 +1405,11 @@
             "comp_to": "SVC",
             "r_for": 8936.530324400564,
             "r_back": 8936.530324400564,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0030261728007321908,
+            "area": 0.0
         },
         "RLB_IVCE": {
             "name": "RLB_IVCE",
@@ -752,7 +1427,11 @@
             "comp_to": "IVCE",
             "r_for": 13240.586741889987,
             "r_back": 13240.586741889987,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.002123192966251492,
+            "area": 0.0
         },
         "LS_IVCE": {
             "name": "LS_IVCE",
@@ -770,7 +1449,11 @@
             "comp_to": "IVCE",
             "r_for": 31413.021156558534,
             "r_back": 31413.021156558534,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0009135639451637096,
+            "area": 0.0
         },
         "KID_IVCE": {
             "name": "KID_IVCE",
@@ -788,7 +1471,11 @@
             "comp_to": "IVCE",
             "r_for": 29598.90550070522,
             "r_back": 29598.90550070522,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0009691256779632532,
+            "area": 0.0
         },
         "INT_IVCE": {
             "name": "INT_IVCE",
@@ -806,7 +1493,11 @@
             "comp_to": "IVCE",
             "r_for": 17350.273624823694,
             "r_back": 17350.273624823694,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0016368766215168592,
+            "area": 0.0
         },
         "IVCE_IVCI": {
             "name": "IVCE_IVCI",
@@ -824,7 +1515,11 @@
             "comp_to": "IVCI",
             "r_for": 13.963328631875882,
             "r_back": 13.963328631875882,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.01435556678912182,
+            "area": 0.0
         },
         "IVCI_RA": {
             "name": "IVCI_RA",
@@ -842,7 +1537,11 @@
             "comp_to": "RA",
             "r_for": 139.63328631875882,
             "r_back": 698.1664315937941,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": -0.0006222968550033057,
+            "area": 0.0
         },
         "SVC_RA": {
             "name": "SVC_RA",
@@ -860,7 +1559,11 @@
             "comp_to": "RA",
             "r_for": 167.55994358251058,
             "r_back": 837.799717912553,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": -0.0008791990162526297,
+            "area": 0.0
         },
         "PA_LL": {
             "name": "PA_LL",
@@ -878,7 +1581,12 @@
             "comp_to": "LL",
             "r_for": 2457.5458392101555,
             "r_back": 2457.5458392101555,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.002306979675040069,
+            "area": 0.0,
+            "r_ans_factor": 1.055531995809336
         },
         "PA_RL": {
             "name": "PA_RL",
@@ -896,7 +1604,12 @@
             "comp_to": "RL",
             "r_for": 2457.5458392101555,
             "r_back": 2457.5458392101555,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.002306979675040069,
+            "area": 0.0,
+            "r_ans_factor": 1.055531995809336
         },
         "LL_PV": {
             "name": "LL_PV",
@@ -914,7 +1627,11 @@
             "comp_to": "PV",
             "r_for": 2010.719322990127,
             "r_back": 2010.719322990127,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0038673686509517412,
+            "area": 0.0
         },
         "RL_PV": {
             "name": "RL_PV",
@@ -932,7 +1649,11 @@
             "comp_to": "PV",
             "r_for": 2010.719322990127,
             "r_back": 2010.719322990127,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0038673686509517412,
+            "area": 0.0
         },
         "PV_LA": {
             "name": "PV_LA",
@@ -950,7 +1671,11 @@
             "comp_to": "LA",
             "r_for": 335.11988716502117,
             "r_back": 335.11988716502117,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.00821760723675561,
+            "area": 0.0
         },
         "AAR_DA": {
             "name": "AAR_DA",
@@ -968,7 +1693,11 @@
             "comp_to": "DA",
             "r_for": 300.0,
             "r_back": 300.0,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0,
+            "area": 0.0
         },
         "DA_PA": {
             "name": "DA_PA",
@@ -986,7 +1715,11 @@
             "comp_to": "PA",
             "r_for": 3000.0,
             "r_back": 3000.0,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.0,
+            "area": 0.0
         },
         "PC": {
             "name": "PC",
@@ -1008,10 +1741,17 @@
                 "LV",
                 "COR"
             ],
-            "vol": 0.028728200684824855,
+            "vol": 0.02588423410025278,
             "u_vol": 0.0,
             "el_base": 9.960507757404796,
-            "el_k": 1.0
+            "el_k": 1.0,
+            "pres_in": 0.2584901081250063,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 4.695078467151555,
+            "pres": -4.178098250901543,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "OUT": {
             "name": "OUT",
@@ -1024,7 +1764,34 @@
             "vol": 1000000,
             "u_vol": 1000000.0,
             "el_base": 0.00076,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "pres_atm": 760,
+            "temp": 0.0185,
+            "target_temp": 0.0185,
+            "humidity": 0.0,
+            "ch2o": 0.0,
+            "pres_in": 760.0,
+            "pres_out": 0.0,
+            "pres_tm": 760.0,
+            "pres": 760.0,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "ctotal": -3.7509931147804385e-12,
+            "ph2o": 0.0,
+            "po2": 159.6,
+            "pco2": 0.29791999999999996,
+            "pn2": 600.10208,
+            "pother": 0.0,
+            "fh2o": 0.0,
+            "fo2": 0.21,
+            "fco2": 0.00039199999999999993,
+            "fn2": 0.789608,
+            "fother": 0.0,
+            "co2": 9.3685117176849,
+            "cco2": 0.017487888539678476,
+            "cn2": 35.225960954179705,
+            "cother": 0.0
         },
         "MOUTH": {
             "name": "MOUTH",
@@ -1037,7 +1804,34 @@
             "vol": 1000000,
             "u_vol": 1000000.0,
             "el_base": 0.00076,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "pres_atm": 760,
+            "temp": 20.0,
+            "target_temp": 20.0,
+            "humidity": 0.5,
+            "ch2o": 0.48267218098389214,
+            "pres_in": 760.0,
+            "pres_out": 0.0,
+            "pres_tm": 760.0,
+            "pres": 760.0,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "ctotal": 41.57114907009006,
+            "ph2o": 8.824169303794598,
+            "po2": 157.74692444620314,
+            "pco2": 0.29446092563291254,
+            "pn2": 593.1344453243694,
+            "pother": 0.0,
+            "fh2o": 0.01161074908394026,
+            "fo2": 0.20756174269237254,
+            "fco2": 0.00038744858635909543,
+            "fn2": 0.7804400596373281,
+            "fother": 0.0,
+            "co2": 8.628580146712295,
+            "cco2": 0.016106682940529617,
+            "cn2": 32.44379005945334,
+            "cother": 0.0
         },
         "DS": {
             "name": "DS",
@@ -1047,10 +1841,37 @@
             "is_enabled": true,
             "dependencies": [],
             "fixed_composition": false,
-            "vol": 0.005179522968418664,
+            "vol": 0.005030894883347747,
             "u_vol": 0.00510808253423132,
             "el_base": 5585.331452750353,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "pres_atm": 760,
+            "temp": 32.45440772226984,
+            "target_temp": 32.0,
+            "humidity": 1.0,
+            "ch2o": 0.8718185636750672,
+            "pres_in": 759.5713757692462,
+            "pres_out": 0.0,
+            "pres_tm": 759.5713757692462,
+            "pres": 759.5713757692462,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "ctotal": 40.18565791898647,
+            "ph2o": 16.49439096903118,
+            "po2": 106.02645149162369,
+            "pco2": 32.670672280211775,
+            "pn2": 604.3798610283795,
+            "pother": 0.0,
+            "fh2o": 0.02171539304298651,
+            "fo2": 0.1395872130966583,
+            "fco2": 0.043011984551320104,
+            "fn2": 0.7956854093090351,
+            "fother": 0.0,
+            "co2": 5.615820483883876,
+            "cco2": 1.7248257171473829,
+            "cn2": 31.97613766219081,
+            "cother": 0.0
         },
         "ALL": {
             "name": "ALL",
@@ -1060,10 +1881,37 @@
             "is_enabled": true,
             "dependencies": [],
             "fixed_composition": false,
-            "vol": 0.06057958382463783,
+            "vol": 0.055202471915227785,
             "u_vol": 0.040404932845769743,
             "el_base": 232.72214386459802,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "pres_atm": 760,
+            "temp": 36.53114130932172,
+            "target_temp": 37.0,
+            "humidity": 1.0,
+            "ch2o": 0.9418782223670615,
+            "pres_in": 763.442416170468,
+            "pres_out": -4.3386248519176265,
+            "pres_tm": 767.7810410223857,
+            "pres": 759.1037913185504,
+            "pres_ext": -4.34498060601841,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "ctotal": 39.807126092606126,
+            "ph2o": 17.96132444531468,
+            "po2": 92.20168772933263,
+            "pco2": 41.250445032009885,
+            "pn2": 607.6903341118932,
+            "pother": 0.0,
+            "fh2o": 0.0236612234726376,
+            "fo2": 0.12146123993028655,
+            "fco2": 0.05434098143596222,
+            "fn2": 0.8005365551611135,
+            "fother": 0.0,
+            "co2": 4.835057243385115,
+            "cco2": 2.1631424416037097,
+            "cn2": 31.86707062109001,
+            "cother": 0.0
         },
         "ALR": {
             "name": "ALR",
@@ -1073,10 +1921,37 @@
             "is_enabled": true,
             "dependencies": [],
             "fixed_composition": false,
-            "vol": 0.06057958382463783,
+            "vol": 0.055202471915227785,
             "u_vol": 0.040404932845769743,
             "el_base": 232.72214386459802,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "pres_atm": 760,
+            "temp": 36.53114130932172,
+            "target_temp": 37.0,
+            "humidity": 1.0,
+            "ch2o": 0.9418782223670615,
+            "pres_in": 763.442416170468,
+            "pres_out": -4.3386248519176265,
+            "pres_tm": 767.7810410223857,
+            "pres": 759.1037913185504,
+            "pres_ext": -4.34498060601841,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "ctotal": 39.807126092606126,
+            "ph2o": 17.96132444531468,
+            "po2": 92.20168772933263,
+            "pco2": 41.250445032009885,
+            "pn2": 607.6903341118932,
+            "pother": 0.0,
+            "fh2o": 0.0236612234726376,
+            "fo2": 0.12146123993028655,
+            "fco2": 0.05434098143596222,
+            "fn2": 0.8005365551611135,
+            "fother": 0.0,
+            "co2": 4.835057243385115,
+            "cco2": 2.1631424416037097,
+            "cn2": 31.86707062109001,
+            "cother": 0.0
         },
         "CHEST_L": {
             "name": "CHEST_L",
@@ -1090,11 +1965,18 @@
             "contained_components": [
                 "ALL"
             ],
-            "vol": 0.06058458133905712,
-            "vol_ext": 0.0,
+            "vol": 0.05519689081462941,
             "u_vol": 0.053228712121212114,
             "el_base": 46.5444287729196,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "vol_ext": 0.0,
+            "pres_in": 0.09160775300813934,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 4.5281961120346885,
+            "pres": -4.34498060601841,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "CHEST_R": {
             "name": "CHEST_R",
@@ -1108,11 +1990,18 @@
             "contained_components": [
                 "ALR"
             ],
-            "vol": 0.06058458133905712,
-            "vol_ext": 0.0,
+            "vol": 0.05519689081462941,
             "u_vol": 0.053228712121212114,
             "el_base": 46.5444287729196,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "vol_ext": 0.0,
+            "pres_in": 0.09160775300813934,
+            "pres_out": -4.436588359026549,
+            "pres_tm": 4.5281961120346885,
+            "pres": -4.34498060601841,
+            "pres_ext": -4.443190083703063,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0
         },
         "THORAX": {
             "name": "THORAX",
@@ -1146,11 +2035,19 @@
                 "LL",
                 "RL"
             ],
-            "vol": 0.2825747227380199,
-            "vol_ext": 0.0,
+            "vol": 0.2684818732021613,
             "u_vol": 0.311530303030303,
             "el_base": 69.81664315937941,
-            "el_k": 0.0
+            "el_k": 0.0,
+            "vol_ext": 0.0,
+            "pres_in": -4.443190083703063,
+            "pres_out": 0.0,
+            "pres_tm": -4.443190083703063,
+            "pres": -4.443190083703063,
+            "pres_ext": 0.0,
+            "pres_cc": 0.0,
+            "pres_mus": 0.0,
+            "act_factor": 33.597094412737015
         },
         "MOUTH_DS": {
             "name": "MOUTH_DS",
@@ -1168,7 +2065,11 @@
             "comp_to": "DS",
             "r_for": 18.61777150916784,
             "r_back": 18.61777150916784,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.021431211537691296,
+            "area": 0.0
         },
         "DS_ALL": {
             "name": "DS_ALL",
@@ -1186,7 +2087,11 @@
             "comp_to": "ALL",
             "r_for": 41.889985895627646,
             "r_back": 41.889985895627646,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.011162201196744076,
+            "area": 0.0
         },
         "DS_ALR": {
             "name": "DS_ALR",
@@ -1204,7 +2109,11 @@
             "comp_to": "ALR",
             "r_for": 41.889985895627646,
             "r_back": 41.889985895627646,
-            "r_k": 0
+            "r_k": 0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.011162201196744076,
+            "area": 0.0
         },
         "GASEX_LL": {
             "name": "GASEX_LL",
@@ -1252,7 +2161,11 @@
             "comp_to": "PV",
             "r_for": 30719.32299012694,
             "r_back": 30719.32299012694,
-            "r_k": 1000.0
+            "r_k": 1000.0,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.00044794412307678247,
+            "area": 0.0
         },
         "FO": {
             "name": "FO",
@@ -1268,8 +2181,16 @@
             "no_back_flow": false,
             "comp_from": "LA",
             "comp_to": "RA",
-            "diameter": 0.85,
-            "length": 2.0
+            "r_for": 1284.0002176772803,
+            "diameter": 1.3,
+            "length": 2.0,
+            "r_k": 0,
+            "r_back": 1284.0002176772803,
+            "area": 1.3273228961416879e-06,
+            "p1_ext": 0,
+            "p2_ext": 0,
+            "flow": 0.001221818293400142,
+            "velocity": 3.6820529411547693
         },
         "VSD": {
             "name": "VSD",
@@ -1285,9 +2206,12 @@
             "no_back_flow": false,
             "comp_from": "LV",
             "comp_to": "RV",
+            "r_for": 1833.6165108540395,
             "diameter": 1.0,
             "length": 1.0,
-            "r_k": 0
+            "r_k": 0,
+            "r_back": 1833.6165108540395,
+            "area": 7.853981633974482e-07
         },
         "Heart": {
             "name": "Heart",
@@ -1307,12 +2231,20 @@
             "tricuspid_valve": "RA_RV",
             "pulmonary_valve": "RV_PA",
             "aortic_valve": "LV_AA",
-            "heart_rate": 106.28925013359532,
+            "heart_rate": 109.42533753384735,
             "heart_rate_ref": 110.0,
             "rhythm_type": 0.0,
             "pq_time": 0.1,
             "qrs_time": 0.075,
-            "qt_time": 0.25
+            "qt_time": 0.25,
+            "cqt_time": 0.18512142574141943,
+            "ncc_atrial": 133,
+            "ncc_ventricular": 1030,
+            "aaf": 0.8686315144381912,
+            "vaf": 0.0,
+            "ans_activity_factor": 1.0,
+            "hr_mob_factor": 1.0,
+            "hr_ans_factor": 0.9947757957622487
         },
         "Circulation": {
             "name": "Circulation",
@@ -1375,7 +2307,8 @@
             ],
             "heart_pulmonary_veins": [
                 "PV_LA"
-            ]
+            ],
+            "dp": 21.767396855386707
         },
         "Lungs": {
             "name": "Lungs",
@@ -1564,7 +2497,13 @@
             "pvr_tc_ph": 12.0,
             "pvr_mxe_po2_low": 1.5,
             "pvr_mxe_po2_high": 0.5,
-            "pvr_tc_po2": 12.0
+            "pvr_tc_po2": 12.0,
+            "hr_effect_factor": 0.9947757957622487,
+            "mv_effect_factor": 0.9694323133572692,
+            "venpool_effect_factor": 1.028525281479868,
+            "cont_effect_factor": 0.9999192415948124,
+            "svr_effect_factor": 1.0015505502179347,
+            "pvr_effect_factor": 1.055531995809336
         },
         "Blood": {
             "name": "Blood",
@@ -1631,16 +2570,23 @@
                 "THORAX"
             ],
             "breathing_enabled": true,
-            "resp_rate": 24.37998667942616,
+            "resp_rate": 39.99654096754407,
             "minute_volume_ref": 0.2,
             "vt_rr_ratio": 0.0001212,
-            "resp_muscle_pressure": 0.7576144486052013,
+            "resp_muscle_pressure": 0.33597094412737016,
             "rmp_gain": 5,
             "rmp_gain_max": 50,
             "ie_ratio": 0.3,
             "targets": [
                 "THORAX"
-            ]
+            ],
+            "is_intubated": false,
+            "target_minute_volume": 0.6873275101703039,
+            "target_tidal_volume": 0.01718467381286918,
+            "mv_ans_factor": 0.9694323133572692,
+            "insp_tidal_volume": -0.013319180850826163,
+            "exp_tidal_volume": 0.01436033402126549,
+            "minute_volume": 0.5736977578603892
         },
         "Metabolism": {
             "name": "Metabolism",
@@ -1649,7 +2595,7 @@
             "category": "general_models",
             "is_enabled": true,
             "dependencies": [],
-            "vo2": 5.0,
+            "vo2": 7.0,
             "resp_q": 0.7,
             "body_temp": 37,
             "metabolic_active_models": {
@@ -1687,14 +2633,15 @@
             "mat_to2": 7.0,
             "mat_tco2": 27.0,
             "plac_do2": 0.1,
-            "plac_dco2": 0.1
+            "plac_dco2": 0.1,
+            "placenta_running": false
         },
         "Mob": {
             "name": "Mob",
             "description": "myocardial oxygen balance model",
             "model_type": "Mob",
             "category": "general_models",
-            "is_enabled": false,
+            "is_enabled": true,
             "dependencies": [
                 "Heart",
                 "AA",
@@ -1706,13 +2653,13 @@
             "aa_cor_model": "AA_COR",
             "cor_model": "COR",
             "ecc_c": 0.0,
-            "pva_c": 8.730000000000001e-05,
+            "pva_c": 3.928500000000001e-05,
             "po2_min": 0.05,
             "po2_set": 10.0,
             "po2_max": 10.0,
-            "bm_vo2_ref": 7.154999999999999e-05,
-            "bm_vo2_max": 7.154999999999999e-05,
-            "bm_vo2_min": 1.431e-05,
+            "bm_vo2_ref": 3.21975e-05,
+            "bm_vo2_max": 3.21975e-05,
+            "bm_vo2_min": 6.4395e-06,
             "vo2_factor": 0.45,
             "bm_po2_tc": 5.0,
             "hr_factor": 1.0,
@@ -1726,14 +2673,36 @@
             "ans_factor": 1.0,
             "ans_factor_max": 1.0,
             "ans_factor_min": 0.01,
-            "ans_tc": 5.0
+            "ans_tc": 5.0,
+            "hw": 23.02832,
+            "ecc_lv": 26955.74047954866,
+            "ecc_rv": 21829.337094499293,
+            "ecc": 48785.07757404795,
+            "stroke_work_lv": 0.3195439102470333,
+            "stroke_work_rv": 0.2089742376312414,
+            "stroke_volume_lv": 0.005740760637330237,
+            "stroke_volume_rv": 0.0055741895222768305,
+            "sv_lv_kg": 1.6193965126460472,
+            "sv_rv_kg": 1.5724088920385981,
+            "pva": 0.5285181478782748,
+            "bm_g": 5.961441874974874e-05,
+            "cont_g": 0.09949748743718594,
+            "hr_g": 0.09949748743718594,
+            "ans_g": 0.09949748743718594,
+            "bm_vo2": 3.307996489693941e-05,
+            "ans_activity_factor": 1.0,
+            "ecc_vo2": 0.0,
+            "pva_vo2": 2.133190053563837e-05,
+            "mvo2": 5.441186543257778e-05,
+            "mvo2_step": 4.9616972840050866e-08,
+            "mob": 5.151873941090341
         },
         "Pda": {
             "name": "Pda",
             "description": "persistent ductus arteriosus model",
             "model_type": "Pda",
             "category": "general_models",
-            "is_enabled": true,
+            "is_enabled": false,
             "dependencies": [
                 "DA",
                 "AAR_DA",
@@ -1838,7 +2807,9 @@
             "oxy_fio2": 0.205,
             "oxy_co2_flow": 10,
             "oxy_humidity_gas": 0.5,
-            "oxy_sweep_gas": 1.5
+            "oxy_sweep_gas": 1.5,
+            "tubing_in_volume": 0.031669217443593606,
+            "tubing_out_volume": 0.031669217443593606
         },
         "Ventilator": {
             "name": "Ventilator",
@@ -1874,6 +2845,116 @@
             "category": "general_models",
             "is_enabled": true,
             "dependencies": []
+        }
+    },
+    "scaler_settings": {
+        "heart_chambers": [
+            "LA",
+            "RA",
+            "LV",
+            "RV",
+            "COR"
+        ],
+        "heart_valves": [
+            "LA_LV",
+            "RA_RV",
+            "LV_AA",
+            "RV_PA",
+            "LV_PA",
+            "RV_AA"
+        ],
+        "pericardium": [
+            "PC",
+            "AA"
+        ],
+        "arteries": [
+            "AA",
+            "AAR",
+            "AD",
+            "PA",
+            "DA"
+        ],
+        "veins": [
+            "IVCE",
+            "IVCI",
+            "SVC",
+            "PV"
+        ],
+        "capillaries": [
+            "LS",
+            "INT",
+            "KID",
+            "RLB",
+            "BR",
+            "RUB",
+            "LL",
+            "RL"
+        ],
+        "shunts": [
+            "IPS",
+            "FO"
+        ],
+        "blood_connectors": [
+            "AA_AAR",
+            "AA_COR",
+            "AAR_AD",
+            "AD_INT",
+            "AD_KID",
+            "AD_LS",
+            "AD_RLB",
+            "AAR_RUB",
+            "AAR_BR",
+            "COR_RA",
+            "RUB_SVC",
+            "BR_SVC",
+            "RLB_IVCE",
+            "LS_IVCE",
+            "KID_IVCE",
+            "INT_IVCE",
+            "IVCE_IVCI",
+            "IVCI_RA",
+            "SVC_RA",
+            "PA_LL",
+            "PA_RL",
+            "LL_PV",
+            "RL_PV",
+            "PV_LA"
+        ],
+        "lungs": [
+            "ALL",
+            "ALR",
+            "DS"
+        ],
+        "airways": [
+            "MOUTH_DS",
+            "DS_ALL",
+            "DS_ALR"
+        ],
+        "thorax": [
+            "THORAX",
+            "CHEST_L",
+            "CHEST_R"
+        ],
+        "patients": {
+            "40": {
+                "weight": 3.545,
+                "height": 0.519,
+                "blood_volume": 0.08,
+                "lung_volume": 0.03,
+                "res_circ_factor": 1.0,
+                "el_base_circ_factor": 1.0,
+                "el_min_circ_factor": 1.0,
+                "el_max_circ_factor": 1.0,
+                "res_resp_factor": 1.0,
+                "el_base_resp_factor": 1.0,
+                "hr_ref": 110.0,
+                "syst_ref": 66.0,
+                "diast_ref": 40.0,
+                "map_ref": 51.26,
+                "resp_rate": 40.0,
+                "vt_rr_ratio": 0.0001212,
+                "mv_ref": 0.2
+            }
         }
     }
 }

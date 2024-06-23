@@ -881,6 +881,8 @@ class NeoInterface(BaseInterface):
                 "RV.vol",
                 "AAR_AD.flow",
                 "SVC_RA.flow",
+                "Pda.flow",
+                "FO.flow",
             ],
             weight_based=weight_based,
             sampleinterval=0.0005,
@@ -905,16 +907,25 @@ class NeoInterface(BaseInterface):
         print(
             f" Pulm pressure  : {result['PA.pres.max']:<0.0f}/{result['PA.pres.min']:<0.0f} ({result['PA.pres.mean']:<0.0f}) mmHg"
         )
-        print(f" LVOCO          : {result['LV_AA.flow.net']:<0.1f} ml/kg/min")
+        print(f" LVO            : {result['LV_AA.flow.net']:<0.1f} ml/kg/min")
         print(f" LVEDV          : {result['LV.vol.max']:<0.1f} ml/kg")
         print(f" LVESV          : {result['LV.vol.min']:<0.1f} ml/kg")
         print(f" LVSV           : {result['LV_AA.flow.sv']:<0.1f} ml/kg")
-        print(f" RVOCO          : {result['RV_PA.flow.net']:<0.1f} ml/kg/min")
+        print(f" RVO            : {result['RV_PA.flow.net']:<0.1f} ml/kg/min")
         print(f" RVEDV          : {result['RV.vol.max']:<0.1f} ml/kg")
         print(f" RVESV          : {result['RV.vol.min']:<0.1f} ml/kg")
         print(f" RVSV           : {result['RV_PA.flow.sv']:<0.1f} ml/kg")
+        print(
+            f" LVO/RVO        : {round(result['LV_AA.flow.net']/result['RV_PA.flow.net'], 2)}"
+        )
         print(f" DAo flow       : {result['AAR_AD.flow.net']:<0.1f} ml/kg/min")
         print(f" SVC flow       : {result['SVC_RA.flow.net']:<0.1f} ml/kg/min")
+        print(
+            f" PDA flow net   : {result['Pda.flow.net']:<0.1f} ml/kg/min, LtR: {result['Pda.flow.forward']:<0.1f} ml/kg/min, RtL: {-result['Pda.flow.backward']:<0.1f} ml/kg/min"
+        )
+        print(
+            f" FO flow net    : {result['FO.flow.net']:<0.1f} ml/kg/min, LtR: {result['FO.flow.forward']:<0.1f} ml/kg/min, RtL: {-result['FO.flow.backward']:<0.1f} ml/kg/min"
+        )
         print(f" Resp rate      : {vitals['resp_rate']:<0.0f} bpm")
         print(f" SpO2 pre       : {vitals['spo2_pre']:<0.0f} %")
         print(f" SpO2 post      : {vitals['spo2_post']:<0.0f} %")
@@ -937,6 +948,7 @@ class NeoInterface(BaseInterface):
                 "RV_PA.flow",
                 "SVC_RA.flow",
                 "Pda.flow",
+                "FO.flow",
             ],
             weight_based=weight_based,
             sampleinterval=0.0005,
@@ -957,7 +969,12 @@ class NeoInterface(BaseInterface):
         print(f" LVO            : {result['LV_AA.flow.net']:<0.1f} ml/kg/min")
         print(f" RVO            : {result['RV_PA.flow.net']:<0.1f} ml/kg/min")
         print(f" SVC flow       : {result['SVC_RA.flow.net']:<0.1f} ml/kg/min")
-        print(f" PDA flow       : {result['Pda.flow.net']:<0.1f} ml/kg/min")
+        print(
+            f" PDA flow net   : {result['Pda.flow.net']:<0.1f} ml/kg/min, LtR: {result['Pda.flow.forward']:<0.1f} ml/kg/min, RtL: {-result['Pda.flow.backward']:<0.1f} ml/kg/min"
+        )
+        print(
+            f" FO flow net    : {result['FO.flow.net']:<0.1f} ml/kg/min, LtR: {result['FO.flow.forward']:<0.1f} ml/kg/min, RtL: {-result['FO.flow.backward']:<0.1f} ml/kg/min"
+        )
         print(
             f" LVO/RVO ratio  : {round(result['LV_AA.flow.net']/result['RV_PA.flow.net'], 2)}"
         )
@@ -965,7 +982,7 @@ class NeoInterface(BaseInterface):
 
         return result
 
-    def open_ductus(
+    def open_ductus_arteriosus(
         self, new_diameter: float, in_time: float = 10.0, at_time: float = 0.0
     ):
         self.model.models["Pda"].open_ductus(
