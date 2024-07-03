@@ -1,15 +1,9 @@
 import math
-from explain_core.base_models.BaseModel import BaseModel
-from explain_core.base_models.Resistor import Resistor
-from explain_core.core_models.BloodCapacitance import BloodCapacitance
-from explain_core.core_models.BloodTimeVaryingElastance import BloodTimeVaryingElastance
-from explain_core.core_models.Heart import Heart
-from explain_core.core_models.Breathing import Breathing
-from explain_core.functions.ActivationFunction import activation_function
-from explain_core.functions.BloodComposition import set_blood_composition
+from explain_core.helpers.ActivationFunction import activation_function
+from explain_core.helpers.BloodComposition import set_blood_composition
 
 
-class Ans(BaseModel):
+class Ans:
     # independent parameters
     baroreceptor_location: str = "AAR"
     chemoreceptor_locatio: str = "AAR"

@@ -22,9 +22,10 @@ def calc_resistance_tube(diameter: float, length: float, viscosity: float = 6.0)
     # calculate the resistance    Pa *  / m3
     res: float = (8.0 * n_pas * length_meters) / (math.pi * math.pow(radius_meters, 4))
 
-    # convert resistance of Pa/m3 to mmHg/l 
+    # convert resistance of Pa/m3 to mmHg/l
     res = res * 0.00000750062
     return res
+
 
 def get_ettube_resistance(diameter: float = 3.5, flow: float = 10.0):
     return 50.0

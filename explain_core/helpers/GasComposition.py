@@ -7,7 +7,14 @@ fco2_dry = 0.000392
 fn2_dry = 0.794608
 fother_dry = 0.0
 
-def set_gas_composition(gc: GasCapacitance, fio2: float, temp: float, humidity: float, fico2: float = 0.000392):
+
+def set_gas_composition(
+    gc: GasCapacitance,
+    fio2: float,
+    temp: float,
+    humidity: float,
+    fico2: float = 0.000392,
+):
     result = calc_gas_composition(gc, fio2, temp, humidity, fico2)
 
     # process the result
@@ -30,7 +37,9 @@ def set_gas_composition(gc: GasCapacitance, fio2: float, temp: float, humidity: 
     gc.cother = result["cother"]
 
 
-def calc_gas_composition(gascomp, fio2=0.205, temp=None, humidity=None, fico2:float = 0.000392) -> object:
+def calc_gas_composition(
+    gascomp, fio2=0.205, temp=None, humidity=None, fico2: float = 0.000392
+) -> object:
     # check that the gascomp is a gas capacitance
     if type(gascomp) is GasCapacitance:
         # make sure the latest pressure is available
@@ -39,7 +48,9 @@ def calc_gas_composition(gascomp, fio2=0.205, temp=None, humidity=None, fico2:fl
         new_fo2_dry = fio2
         new_fco2_dry = fico2
         new_fn2_dry = fn2_dry * (1.0 - (fio2 + fico2)) / (1.0 - (fo2_dry + fco2_dry))
-        new_fother_dry = fother_dry * (1.0 - (fio2 + fico2)) / (1.0 - (fo2_dry + fco2_dry))
+        new_fother_dry = (
+            fother_dry * (1.0 - (fio2 + fico2)) / (1.0 - (fo2_dry + fco2_dry))
+        )
         # if temp is set then transfer that temp to the gascomp
         if temp is not None:
             gascomp.target_temp = temp
@@ -47,14 +58,24 @@ def calc_gas_composition(gascomp, fio2=0.205, temp=None, humidity=None, fico2:fl
         # if humidity is set then transfer that humidity to the gascomp
         if humidity is not None:
             gascomp.humidity = humidity
-        
+
         # calculate the gas composition
-        result = gas_composition(gascomp.pres, new_fo2_dry, new_fco2_dry, new_fn2_dry, new_fother_dry, gascomp.temp, gascomp.humidity)
+        result = gas_composition(
+            gascomp.pres,
+            new_fo2_dry,
+            new_fco2_dry,
+            new_fn2_dry,
+            new_fother_dry,
+            gascomp.temp,
+            gascomp.humidity,
+        )
 
         return result
 
 
-def gas_composition(pressure, new_fo2_dry, new_fco2_dry, new_fn2_dry, new_fother_dry, temp, humidity):
+def gas_composition(
+    pressure, new_fo2_dry, new_fco2_dry, new_fn2_dry, new_fother_dry, temp, humidity
+):
     # local constant
     _gas_constant: float = 62.36367
 
