@@ -114,10 +114,7 @@ class Container:
         self._temp_vol_max = max(self.vol, self._temp_vol_max)
         self._temp_vol_min = min(self.vol, self._temp_vol_min)
 
-        if (
-            self._analytics_timer >= self._analytics_window
-            or self._heart.ncc_ventricular == 1
-        ):
+        if self._analytics_timer >= self._analytics_window:
             self.pres_max = self._temp_pres_max
             self.pres_min = self._temp_pres_min
             self.pres_mean = (2.0 * self.pres_min + self.pres_max) / 3.0

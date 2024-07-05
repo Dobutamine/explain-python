@@ -89,7 +89,7 @@ class BloodResistor:
         _r_for = (
             _r_for_base
             + (self.r_for_factor - 1) * _r_for_base
-            + ((self.r_ans_factor - 1) * r_for_base) * self.ans_activity_factor
+            + ((self.r_ans_factor - 1) * _r_for_base) * self.ans_activity_factor
             + (self.r_mob_factor - 1) * _r_for_base
             + (self.r_drug_factor - 1) * _r_for_base
         )
@@ -131,7 +131,7 @@ class BloodResistor:
             self._cum_backward_flow += self.flow * self._t
 
         # analyze current state
-        self.analyze(_r_for, _r_back)
+        self.analyze()
 
         # Update the volumes of the model components connected by this resistor
         vol_not_removed = 0.0

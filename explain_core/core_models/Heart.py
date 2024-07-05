@@ -137,7 +137,7 @@ class Heart:
             # reset the sinus node timer
             self._sa_node_timer = 0.0
             # signal that the pq-time starts running
-            self._pq_running = true
+            self._pq_running = True
             # reset the atrial activation curve counter
             self.ncc_atrial = -1
             # signal that the cardiac cycle is running and reset the timer
@@ -149,20 +149,20 @@ class Heart:
             # reset the pq timer
             self._pq_timer = 0.0
             # signal that pq timer has stopped
-            self._pq_running = false
+            self._pq_running = False
             # signal that the av delay timer has started
-            self._av_delay_running = true
+            self._av_delay_running = True
 
         # has the av delay time elasped
         if self._av_delay_timer > self.av_delay:
             # reset the av delay timer
             self._av_delay_timer = 0.0
             # signal that the av delay has stopped
-            self._av_delay_running = false
+            self._av_delay_running = False
             # check whether the ventricles are in a refractory state
             if not self._ventricle_is_refractory:
                 # signal that the qrs time starts running
-                self._qrs_running = true
+                self._qrs_running = True
                 # reset the ventricular activation curve
                 self.ncc_ventricular = -1
 
@@ -171,20 +171,20 @@ class Heart:
             # reset the qrs timer
             self._qrs_timer = 0.0
             # signal that the qrs timer has stopped
-            self._qrs_running = false
+            self._qrs_running = False
             # signal that the at timer starts running
-            self._qt_running = true
+            self._qt_running = True
             # signal that the ventricles are now in a refractory state
-            self._ventricle_is_refractory = true
+            self._ventricle_is_refractory = True
 
         # has the qt time period elapsed?
         if self._qt_timer > self.cqt_time:
             # reset the qt timer
             self._qt_timer = 0.0
             # signal that the qt timer has stopped
-            self._qt_running = false
+            self._qt_running = False
             # signal that the ventricles are coming out of their refractory state
-            self._ventricle_is_refractory = false
+            self._ventricle_is_refractory = False
             # signal the end of the cardiac cycle
             self.cardiac_cycle_time = self._temp_cardiac_cycle_time
             self.cardiac_cycle_running = 0
@@ -248,3 +248,44 @@ class Heart:
         else:
             return self.qt_time * 2.449
             # (sqrt(6))
+
+    def set_ecg_timings(self, pq_time, qrs_time, qt_time):
+        self.pq_time = pq_time
+        self.qrs_time = qrs_time
+        self.qt_time = qt_time
+
+    def set_heartchamber_props_abs(self, chamber, el_min, el_max, u_vol, el_k):
+        t = self._model_engine.models[chamber]
+        t.el_min = el_min
+        t.el_max = el_max
+        t.u_vol = u_vol
+        t.el_k = el_k
+
+    def set_heartchamber_props_rel(
+        self, chamber, el_min_factor, el_max_factor, el_k_factor, u_vol_factor
+    ):
+        t = self._model_engine.models[chamber]
+        t.el_min_factor = el_min_factor
+        t.el_max_factor = el_max_factor
+        t.u_vol_factor = u_vol_factor
+        t.el_k_factor = el_k_factor
+
+    def set_heartvalve_props_abs(
+        self, valve, r_for, r_back, r_k, no_flow, no_back_flow
+    ):
+        t = self._model_engine.models[valve]
+        t.r_for = r_for
+        t.r_back = r_back
+        t.r_k = r_k
+        t.no_flow = no_flow
+        t.no_back_flow = no_back_flow
+
+    def set_heartvalve_props_rel(
+        valve, r_for_factor, r_back_factor, r_k_factor, no_flow, no_back_flow
+    ):
+        t = self._model_engine.models[valve]
+        t.r_for_factor = r_for_factor
+        t.r_back_factor = r_back_factor
+        t.r_k_factor = r_k_factor
+        t.no_flow = no_flow
+        t.no_back_flow = no_back_flow
