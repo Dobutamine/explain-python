@@ -7,11 +7,9 @@ import math
 import datetime
 from time import perf_counter
 
-from explain_core.base_models.BaseModel import BaseModel
 from explain_core.helpers.DataCollector import DataCollector
 from explain_core.helpers.TaskScheduler import TaskScheduler
 from explain_core.cpp_models.CppModelsBuilder import compile_modules
-from explain_core.helpers.Scaler import Scaler
 
 
 class ModelEngine:
@@ -60,10 +58,6 @@ class ModelEngine:
 
     # define an object holding the task scheduler
     _task_scheduler: dict = {}
-
-    # define a scaler object
-    scaler_settings: dict = {}
-    _scaler: Scaler = None
 
     # performance
     run_duration: float = 0.0

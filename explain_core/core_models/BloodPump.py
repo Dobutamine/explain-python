@@ -1,38 +1,41 @@
 import math
-from explain_core.base_models.Resistor import Resistor
-from explain_core.core_models.BloodCapacitance import BloodCapacitance
 
 
-class BloodPump(BloodCapacitance):
-    # independent parameters
-    pump_mode: int = 0  # 0 = centrifugal, 1 = roller pump
-    pump_pressure: float = 0.0
-    pump_rpm: float = 0.0
-    inlet: str = ""
-    outlet: str = ""
+class BloodPump:
+    # static properties
+    model_type: str = "BloodPump"
+    model_interface: list = []
 
-    # # dependent parameters
-    # pres_inlet: float = 0.0
-    # pres_outlet: float = 0.0
+    def __init__(self, model_ref: object, name: str = ""):
+        # independent properties
+        self.name: str = name
+        self.description: str = ""
+        self.is_enabled: bool = False
+        self.dependencies: list = []
 
-    # local parameters
-    _inlet_res: Resistor = {}
-    _outlet_res: Resistor = {}
+        # dependent properties
 
-    def connect_pump(self, _in: Resistor, _out: Resistor):
-        self._inlet_res = _in
-        self._outlet_res = _out
+        # local properties
+        self._model_engine: object = model_ref
+        self._is_initialized: bool = False
+        self._t: float = 0.0005
 
-    def calc_model(self) -> None:
-        # calculate the parent class
-        super().calc_model()
+    def init_model(self, **args: dict[str, any]):
+        # set the values of the properties as passed in the arguments
+        for key, value in args.items():
+            setattr(self, key, value)
 
-        # create a pressure gradient across the pump
-        self.pump_pressure = -self.pump_rpm / 25.0
+        # get the modeling step size
+        self._t = model.modeling_stepsize
 
-        if self.pump_mode == 0:
-            self._inlet_res.set_p1_ext(0.0)
-            self._inlet_res.set_p2_ext(self.pump_pressure)
-        else:
-            self._outlet_res.set_p1_ext(self.pump_pressure)
-            self._outlet_res.set_p2_ext(0.0)
+        # flag that the model is initialized
+        self._is_initialized = True
+
+    # this method is called during every model step by the model engine
+    def step_model(self):
+        if self.is_enabled and self._is_initialized:
+            self.calc_model()
+
+    # actual model calculations are done here
+    def calc_model(self):
+        pass

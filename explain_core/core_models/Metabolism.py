@@ -1,52 +1,41 @@
-from explain_core.base_models.BaseModel import BaseModel
+import math
 
 
-class Metabolism(BaseModel):
-    # independent variables
-    vo2_factor: float = 1.0
-    vo2_scaling_factor: float = 1.0
-    resp_q: float = 0.6
+class Metabolism:
+    # static properties
+    model_type: str = "Metabolism"
+    model_interface: list = []
 
-    def change_vo2(self, _vo2_factor):
-        if _vo2_factor >= 0.0:
-            self.vo2_factor = _vo2_factor
+    def __init__(self, model_ref: object, name: str = ""):
+        # independent properties
+        self.name: str = name
+        self.description: str = ""
+        self.is_enabled: bool = False
+        self.dependencies: list = []
 
-    def set_resp_q(self, new_resp_q):
-        if new_resp_q >= 0.0:
-            self.resp_q = new_resp_q
+        # dependent properties
 
-    def calc_model(self) -> None:
-        super().calc_model()
+        # local properties
+        self._model_engine: object = model_ref
+        self._is_initialized: bool = False
+        self._t: float = 0.0005
 
-        # translate the VO2 in ml/kg/min to VO2 in mmol for this stepsize (assumption is 37 degrees and atmospheric pressure)
-        vo2_step: float = (
-            (0.039 * self.vo2 * self.vo2_factor * self.vo2_scaling_factor * self._model.weight) / 60.0
-        ) * self._t
+    def init_model(self, **args: dict[str, any]):
+        # set the values of the independent properties
+        for key, value in args.items():
+            setattr(self, key, value)
 
-        for model, fvo2 in self.metabolic_active_models.items():
-            # get the vol, tco2 and to2 from the blood compartment
-            vol: float = self._model.models[model].vol
-            to2: float = self._model.models[model].aboxy["to2"]
-            tco2: float = self._model.models[model].aboxy["tco2"]
+        # get the modeling step size
+        self._t = model.modeling_stepsize
 
-            # calculate the change in oxygen concentration in this step
-            dto2: float = vo2_step * fvo2
+        # flag that the model is initialized
+        self._is_initialized = True
 
-            # calculate the new oxygen concentration in blood
-            new_to2: float = (to2 * vol - dto2) / vol
-            # guard against negative values
-            if new_to2 < 0:
-                new_to2 = 0
+    # this method is called during every model step by the model engine
+    def step_model(self):
+        if self.is_enabled and self._is_initialized:
+            self.calc_model()
 
-            # calculate the change in co2 concentration in this step
-            dtco2 = vo2_step * fvo2 * self.resp_q
-
-            # calculate the new co2 concentration in blood
-            new_tco2: float = (tco2 * vol + dtco2) / vol
-            # guard against negative values
-            if new_tco2 < 0:
-                new_tco2 = 0
-
-            # store the new to2 and tco2
-            self._model.models[model].aboxy["to2"] = new_to2
-            self._model.models[model].aboxy["tco2"] = new_tco2
+    # actual model calculations are done here
+    def calc_model(self):
+        pass

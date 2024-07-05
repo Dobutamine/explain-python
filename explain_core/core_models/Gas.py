@@ -1,70 +1,41 @@
 import math
-from explain_core.base_models.BaseModel import BaseModel
-from explain_core.functions.GasComposition import calc_gas_composition
 
 
-class Gas(BaseModel):
-    # local constant
-    _gas_constant: float = 62.36367
+class Gas:
+    # static properties
+    model_type: str = "Gas"
+    model_interface: list = []
 
-    def init_model(self, model: object) -> bool:
-        super().init_model(model)
+    def __init__(self, model_ref: object, name: str = ""):
+        # independent properties
+        self.name: str = name
+        self.description: str = ""
+        self.is_enabled: bool = False
+        self.dependencies: list = []
 
-        # set the atmospheric pressure, temperatures and humidities of the gas capacitances
-        self.set_atmospheric_pressure()
-        self.set_temperatures()
-        self.set_humidity()
+        # dependent properties
 
-        # we need a pressure to calculate the composition of the gas in the gas capacitances
-        for model in self._model.models.values():
-            if model.model_type == "GasCapacitance":
-                # calculate the pressure
-                model.calc_model()
+        # local properties
+        self._model_engine: object = model_ref
+        self._is_initialized: bool = False
+        self._t: float = 0.0005
 
-                # calculate the gas composition
-                result = calc_gas_composition(
-                    model, self.fio2, model.temp, model.humidity
-                )
+    def init_model(self, **args: dict[str, any]):
+        # set the values of the independent properties
+        for key, value in args.items():
+            setattr(self, key, value)
 
-                # process the result
-                for key, value in result.items():
-                    setattr(model, key, value)
+        # get the modeling step size
+        self._t = model.modeling_stepsize
 
-        return self._is_initialized
+        # flag that the model is initialized
+        self._is_initialized = True
 
-    # return the total blood volume
-    def get_total_gas_volume(self, output=True) -> float:
-        total_gas_volume: float = 0.0
+    # this method is called during every model step by the model engine
+    def step_model(self):
+        if self.is_enabled and self._is_initialized:
+            self.calc_model()
 
-        for model in self._model.models.values():
-            if model.model_type == "GasCapacitance":
-                if model.is_enabled and not model.fixed_composition:
-                    try:
-                        total_gas_volume += model.vol
-                        print(f"{model.name}: {model.vol}")
-                    except:
-                        total_gas_volume += 0.0
-
-        if output:
-            print(
-                f"Total gas volume = {total_gas_volume * 1000.0} ml ({total_gas_volume * 1000.0 / self._model.weight} ml/kg)"
-            )
-
-        return total_gas_volume
-
-    def calc_model(self) -> None:
+    # actual model calculations are done here
+    def calc_model(self):
         pass
-
-    def set_atmospheric_pressure(self):
-        for model in self._model.models.values():
-            if model.model_type == "GasCapacitance":
-                model.pres_atm = self.pres_atm
-
-    def set_temperatures(self):
-        for key, temp in self.temp_settings.items():
-            self._model.models[key].temp = temp
-            self._model.models[key].target_temp = temp
-
-    def set_humidity(self):
-        for key, hum in self.humidity_settings.items():
-            self._model.models[key].humidity = hum

@@ -1,90 +1,41 @@
-from explain_core.base_models.BaseModel import BaseModel
-from explain_core.core_models.GasCapacitance import GasCapacitance
-from explain_core.core_models.GasExchanger import GasExchanger
-from explain_core.base_models.Container import Container
-from explain_core.base_models.Resistor import Resistor
+import math
 
 
-class Lungs(BaseModel):
-    # independent parameters
-    upper_airways: str = ["MOUTH_DS"]
-    dead_space: str = ["DS"]
-    thorax: str = "THORAX"
-    chestwall: str = ["CHEST_L", "CHEST_R"]
-    alveolar_spaces: str = ["ALL", "ALR"]
-    lower_airways: str = ["DS_ALL", "DS_ALR"]
-    gas_exchangers: str = ["GASEX_LL", "GASEX_RL"]
+class Lungs:
+    # static properties
+    model_type: str = "Lungs"
+    model_interface: list = []
 
-    # local parameters
-    _upper_airways: Resistor = []
-    _dead_space: GasCapacitance = []
-    _lower_airways: Resistor = []
-    _alveolar_spaces: GasCapacitance = []
-    _thorax: Container = []
-    _chestwall: Container = []
-    _gas_exchangers: Resistor = []
+    def __init__(self, model_ref: object, name: str = ""):
+        # independent properties
+        self.name: str = name
+        self.description: str = ""
+        self.is_enabled: bool = False
+        self.dependencies: list = []
 
-    def init_model(self, model: object) -> bool:
-        # initialize the base model
-        super().init_model(model)
+        # dependent properties
 
-        # get all the model components
-        for uaw in self.upper_airways:
-            self._upper_airways.append(self._model.models[uaw])
+        # local properties
+        self._model_engine: object = model_ref
+        self._is_initialized: bool = False
+        self._t: float = 0.0005
 
-        for ds in self.dead_space:
-            self._dead_space.append(self._model.models[ds])
+    def init_model(self, **args: dict[str, any]):
+        # set the values of the independent properties
+        for key, value in args.items():
+            setattr(self, key, value)
 
-        for law in self.lower_airways:
-            self._lower_airways.append(self._model.models[law])
+        # get the modeling step size
+        self._t = model.modeling_stepsize
 
-        for alvs in self.alveolar_spaces:
-            self._alveolar_spaces.append(self._model.models[alvs])
-
-        for th in self.thorax:
-            self._thorax.append(self._model.models[th])
-
-        for cw in self.chestwall:
-            self._chestwall.append(self._model.models[cw])
-
-        for gasex in self.gas_exchangers:
-            self._gas_exchangers.append(self._model.models[gasex])
-
-        # signal that the ventilator model is initialized and return it
+        # flag that the model is initialized
         self._is_initialized = True
-        return self._is_initialized
 
-    def calc_model(self) -> None:
+    # this method is called during every model step by the model engine
+    def step_model(self):
+        if self.is_enabled and self._is_initialized:
+            self.calc_model()
+
+    # actual model calculations are done here
+    def calc_model(self):
         pass
-
-    def change_dif_o2(self, dif_o2_change):
-        if dif_o2_change > 0.0:
-            for gasex in self._gas_exchangers:
-                gasex.dif_o2_factor = dif_o2_change
-
-    def change_dif_co2(self, dif_co2_change):
-        if dif_co2_change > 0.0:
-            for gasex in self._gas_exchangers:
-                gasex.dif_co2_factor = dif_co2_change
-
-    def change_lung_compliance(self, comp_change):
-        if comp_change > 0.0:
-            for alv_space in self._alveolar_spaces:
-                alv_space.el_base_factor = 1.0 / comp_change
-
-    def change_chestwall_compliance(self, comp_change):
-        if comp_change > 0.0:
-            for cw in self._chestwall:
-                cw.el_base_factor = 1.0 / comp_change
-
-    def change_upper_airway_resistance(self, res_change):
-        if res_change > 0.0:
-            for uaw in self._upper_airways:
-                uaw.r_for_factor = res_change
-                uaw.r_back_factor = res_change
-
-    def change_lower_airway_resistance(self, res_change):
-        if res_change > 0.0:
-            for law in self._lower_airways:
-                law.r_for_factor = res_change
-                law.r_back_factor = res_change

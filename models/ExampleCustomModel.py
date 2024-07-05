@@ -2,27 +2,23 @@ import math
 
 
 class ExampleCustomModel:
-    # public model properties which are present in all model types
-    name: str = ""
-    model_type: str = ""
-    description: str = ""
-    is_enabled: bool = False
-    dependencies: list = []
+    # static properties
+    model_type: str = "ExampleCustomModel"
+    model_interface: list = []
 
-    # local properties
-    _model_engine: object = None
-    _is_initialized: bool = False
-    _t: float = 0.0005
+    def __init__(self, model_ref: object, name: str = ""):
+        # independent properties
+        self.name: str = name
+        self.description: str = ""
+        self.is_enabled: bool = False
+        self.dependencies: list = []
 
-    def __init__(self, model_ref, name: str = "", type: str = ""):
-        # model name
-        self.name = name
+        # dependent properties
 
-        # model type
-        self.model_type = type
-
-        # reference to the model engine
-        self._model_engine = model_ref
+        # local properties
+        self._model_engine: object = model_ref
+        self._is_initialized: bool = False
+        self._t: float = 0.0005
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the independent properties
