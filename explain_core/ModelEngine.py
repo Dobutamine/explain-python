@@ -13,7 +13,7 @@ from explain_core.cpp_models.CppModelsBuilder import compile_modules
 
 
 class ModelEngine:
-    # define the constructor
+    # ---------------------- updated -----------------------------------------------
     def __init__(self):
         # define an object holding the entire model and submodels
         self.models: dict = {}
@@ -208,6 +208,7 @@ class ModelEngine:
 
         self.status["initialized"] = self.initialized
 
+    # ---------------------- not updated -------------------------------------------
     def print_scaling_to_json(self, filename):
         # create basic json object
         new_json = {
@@ -358,91 +359,6 @@ class ModelEngine:
         if height > 0.0 and height < 2.5:
             self.height = height
             self.bsa = math.pow((self.weight * (self.height * 100.0) / 3600.0), 0.5)
-
-    def start_rt(self, rt_interval=0.015):
-        # set the realtime interval
-        self._rt_interval = rt_interval
-
-        # calculate the number of steps of the model
-        self._rt_no_of_steps: int = int(self._rt_interval / self.modeling_stepsize)
-
-        # empty the datacollector
-        self._datacollector.clear_data()
-
-        # declare the realtime counter
-        self._rt_clock = multitimer.RepeatingTimer(rt_interval, self._calculate_rt)
-
-        # start the realtime clock
-        self._rt_clock.start()
-        self._rt_running = True
-        self._update_log(
-            f"Model '{self.name}' is running in realtime with a {self._rt_interval} sec. resolution."
-        )
-
-    def stop_rt(self):
-        try:
-            self._update_log(f"Model '{self.name}' is stopped.")
-            self._rt_clock.stop()
-            self._rt_clock = None
-            self._rt_running = False
-        except:
-            pass
-
-    def set_pressure_unit(self, unit="kpa"):
-        if unit.lower() == "kpa":
-            self.mmhg_kpa = 0.1333
-        else:
-            self.mmhg_kpa = 1.0
-
-        for m in self.models.values():
-            m._mmhg_kpa = self.mmhg_kpa
-
-    def scale_patient_by_gestational_age(
-        self, gestational_age: float, output: bool = False
-    ):
-        self._scaler.scale_patient_by_gestational_age(gestational_age, output)
-
-    def scale_patient(
-        self,
-        weight: float,
-        height: float,
-        blood_volume: float,
-        lung_volume: float,
-        res_circ_factor: float,
-        el_base_circ_factor: float,
-        el_min_circ_factor: float,
-        el_max_circ_factor: float,
-        res_resp_factor: float,
-        el_base_resp_factor: float,
-        u_vol_factor: float,
-        hr_ref: float,
-        syst_ref: float,
-        diast_ref: float,
-        map_ref: float,
-        resp_rate: float,
-        vt_rr_ratio: float,
-        mv_ref: float,
-    ):
-        self._scaler.scale_patient(
-            weight=weight,
-            height=height,
-            blood_volume=blood_volume,
-            lung_volume=lung_volume,
-            res_circ_factor=res_circ_factor,
-            el_base_circ_factor=el_base_circ_factor,
-            el_min_circ_factor=el_min_circ_factor,
-            el_max_circ_factor=el_max_circ_factor,
-            res_resp_factor=res_resp_factor,
-            el_base_resp_factor=el_base_resp_factor,
-            u_vol_factor=u_vol_factor,
-            hr_ref=hr_ref,
-            syst_ref=syst_ref,
-            diast_ref=diast_ref,
-            map_ref=map_ref,
-            resp_rate=resp_rate,
-            vt_rr_ratio=vt_rr_ratio,
-            mv_ref=mv_ref,
-        )
 
     def fast_forward(
         self, time_to_calculate: float = 10.0, performance: bool = True
@@ -674,29 +590,6 @@ class ModelEngine:
             self.initialized = self.init_model(self.model_definition_filename)
         else:
             self.initialized = self.init_model(filename)
-
-    def _calculate_rt(self):
-        # this performance optimized routine will quickly calculate a model run
-        # but does not use the datacollector module record any data
-        # so only instantaneous data is available by explicit request
-        # for example models['AA'].pres  for the pressure in AA
-
-        # Cache the attributes for faster access during the model loop
-        run_tasks = self._task_scheduler.run_tasks
-        model_time_total = self.model_time_total
-        modeling_stepsize = self.modeling_stepsize
-
-        # Do all model steps
-        for _ in range(self._rt_no_of_steps):
-            # Execute the model step method of all models
-            for model in self.models.values():
-                model.step_model()
-
-            # call the task scheduler
-            run_tasks(model_time_total)
-
-            # Increase the model clock
-            model_time_total += modeling_stepsize
 
     def _check_dependencies(self) -> int:
         dep_errors = 0
