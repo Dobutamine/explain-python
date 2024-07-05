@@ -52,11 +52,8 @@ class BloodTimeVaryingElastance:
         for key, value in args.items():
             setattr(self, key, value)
 
-        # get the modeling step size
-        self._t = model.modeling_stepsize
-
         # get the reference to the heart model
-        self._heart = self._model_engine.models("Heart")
+        self._heart = self._model_engine.models["Heart"]
 
         # flag that the model is initialized
         self._is_initialized = True

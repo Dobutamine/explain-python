@@ -25,9 +25,6 @@ class Scaler:
         for key, value in args.items():
             setattr(self, key, value)
 
-        # get the modeling step size
-        self._t = model.modeling_stepsize
-
         # flag that the model is initialized
         self._is_initialized = True
 

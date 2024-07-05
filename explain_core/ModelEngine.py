@@ -13,82 +13,72 @@ from explain_core.cpp_models.CppModelsBuilder import compile_modules
 
 
 class ModelEngine:
-    # define an object holding the entire model and submodels
-    models: dict = {}
-
-    # define an object holding the model properties of the current model
-    model_definition: dict = {}
-    model_definition_filename: str = ""
-
-    # define an object holding the high resolution model data
-    model_data: list = []
-
-    # define an attribute holding the name of the model
-    name: str = ""
-
-    # define an attribute holding the description of the model
-    description: str = ""
-
-    # define an attribute holding the weight
-    weight: float = 3.3
-
-    # define a gestational age attribute
-    gestational_age: float = 40.0
-
-    # define a age attribute
-    age: float = 0.0
-
-    # define an attribute holding the length in meters
-    height: float = 0.50
-
-    # define an attribute holding the body surface area in meters (BSA (m2) =(weight(kg) * height(cm)/3600)^0.5
-    bsa: float = 0.214
-
-    # pressure conversion factor (1.0 = mmHg, 0.1333 = kPa)
-    mmhg_kpa = 1.0
-
-    # define an attribute holding the modeling stepsize
-    modeling_stepsize: float = 0.0005
-
-    # define an attribute holding the model time
-    model_time_total: float = 0.0
-
-    # define an obvject holding the  datacollector
-    _datacollector: dict = {}
-
-    # define an object holding the task scheduler
-    _task_scheduler: dict = {}
-
-    # performance
-    run_duration: float = 0.0
-    step_duration: float = 0.0
-
-    # define local attributes
-    initialized: bool = False
-
-    # define a status message object
-    status = {"log": [], "error_log": [], "initialized": False}
-
-    # realtime object
-    _rt_clock = None
-    _rt_running = False
-    _rt_interval = 0.015
-    _rt_no_of_steps = 30
-
     # define the constructor
-    def __init__(self, model_definition_filename: str):
+    def __init__(self):
+        # define an object holding the entire model and submodels
+        self.models: dict = {}
+
+        # define an object holding the model properties of the current model
+        self.model_definition: dict = {}
+        self.model_definition_filename: str = ""
+
+        # define an object holding the high resolution model data
+        self.model_data: list = []
+
+        # define an attribute holding the name of the model
+        self.name: str = ""
+
+        # define an attribute holding the description of the model
+        self.description: str = ""
+
+        # define an attribute holding the weight
+        self.weight: float = 3.3
+
+        # define an attribute holding the length in meters
+        self.height: float = 0.50
+
+        # define an attribute holding the body surface area
+        self.bsa: float = 0.2
+
+        # define a gestational age attribute
+        self.gestational_age: float = 40.0
+
+        # define a age attribute
+        self.age: float = 0.0
+
+        # define an attribute holding the modeling stepsize
+        self.modeling_stepsize: float = 0.0005
+
+        # define an attribute holding the model time
+        self.model_time_total: float = 0.0
+
+        # define an obvject holding the  datacollector
+        self._datacollector: dict = {}
+
+        # define an object holding the task scheduler
+        self._task_scheduler: dict = {}
+
+        # performance
+        self.run_duration: float = 0.0
+        self.step_duration: float = 0.0
+
+        # define local attributes
+        self.initialized: bool = False
+
+        # define a status message object
+        self.status = {"log": [], "error_log": [], "initialized": False}
+
         # compile the c++ modules
         compile_modules()
 
-        # initialize all model components with the parameters from the JSON file
-        self.initialized = self.load_model_definition(model_definition_filename)
-
-        # store the current model definition filename
+    def load_model_definition(self, model_definition_filename: str):
+        # store the definition filename
         self.model_definition_filename = model_definition_filename
 
-    def load_model_definition(self, model_definition_filename: str):
         # set the error counter = 0
         error_counter = 0
+
+        # reset the status log
         self.status = {"log": [], "error_log": [], "initialized": False}
 
         # make sure the objects are empty
@@ -114,7 +104,6 @@ class ModelEngine:
             self.bsa = math.pow((self.weight * (self.height * 100.0) / 3600.0), 0.5)
             self.modeling_stepsize = self.model_definition["modeling_stepsize"]
             self.model_time_total = self.model_definition["model_time_total"]
-            self.scaler_settings = self.model_definition["scaler_settings"]
 
         except:
             # signal that the json file failed to load
@@ -130,7 +119,7 @@ class ModelEngine:
             # terminate function
             return
 
-        # initialize all model components and put a reference to them in the components list
+        # instantiate all model components and put a reference to them in the components list
         for key, model in self.model_definition["models"].items():
             # try to find the desired model class from the core_models or custom_models folder
             model_type = model["model_type"]
@@ -142,13 +131,14 @@ class ModelEngine:
                 )
             except:
                 try:
-                    model_module = importlib.import_module(
-                        "explain_core.base_models." + model_type
-                    )
+                    # try to import the module holding the model class from the custom models folder
+                    model_module = importlib.import_module("models." + model_type)
                 except:
                     try:
                         # try to import the module holding the model class from the custom models folder
-                        model_module = importlib.import_module("models." + model_type)
+                        model_module = importlib.import_module(
+                            "explain_core.device_models." + model_type
+                        )
                     except Exception as error:
                         print(
                             f"Load error: {model_type} model not found OR the model has a syntax error. Error {error}"
@@ -164,7 +154,7 @@ class ModelEngine:
 
             # instantiate the model class with the properties stored in the model_definition file and a reference to the other components and add it to the components dictionary
             try:
-                self.models[model["name"]] = model_class(**model)
+                self.models[model["name"]] = model_class(self)
             except Exception as error:
                 print(
                     f"Instantiation error: {model_type} model failed to instantiate. Error: {error}"
@@ -182,9 +172,6 @@ class ModelEngine:
         # initialize a task scheduler
         self._task_scheduler = TaskScheduler(self)
 
-        # initialize a scaler object
-        self._scaler = Scaler(self, **self.scaler_settings)
-
         # check the dependencies
         dep_errors: int = self._check_dependencies()
 
@@ -192,9 +179,10 @@ class ModelEngine:
         if error_counter == 0:
             init_errors = 0
             # initialize all components
-            for _, model in self.models.items():
+            for model_name, model in self.models.items():
+                model_args = self.model_definition["models"][model_name]
                 try:
-                    model.init_model(self)
+                    model.init_model(**model_args)
                 except Exception as error:
                     print(
                         f"Initialization error: {model.name}: {model.model_type} model failed to initialize with error: {error}"

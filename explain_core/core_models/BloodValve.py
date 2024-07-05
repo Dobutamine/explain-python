@@ -58,9 +58,6 @@ class BloodValve:
         # reference to the heart
         self._heart = self._model_engine.models["Heart"]
 
-        # get the modeling step size
-        self._t = model.modeling_stepsize
-
         # flag that the model is initialized
         self._is_initialized = True
 
