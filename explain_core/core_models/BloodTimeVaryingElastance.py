@@ -37,8 +37,8 @@ class BloodTimeVaryingElastance:
 
         # initialize local properties
         self._model_engine: object = model_ref
+        self._t: float = model_ref.modeling_stepsize
         self._is_initialized: bool = False
-        self._t: float = 0.0005
         self._heart = None
         self._temp_pres_max = -1000.0
         self._temp_pres_min = 1000.0

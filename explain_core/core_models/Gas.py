@@ -18,7 +18,7 @@ class Gas:
         # local properties
         self._model_engine: object = model_ref
         self._is_initialized: bool = False
-        self._t: float = 0.0005
+        self._t: float = model_ref.modeling_stepsize
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the independent properties

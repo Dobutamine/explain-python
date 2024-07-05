@@ -26,9 +26,9 @@ class BloodValve:
 
         # local properties
         self._model_engine: object = model_ref
+        self._t: float = model_ref.modeling_stepsize
         self._is_initialized: bool = False
         self._heart = None
-        self._t: float = 0.0005
         self._model_comp_from = None
         self._model_comp_to = None
         self._cum_forward_flow = 0.0
