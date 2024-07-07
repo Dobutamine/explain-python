@@ -1,5 +1,7 @@
 import math
 
+from explain_core.helpers.BloodComposition import set_blood_composition
+
 
 class Blood:
     # static properties
@@ -12,6 +14,10 @@ class Blood:
         self.description: str = ""
         self.is_enabled: bool = False
         self.dependencies: list = []
+        self.blood_containing_components = []
+        self.solutes = None
+        self.aboxy = None
+        self.viscosity = 6.0
 
         # dependent properties
 
@@ -24,6 +30,13 @@ class Blood:
         # set the values of the properties as passed in the arguments
         for key, value in args.items():
             setattr(self, key, value)
+
+        # set the aboxy and solutes if not set by the state which is loaded
+        for model in self.blood_containing_components:
+            if not hasattr(self._model_engine.models[model], "aboxy"):
+                self._model_engine.models[model].aboxy = {**self.aboxy}
+            if not hasattr(self._model_engine.models[model], "solutes"):
+                self._model_engine.models[model].solutes = {**self.solutes}
 
         # flag that the model is initialized
         self._is_initialized = True
