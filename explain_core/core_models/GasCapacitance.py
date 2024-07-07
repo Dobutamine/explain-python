@@ -136,7 +136,7 @@ class GasCapacitance:
             dtemp = (comp_from.temp - self.temp) * dvol
             self.temp = (self.temp * self.vol + dtemp) / self.vol
 
-    def volume_out(self):
+    def volume_out(self, dvol):
         # do not change the volume if the composition is fixed
         if self.fixed_composition:
             return 0.0
