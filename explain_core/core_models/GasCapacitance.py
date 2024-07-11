@@ -108,6 +108,9 @@ class GasCapacitance:
         # Reset external pressures
         self.pres_ext = self.pres_cc = self.pres_mus = 0.0
 
+        # calculate the current gas composition
+        self.calc_gas_composition()
+
     def volume_in(self, dvol, comp_from):
         if self.fixed_composition:
             return

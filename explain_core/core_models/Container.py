@@ -71,7 +71,8 @@ class Container:
         # Adjust for factors
         _el = (
             _el_base
-            + (self.el_base_factor - 1) * _el_base
+            + self.act_factor
+            + +(self.el_base_factor - 1) * _el_base
             + (self.el_base_drug_factor - 1) * _el_base
         )
         _el_k = (
