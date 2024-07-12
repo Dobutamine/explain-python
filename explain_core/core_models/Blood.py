@@ -15,6 +15,7 @@ class Blood:
         self.is_enabled: bool = False
         self.dependencies: list = []
         self.blood_containing_components = []
+        self.acidbase_components = []
         self.solutes = None
         self.aboxy = None
         self.viscosity = 6.0
@@ -25,6 +26,8 @@ class Blood:
         self._model_engine: object = model_ref
         self._t: float = model_ref.modeling_stepsize
         self._is_initialized: bool = False
+        self._update_window = 0.015
+        self._update_counter = 0.0
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the properties as passed in the arguments
@@ -48,4 +51,10 @@ class Blood:
 
     # actual model calculations are done here
     def calc_model(self):
-        pass
+        self._update_counter += self._t
+        if self._update_counter >= self._update_window:
+            self._update_counter = 0.0
+
+            for m in self.acidbase_components:
+                # update the blood composition
+                set_blood_composition(self._model_engine.models[m])

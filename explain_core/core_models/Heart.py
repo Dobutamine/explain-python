@@ -45,6 +45,7 @@ class Heart:
         self.ncc_resus = 0.0
         self.cardiac_cycle_running = 0
         self.prev_cardiac_cycle_running = 0
+        self.input_values = []
 
         # local properties
         self._model_engine: object = model_ref
@@ -97,6 +98,8 @@ class Heart:
 
         # get a reference to the coronaries model
         self._cor = self._model_engine.models[self.coronaries]
+
+        self.input_value = self._input_site = self._model_engine.models["LL"].aboxy
 
         # flag that the model is initialized
         self._is_initialized = True

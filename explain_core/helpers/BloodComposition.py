@@ -23,11 +23,15 @@ def set_blood_composition(bc) -> None:
     )
 
     if bg.valid_ab:
+        bc.ph = bg.ph
+        bc.pco2 = bg.pco2
         aboxy["ph"] = bg.ph
         aboxy["pco2"] = bg.pco2
         aboxy["hco3"] = bg.hco3
         aboxy["be"] = bg.be
 
     if bg.valid_o2:
+        bc.po2 = bg.po2
+        bc.so2 = bg.so2
         aboxy["po2"] = bg.po2
         aboxy["so2"] = bg.so2

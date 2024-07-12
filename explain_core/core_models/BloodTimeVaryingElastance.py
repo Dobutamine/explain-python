@@ -34,6 +34,7 @@ class BloodTimeVaryingElastance:
         self.pres = self.pres_in = self.pres_out = self.pres_tm = 0.0
         self.pres_max = self.pres_min = self.pres_mean = 0.0
         self.pres_ed = self.pres_ms = 0.0
+        self.po2 = self.pco2 = self.ph = self.so2 = 0.0
 
         # initialize local properties
         self._model_engine: object = model_ref
