@@ -96,27 +96,32 @@ class Ans:
 
         # calculate the effectors
         for _effector_name, _effector in self._effectors.items():
-            # determine the total average firing rate
-            _firing_rate_avg = _effector["cum_firing_rate"] / _effector["cum_weight"]
-
-            # translate the average firing rate to the effect factor where 100 is the maximum, 0 is the minimum and 50 is the set value
-            _effector_change = 0.0
-
-            if _firing_rate_avg >= 50.0:
-                # select the high
-                _effector_change = 1.0 + ((_effector["cum_mxe_high"] - 1.0) / 50.0) * (
-                    _firing_rate_avg - 50.0
-                )
-            else:
-                _effector_change = (
-                    _effector["cum_mxe_low"]
-                    + (1.0 - _effector["cum_mxe_low"]) / 50.0 * _firing_rate_avg
+            if _effector["cum_weight"] > 0:
+                # determine the total average firing rate
+                _firing_rate_avg = (
+                    _effector["cum_firing_rate"] / _effector["cum_weight"]
                 )
 
-            # transfer the effect factor to the target model
-            setattr(
-                _effector["target_model"], _effector["target_prop"], _effector_change
-            )
+                # translate the average firing rate to the effect factor where 100 is the maximum, 0 is the minimum and 50 is the set value
+                _effector_change = 0.0
+
+                if _firing_rate_avg >= 50.0:
+                    # select the high
+                    _effector_change = 1.0 + (
+                        (_effector["cum_mxe_high"] - 1.0) / 50.0
+                    ) * (_firing_rate_avg - 50.0)
+                else:
+                    _effector_change = (
+                        _effector["cum_mxe_low"]
+                        + (1.0 - _effector["cum_mxe_low"]) / 50.0 * _firing_rate_avg
+                    )
+
+                # transfer the effect factor to the target model
+                setattr(
+                    _effector["target_model"],
+                    _effector["target_prop"],
+                    _effector_change,
+                )
 
             # reset the effect factor and number of effectors
             _effector["cum_firing_rate"] = 0.0

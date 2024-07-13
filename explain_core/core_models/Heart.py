@@ -33,6 +33,7 @@ class Heart:
         self.av_delay = 0.0005
         self.cardiac_cycle_time = 0.353
         self.hr_ans_factor = 1.0
+        self.cont_ans_factor = 1.0
         self.hr_mob_factor = 1.0
         self.hr_temp_factor = 1.0
         self.hr_drug_factor = 1.0
@@ -240,6 +241,12 @@ class Heart:
         self._ra.act_factor = self.aaf
         self._lv.act_factor = self.vaf
         self._rv.act_factor = self.vaf
+
+        # incorporate the ans factors
+        self._la.el_max_ans_factor = self.cont_ans_factor
+        self._ra.el_max_ans_factor = self.cont_ans_factor
+        self._lv.el_max_ans_factor = self.cont_ans_factor
+        self._rv.el_max_ans_factor = self.cont_ans_factor
 
         if self._cor:
             # transfer the activation factor to the heart components

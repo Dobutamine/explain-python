@@ -4987,7 +4987,7 @@
           "is_enabled": true,
           "dependencies": ["AAR"],
           "input_site": "AAR",
-          "input_parameter": "pres_in",
+          "input_parameter": "pres_mean",
           "min_value": 25.0,
           "set_value": 50.0,
           "max_value": 100.0,
@@ -5268,9 +5268,19 @@
           "dependencies": [],
           "ans_active": true,
           "sensors":[
+            {"name": "br map", "input": "BR_MAP", "effector": "hr", "weight": 1.0},
             {"name": "cr pco2", "input": "CR_PCO2", "effector": "mv", "weight": 1.0}
           ],
           "effectors": {
+            "hr": {
+              "target": "Heart.hr_ans_factor",
+              "cum_mxe_high": 0.428,
+              "cum_mxe_low": 1.5,
+              "cum_firing_rate": 50.0,
+              "cum_weight": 1.0,
+              "tc": 2.0,
+              "effector_change": 1.0
+            },
             "mv": {
                 "target": "Breathing.mv_ans_factor",
                 "cum_mxe_high": 10.0,
@@ -5279,6 +5289,42 @@
                 "cum_weight": 1.0,
                 "tc": 5.0,
                 "effector_change": 1.0
+            },
+            "venpool": {
+              "target": "Circulation.venpool_ans_factor",
+              "cum_mxe_high": 2.5,
+              "cum_mxe_low": 0.1,
+              "cum_firing_rate": 50.0,
+              "cum_weight": 1.0,
+              "tc": 5.0,
+              "effector_change": 1.0
+            },
+            "cont": {
+              "target": "Circulation.cont_ans_factor",
+              "cum_mxe_high": 2.5,
+              "cum_mxe_low": 0.5,
+              "cum_firing_rate": 50.0,
+              "cum_weight": 1.0,
+              "tc": 5.0,
+              "effector_change": 1.0
+            },
+            "svr": {
+              "target": "Circulation.svr_ans_factor",
+              "cum_mxe_high": 5.0,
+              "cum_mxe_low": 0.5,
+              "cum_firing_rate": 50.0,
+              "cum_weight": 1.0,
+              "tc": 5.0,
+              "effector_change": 1.0
+            },
+            "pvr": {
+              "target": "Circulation.pvr_ans_factor",
+              "cum_mxe_high": 5.0,
+              "cum_mxe_low": 0.5,
+              "cum_firing_rate": 50.0,
+              "cum_weight": 1.0,
+              "tc": 5.0,
+              "effector_change": 1.0
             }
         }
         },
@@ -5338,7 +5384,7 @@
             "hemoglobin": 8,
             "temp": 37
           },
-          "acidbase_components": ["AAR"]
+          "acidbase_components": ["AAR", "IVCI"]
         },
         "Gas": {
           "name": "Gas",
