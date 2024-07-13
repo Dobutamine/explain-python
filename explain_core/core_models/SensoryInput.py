@@ -16,9 +16,9 @@ class SensoryInput:
         self.input_site = ""
         self.input_parameter = ""
         self.min_value = self.set_value = self.max_value = 0.0
-        self.max_firing_rate = self.set_firing_rate = self.min_firing_rate = (
-            0.0  # in Hz
-        )
+        self.max_firing_rate = 100.0
+        self.set_firing_rate = 50.0
+        self.min_firing_rate = 0.0
         self.time_constant = 1.0
 
         # dependent properties

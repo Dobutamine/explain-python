@@ -4991,9 +4991,6 @@
           "min_value": 25.0,
           "set_value": 50.0,
           "max_value": 100.0,
-          "max_firing_rate": 100.0,
-          "set_firing_rate": 50.0,
-          "min_firing_rate": 0.0,
           "time_constant": 4.0
         },
         "CR_PCO2": {
@@ -5007,9 +5004,6 @@
           "min_value": 15.0,
           "set_value": 40.0,
           "max_value": 75.0,
-          "max_firing_rate": 100.0,
-          "set_firing_rate": 50.0,
-          "min_firing_rate": 0.0,
           "time_constant": 1.0
         },
         "CR_PO2": {
@@ -5023,9 +5017,6 @@
           "min_value": 30.0,
           "set_value": 80.0,
           "max_value": 150.0,
-          "max_firing_rate": 100.0,
-          "set_firing_rate": 50.0,
-          "min_firing_rate": 0.0,
           "time_constant": 1.0
         },
         "CR_PH": {
@@ -5039,9 +5030,6 @@
           "min_value": 6.9,
           "set_value": 7.4,
           "max_value": 7.7,
-          "max_firing_rate": 100.0,
-          "set_firing_rate": 50.0,
-          "min_firing_rate": 0.0,
           "time_constant": 1.0
         },
         "Heart": {
@@ -5291,7 +5279,7 @@
                 "cum_firing_rate": 50.0,
                 "cum_weight": 1.0,
                 "tc": 5.0,
-                "effect_factor": 1.0
+                "effector_change": 0.0
             }
         }
         },
