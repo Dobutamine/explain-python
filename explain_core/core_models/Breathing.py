@@ -87,11 +87,10 @@ class Breathing:
             * self.minute_volume_ref_scaling_factor
             * _weight
         )
+
         self.target_minute_volume = (
-            _minute_volume_ref
-            + (self.mv_ans_factor * _minute_volume_ref - _minute_volume_ref)
-            * self.ans_activity_factor
-        )
+            _minute_volume_ref + (self.mv_ans_factor - 1.0) * _minute_volume_ref
+        ) * self.ans_activity_factor
 
         if self.target_minute_volume < 0.01:
             self.target_minute_volume = 0.01

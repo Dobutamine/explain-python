@@ -49,12 +49,6 @@ class Ans:
         for effector_name, effector in self.effectors.items():
             target = effector["target"].split(".")
 
-            # translate the factors to change (10 = ref + 9xref  and 0.1 = ref - 0.9xref, 1 = ref + 0xref)
-            effector["cum_mxe_high"] = effector["cum_mxe_high"] - 1.0
-            effector["cum_mxe_low"] = effector["cum_mxe_low"] - 1.0
-
-            print(effector["cum_mxe_high"], effector["cum_mxe_low"])
-
             self._effectors[effector_name] = {
                 "target_model": self._model_engine.models[target[0]],
                 "target_prop": target[1],
@@ -110,12 +104,13 @@ class Ans:
 
             if _firing_rate_avg >= 50.0:
                 # select the high
-                _effector_change = (_effector["cum_mxe_high"] / 50.0) * (
+                _effector_change = 1.0 + ((_effector["cum_mxe_high"] - 1.0) / 50.0) * (
                     _firing_rate_avg - 50.0
                 )
             else:
-                _effector_change = _effector["cum_mxe_low"] - (
-                    _effector["cum_mxe_low"] / 50.0 * _firing_rate_avg
+                _effector_change = (
+                    _effector["cum_mxe_low"]
+                    + (1.0 - _effector["cum_mxe_low"]) / 50.0 * _firing_rate_avg
                 )
 
             # transfer the effect factor to the target model

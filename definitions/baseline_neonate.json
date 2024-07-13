@@ -5268,8 +5268,7 @@
           "dependencies": [],
           "ans_active": true,
           "sensors":[
-            {"name": "cr pco2", "input": "CR_PCO2", "effector": "mv", "weight": 1.0},
-            {"name": "cr po2", "input": "CR_PO2", "effector": "mv", "weight": 1.0}
+            {"name": "cr pco2", "input": "CR_PCO2", "effector": "mv", "weight": 1.0}
           ],
           "effectors": {
             "mv": {
@@ -5279,7 +5278,7 @@
                 "cum_firing_rate": 50.0,
                 "cum_weight": 1.0,
                 "tc": 5.0,
-                "effector_change": 0.0
+                "effector_change": 1.0
             }
         }
         },
@@ -5384,8 +5383,8 @@
           ],
           "breathing_enabled": true,
           "minute_volume_ref": 0.2,
-          "minute_volume_ref_factor": 1,
-          "minute_volume_ref_scaling_factor": 1,
+          "minute_volume_ref_factor": 1.0,
+          "minute_volume_ref_scaling_factor": 1.0,
           "vt_rr_ratio": 0.0001212,
           "vt_rr_ratio_factor": 1,
           "vt_rr_ratio_scaling_factor": 1,
@@ -5415,7 +5414,7 @@
           "description": "Metabolism model",
           "is_enabled": true,
           "dependencies": [],
-          "vo2": 6.5,
+          "vo2": 8.1,
           "vo2_factor": 1,
           "vo2_scaling_factor": 1,
           "resp_q": 0.8,
