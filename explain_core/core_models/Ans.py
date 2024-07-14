@@ -83,46 +83,60 @@ class Ans:
         if self._update_counter >= self._update_window:
             self._update_counter = 0.0
 
-        # get the sensor values into the effectors
+        # Get the sensor values into the effectors
         for _sensor_name, _sensor in self._sensors.items():
-            # get the firing rate
+            # Get the firing rate
             _firing_rate = _sensor["input"].firing_rate
 
-            # add the firing rate to the effector
-            self._effectors[_sensor["effector"]]["cum_firing_rate"] += (
-                _firing_rate * _sensor["weight"]
-            )
-            self._effectors[_sensor["effector"]]["cum_weight"] += _sensor["weight"]
+            # Fetch the effector name and its weight once
+            effector_name = _sensor["effector"]
+            sensor_weight = _sensor["weight"]
+
+            # Access the effector dictionary once
+            _effector = self._effectors[effector_name]
+
+            # Add the firing rate to the effector
+            _effector["cum_firing_rate"] += _firing_rate * sensor_weight
+            _effector["cum_weight"] += sensor_weight
 
         # calculate the effectors
         for _effector_name, _effector in self._effectors.items():
-            if _effector["cum_weight"] > 0:
-                # determine the total average firing rate
-                _firing_rate_avg = (
-                    _effector["cum_firing_rate"] / _effector["cum_weight"]
+            cum_weight = _effector["cum_weight"]
+            cum_firing_rate = _effector["cum_firing_rate"]
+            cum_mxe_high = _effector["cum_mxe_high"]
+            cum_mxe_low = _effector["cum_mxe_low"]
+            effector_change_current = _effector["effector_change"]
+            tc = _effector["tc"]
+
+            # Determine the total average firing rate
+            _firing_rate_avg = (
+                50.0 if cum_weight == 0.0 else cum_firing_rate / cum_weight
+            )
+
+            # Translate the average firing rate to the effect factor
+            if _firing_rate_avg >= 50.0:
+                _effector_change = 1.0 + ((cum_mxe_high - 1.0) / 50.0) * (
+                    _firing_rate_avg - 50.0
+                )
+            else:
+                _effector_change = (
+                    cum_mxe_low + (1.0 - cum_mxe_low) / 50.0 * _firing_rate_avg
                 )
 
-                # translate the average firing rate to the effect factor where 100 is the maximum, 0 is the minimum and 50 is the set value
-                _effector_change = 0.0
+            # Incorporate the time constant for the effector change
+            new_effector_change = (
+                self._update_window
+                * ((1.0 / tc) * (-effector_change_current + _effector_change))
+                + effector_change_current
+            )
 
-                if _firing_rate_avg >= 50.0:
-                    # select the high
-                    _effector_change = 1.0 + (
-                        (_effector["cum_mxe_high"] - 1.0) / 50.0
-                    ) * (_firing_rate_avg - 50.0)
-                else:
-                    _effector_change = (
-                        _effector["cum_mxe_low"]
-                        + (1.0 - _effector["cum_mxe_low"]) / 50.0 * _firing_rate_avg
-                    )
+            _effector["effector_change"] = new_effector_change
 
-                # transfer the effect factor to the target model
-                setattr(
-                    _effector["target_model"],
-                    _effector["target_prop"],
-                    _effector_change,
-                )
+            # Transfer the effect factor to the target model
+            setattr(
+                _effector["target_model"], _effector["target_prop"], new_effector_change
+            )
 
-            # reset the effect factor and number of effectors
+            # Reset the effect factor and number of effectors
             _effector["cum_firing_rate"] = 0.0
             _effector["cum_weight"] = 0.0

@@ -76,12 +76,12 @@ class Circulation:
         if self._update_counter > self._update_window:
             self._update_counter = 0.0
 
-            # # apply the ans factors
-            # for svrt in self._svr_targets:
-            #     svrt.r_ans_factor = self.svr_ans_factor
+            # apply the ans factors
+            for svrt in self._svr_targets:
+                svrt.r_ans_factor = self.svr_ans_factor
 
-            # for pvrt in self._pvr_targets:
-            #     pvrt.r_ans_factor = self.pvr_ans_factor
+            for pvrt in self._pvr_targets:
+                pvrt.r_ans_factor = self.pvr_ans_factor
 
-            # for vpt in self._venpool_targets:
-            #     vpt.u_vol_ans_factor = self.venpool_ans_factor
+            for vpt in self._venpool_targets:
+                vpt.u_vol_ans_factor = self.venpool_ans_factor

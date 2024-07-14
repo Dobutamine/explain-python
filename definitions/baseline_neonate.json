@@ -5296,7 +5296,7 @@
               "cum_mxe_low": 0.1,
               "cum_firing_rate": 50.0,
               "cum_weight": 1.0,
-              "tc": 5.0,
+              "tc": 30.0,
               "effector_change": 1.0
             },
             "cont": {
@@ -5305,7 +5305,7 @@
               "cum_mxe_low": 0.5,
               "cum_firing_rate": 50.0,
               "cum_weight": 1.0,
-              "tc": 5.0,
+              "tc": 15.0,
               "effector_change": 1.0
             },
             "svr": {
@@ -5314,7 +5314,7 @@
               "cum_mxe_low": 0.5,
               "cum_firing_rate": 50.0,
               "cum_weight": 1.0,
-              "tc": 5.0,
+              "tc": 20.0,
               "effector_change": 1.0
             },
             "pvr": {
@@ -5323,7 +5323,7 @@
               "cum_mxe_low": 0.5,
               "cum_firing_rate": 50.0,
               "cum_weight": 1.0,
-              "tc": 5.0,
+              "tc": 15.0,
               "effector_change": 1.0
             }
         }
