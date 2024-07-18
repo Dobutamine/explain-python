@@ -5726,7 +5726,7 @@
           "inlet_res_factor": 1,
           "outlet_res": 2000,
           "outlet_res_factor": 1,
-          "pump_rpm": 2500,
+          "pump_rpm": 1500,
           "pre_oxy_ph": 0,
           "pre_oxy_po2": 0,
           "pre_oxy_pco2": 0,
@@ -5743,7 +5743,7 @@
           "pre_oxy_pres": 0,
           "post_oxy_pres": 0,
           "tmp_pres": 0,
-          "flow": 0,
+          "blood_flow": 0,
           "gas_flow": 0
         },
         "Ventilator": {

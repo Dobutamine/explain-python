@@ -72,7 +72,7 @@ class Ecls:
         self.pre_oxy_pres = 0.0
         self.post_oxy_pres = 0.0
         self.tmp_pres = 0.0
-        self.flow = 0.0
+        self.blood_flow = 0.0
         self.gas_flow = 0.0
 
         # local properties
@@ -140,10 +140,6 @@ class Ecls:
 
     # actual model calculations are done here
     def calc_model(self):
-        # make sure all components are enabled
-        for ecls_part in self._ecls_parts:
-            ecls_part.is_enabled = True
-
         # set the number of rotations of the pump
         self._pump.pump_rpm = self.pump_rpm
 
@@ -152,7 +148,7 @@ class Ecls:
         self._return_cannula.no_flow = self.ecls_clamped
 
         # get the dependent parameters
-        self.flow = self._oxy_tubing_out.flow_lmin_avg
+        self.blood_flow = self._oxy_tubing_out.flow_lmin_avg
         self.gas_flow = self._gas_oxy_out.flow * 60.0
         self.ven_pres = self._tubing_in.pres
         self.pre_oxy_pres = self._bridge.pres
@@ -165,19 +161,19 @@ class Ecls:
             set_blood_composition(self._tubing_in)
             set_blood_composition(self._tubing_out)
 
-            self.pre_oxy_ph = self._tubing_in.aboxy.ph
-            self.pre_oxy_po2 = self._tubing_in.aboxy.po2
-            self.pre_oxy_pco2 = self._tubing_in.aboxy.pco2
-            self.pre_oxy_hco3 = self._tubing_in.aboxy.hco3
-            self.pre_oxy_be = self._tubing_in.aboxy.be
-            self.pre_oxy_so2 = self._tubing_in.aboxy.so2
+            self.pre_oxy_ph = self._tubing_in.ph
+            self.pre_oxy_po2 = self._tubing_in.po2
+            self.pre_oxy_pco2 = self._tubing_in.pco2
+            # self.pre_oxy_hco3 = self._tubing_in.aboxy.hco3
+            # self.pre_oxy_be = self._tubing_in.aboxy.be
+            self.pre_oxy_so2 = self._tubing_in.so2
 
-            self.post_oxy_ph = self._tubing_out.aboxy.ph
-            self.post_oxy_po2 = self._tubing_out.aboxy.po2
-            self.post_oxy_pco2 = self._tubing_out.aboxy.pco2
-            self.post_oxy_hco3 = self._tubing_out.aboxy.hco3
-            self.post_oxy_be = self._tubing_out.aboxy.be
-            self.post_oxy_so2 = self._tubing_out.aboxy.so2
+            self.post_oxy_ph = self._tubing_out.ph
+            self.post_oxy_po2 = self._tubing_out.po2
+            self.post_oxy_pco2 = self._tubing_out.pco2
+            # self.post_oxy_hco3 = self._tubing_out.aboxy.hco3
+            # self.post_oxy_be = self._tubing_out.aboxy.be
+            self.post_oxy_so2 = self._tubing_out.so2
 
             # calculate the tubing diameter from the tubing size
             self.tubing_diameter = self.tubing_size * 0.0254
@@ -468,6 +464,13 @@ class Ecls:
         # initialize the pump
         self.init_pump()
 
+    def set_rpm(self, new_rpm):
+        if new_rpm > 0.0:
+            self.pump_rpm = new_rpm
+
+    def set_sweep_gas(self, new_sweep_gas):
+        self.sweep_gas = new_sweep_gas
+
     def set_fio2(self, new_fio2):
         self.fio2_gas = new_fio2
         set_gas_composition(
@@ -601,7 +604,7 @@ class Ecls:
         )
         self._ecls_parts.append(self._gasex)
 
-    def toggle_ecls(self, state):
+    def switch_ecls(self, state):
         # turn all on
         for ecls_part in self._ecls_parts:
             ecls_part.is_enabled = state
@@ -615,7 +618,7 @@ class Ecls:
         self._drainage_cannula.no_flow = not state
         self._return_cannula.no_flow = not state
 
-    def toggle_clamp(self, state):
+    def switch_clamp(self, state):
         self.ecls_clamped = state
 
     def calc_volume(self, length, diameter):
