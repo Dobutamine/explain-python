@@ -3,6 +3,7 @@ class BloodCapacitance:
     model_type: str = "BloodCapacitance"
     model_interface: list = []
 
+    # works
     def __init__(self, model_ref: object, name: str = ""):
         # initialize independent properties
         self.name: str = name
