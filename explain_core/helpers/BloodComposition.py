@@ -1,6 +1,5 @@
 import math
 
-# from explain_core.cpp_models._blood_composition.lib import GetBloodComposition
 import explain_core.cpp_models._blood_composition as bcomp
 
 
