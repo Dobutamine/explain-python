@@ -1,5 +1,7 @@
 import math
-from explain_core.cpp_models._blood_composition.lib import GetBloodComposition
+
+# from explain_core.cpp_models._blood_composition.lib import GetBloodComposition
+import explain_core.cpp_models._blood_composition as bcomp
 
 
 def set_blood_composition(bc) -> None:
@@ -10,7 +12,7 @@ def set_blood_composition(bc) -> None:
     # calculate the apparent SID
     sid = sol["na"] + sol["k"] + 2 * sol["ca"] + 2 * sol["mg"] - sol["cl"] - sol["lact"]
 
-    bg = GetBloodComposition(
+    bg = bcomp.lib.GetBloodComposition(
         aboxy["to2"],
         aboxy["tco2"],
         sid,
