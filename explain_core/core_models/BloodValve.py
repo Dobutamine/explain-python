@@ -28,7 +28,6 @@ class BloodValve:
         self._model_engine: object = model_ref
         self._t: float = model_ref.modeling_stepsize
         self._is_initialized: bool = False
-        self._heart = None
         self._model_comp_from = None
         self._model_comp_to = None
         self._cum_forward_flow = 0.0
@@ -54,9 +53,6 @@ class BloodValve:
             self._model_comp_to = self._model_engine.models[self.comp_to]
         else:
             self._model_comp_to = self.comp_to
-
-        # reference to the heart
-        self._heart = self._model_engine.models["Heart"]
 
         # flag that the model is initialized
         self._is_initialized = True
@@ -148,7 +144,7 @@ class BloodValve:
         self._analytics_timer += self._t
 
         if (
-            self._heart.ncc_ventricular == 1
+            self._model_engine.ncc_ventricular == 1
             or self._analytics_timer > self._analytics_window
         ):
             self._analytics_timer = 0.0

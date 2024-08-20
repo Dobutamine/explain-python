@@ -40,7 +40,6 @@ class BloodTimeVaryingElastance:
         self._model_engine: object = model_ref
         self._t: float = model_ref.modeling_stepsize
         self._is_initialized: bool = False
-        self._heart = None
         self._temp_pres_max = -1000.0
         self._temp_pres_min = 1000.0
         self._temp_vol_max = -1000.0
@@ -52,9 +51,6 @@ class BloodTimeVaryingElastance:
         # set the values of the properties as passed in the arguments
         for key, value in args.items():
             setattr(self, key, value)
-
-        # get the reference to the heart model
-        self._heart = self._model_engine.models["Heart"]
 
         # flag that the model is initialized
         self._is_initialized = True
@@ -177,7 +173,7 @@ class BloodTimeVaryingElastance:
 
         if (
             self._analytics_timer >= self._analytics_window
-            or self._heart.ncc_ventricular == 1
+            or self._model_engine.ncc_ventricular == 1
         ):
             self.pres_max = self._temp_pres_max
             self.pres_min = self._temp_pres_min

@@ -215,6 +215,7 @@ class Heart:
         # increase the heart activation function counters
         self.ncc_atrial += 1
         self.ncc_ventricular += 1
+        self._model_engine.ncc_ventricular = self.ncc_ventricular
 
         # calculate the varying elastance factor
         self.calc_varying_elastance()
@@ -291,7 +292,7 @@ class Heart:
         t.no_back_flow = no_back_flow
 
     def set_heartvalve_props_rel(
-        valve, r_for_factor, r_back_factor, r_k_factor, no_flow, no_back_flow
+        self, valve, r_for_factor, r_back_factor, r_k_factor, no_flow, no_back_flow
     ):
         t = self._model_engine.models[valve]
         t.r_for_factor = r_for_factor

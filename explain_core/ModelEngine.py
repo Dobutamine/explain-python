@@ -67,6 +67,9 @@ class ModelEngine:
         # define a status message object
         self.status = {"log": [], "error_log": [], "initialized": False}
 
+        # define state variables for analysis purposes
+        self.ncc_ventricular: int = 0.0
+
         # compile the c++ modules
         compile_modules()
 
@@ -171,8 +174,7 @@ class ModelEngine:
         # initialize a task scheduler
         self._task_scheduler = TaskScheduler(self)
 
-        # check the dependencies
-        dep_errors: int = self._check_dependencies()
+
 
         # initialize all the models
         if error_counter == 0:
@@ -192,6 +194,9 @@ class ModelEngine:
                         "error",
                     )
                     init_errors += 1
+
+            # check all models for dependency errors
+            dep_errors: int = self._check_dependencies()
 
             if init_errors > 0 or dep_errors > 0:
                 self.initialized = False
@@ -545,6 +550,7 @@ class ModelEngine:
                     if dep_model.name == dep:
                         present = True
                 if not present:
+                    print(f"Dependency error: model {model.name} depends on {dep} which is not present.")
                     self._update_log(
                         f"Dependency error: model {model.name} depends on {dep} which is not present.",
                         "error",

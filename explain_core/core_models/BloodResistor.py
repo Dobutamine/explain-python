@@ -60,9 +60,6 @@ class BloodResistor:
         else:
             self._model_comp_to = self.comp_to
 
-        # reference to the heart
-        self._heart = self._model_engine.models["Heart"]
-
         # flag that the model is initialized
         self._is_initialized = True
 
@@ -173,7 +170,7 @@ class BloodResistor:
         self._analytics_timer += self._t
 
         if (
-            self._heart.ncc_ventricular == 1
+            self._model_engine.ncc_ventricular == 1
             or self._analytics_timer > self._analytics_window
         ):
             self._analytics_timer = 0.0
