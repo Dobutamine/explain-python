@@ -207,62 +207,6 @@ class ModelEngine:
 
         self.status["initialized"] = self.initialized
 
-    # ---------------------- not updated -------------------------------------------
-    def print_scaling_to_json(self, filename):
-        # create basic json object
-        new_json = {
-            "explain_version": self.model_definition["explain_version"],
-            "owner": self.model_definition["owner"],
-            "date_created": self.model_definition["date_created"],
-            "date_modified": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-            "shared": self.model_definition["shared"],
-            "protected": self.model_definition["protected"],
-            "name": self.name,
-            "description": self.description,
-            "weight": self.weight,
-            "height": self.height,
-            "gestational_age": self.gestational_age,
-            "age": self.age,
-            "modeling_stepsize": self.modeling_stepsize,
-            "model_time_total": self.model_time_total,
-            "models": {},
-            "scaler_settings": self.model_definition["scaler_settings"],
-        }
-        # process the model definition file to find the necessary properties
-        for model_name, model in self.models.items():
-            new_json["models"][model_name] = {}
-            # iterate over all attributes of the model which are in the loaded baseline model
-            for def_prop_name in self.model_definition["models"][model_name].keys():
-                value = getattr(self.models[model_name], def_prop_name)
-                new_json["models"][model_name][def_prop_name] = value
-                scaler = 1.0
-                if def_prop_name == "u_vol":
-                    scaler = getattr(self.models[model_name], "u_vol_scaling_factor")
-                    new_json["models"][model_name][def_prop_name] = value * scaler
-                if def_prop_name == "el_base":
-                    scaler = getattr(self.models[model_name], "el_base_scaling_factor")
-                    new_json["models"][model_name][def_prop_name] = value * scaler
-                if def_prop_name == "el_min":
-                    scaler = getattr(self.models[model_name], "el_min_scaling_factor")
-                    new_json["models"][model_name][def_prop_name] = value * scaler
-                if def_prop_name == "el_max":
-                    scaler = getattr(self.models[model_name], "el_max_scaling_factor")
-                    new_json["models"][model_name][def_prop_name] = value * scaler
-                if def_prop_name == "el_k":
-                    scaler = getattr(self.models[model_name], "el_k_scaling_factor")
-                    new_json["models"][model_name][def_prop_name] = value * scaler
-                if def_prop_name == "r_for":
-                    scaler = getattr(self.models[model_name], "r_scaling_factor")
-                    new_json["models"][model_name][def_prop_name] = value * scaler
-                if def_prop_name == "r_back":
-                    scaler = getattr(self.models[model_name], "r_scaling_factor")
-                    new_json["models"][model_name][def_prop_name] = value * scaler
-
-        # save the json file
-        with open(filename, "w") as file:
-            # Write the dictionary to the file as JSON
-            json.dump(new_json, file, indent=4)
-
     def save_model_state_json(self, filename):
         # create basic json object
         new_json = {

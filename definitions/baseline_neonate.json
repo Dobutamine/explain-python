@@ -1,10 +1,10 @@
 {
       "explain_version": "1.0",
       "owner": "Timothy Antonius",
-      "date_created": "2024-05-13T14:00:00.000000",
+      "date_created": "2024-08-20T14:00:00.000000",
       "date_modified": "14:51:50",
       "shared": true,
-      "protected": false,
+      "protected": true,
       "name": "baseline neonate",
       "description": "normal 3.545 kg neonate at an age of 24h without shunts",
       "weight": 3.545,
@@ -5825,6 +5825,15 @@
           "heart": [
             "Heart"
           ],
+          "breathing": [
+            "Breathing"
+          ],
+          "metabolism": [
+            "Metabolism"
+          ],
+          "baroreceptor": [
+            "BR_MAP"
+          ],
           "left_atrium": [
             "LA"
           ],
@@ -5840,7 +5849,6 @@
           "coronaries": [
             "COR"
           ],
-          "arteries": [],
           "pulmonary_arteries": [
             "PA"
           ],
@@ -5924,9 +5932,6 @@
           "thorax": [
             "THORAX"
           ],
-          "ans_active": true,
-          "mob_active": true,
-          "live_update": true,
           "blood_containing_components": [
             "LA",
             "RA",
