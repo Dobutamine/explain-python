@@ -25,9 +25,8 @@ class GasCapacitance:
         self.act_factor = self.ans_activity_factor = 1.0
 
         # initialize dependent properties
-        self.vol = self.vol_max = self.vol_min = self.tidal_volume = 0.0
+        self.vol = 0.0
         self.pres = self.pres_in = self.pres_out = self.pres_tm = 0.0
-        self.pres_max = self.pres_min = self.pres_mean = 0.0
         self.ctotal = self.co2 = self.cco2 = self.cn2 = self.ch2o = self.cother = 0.0
         self.po2 = self.pco2 = self.pn2 = self.ph2o = self.pother = 0.0
         self.fo2 = self.fco2 = self.fn2 = self.fh2o = self.fother = 0.0
@@ -37,12 +36,6 @@ class GasCapacitance:
         self._is_initialized: bool = False
         self._t: float = model_ref.modeling_stepsize
         self._gas_constant = 62.36367
-        self._temp_pres_max = -1000.0
-        self._temp_pres_min = 1000.0
-        self._temp_vol_max = -1000.0
-        self._temp_vol_min = 1000.0
-        self._analytics_timer = 0.0
-        self._analytics_window = 3.0
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the independent properties
@@ -101,9 +94,6 @@ class GasCapacitance:
         self.pres_out = self.pres_ext + self.pres_cc + self.pres_mus + self.pres_atm
         self.pres_tm = self.pres_in - self.pres_out
         self.pres = self.pres_in + self.pres_out
-
-        # Analyze pressure and volume values
-        self.analyze()
 
         # Reset external pressures
         self.pres_ext = self.pres_cc = self.pres_mus = 0.0
@@ -207,25 +197,3 @@ class GasCapacitance:
         self.fn2 = self.cn2 / self.ctotal
         self.fother = self.cother / self.ctotal
 
-    def analyze(self):
-        self._temp_pres_max = max(self.pres, self._temp_pres_max)
-        self._temp_pres_min = min(self.pres, self._temp_pres_min)
-        self._temp_vol_max = max(self.vol, self._temp_vol_max)
-        self._temp_vol_min = min(self.vol, self._temp_vol_min)
-
-        if self._analytics_timer >= self._analytics_window:
-            self.pres_max = self._temp_pres_max
-            self.pres_min = self._temp_pres_min
-            self.pres_mean = (2.0 * self.pres_min + self.pres_max) / 3.0
-            self.vol_max = self._temp_vol_max
-            self.vol_min = self._temp_vol_min
-            self.tidal_volume = self.vol_max - self.vol_min
-
-            self._temp_pres_max = -1000.0
-            self._temp_pres_min = 1000.0
-            self._temp_vol_max = -1000.0
-            self._temp_vol_min = 1000.0
-            self._analytics_timer = 0.0
-
-        # increase the analytics timer with the modeling stepsize
-        self._analytics_timer += self._t

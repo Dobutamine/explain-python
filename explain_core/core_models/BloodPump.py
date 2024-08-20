@@ -26,9 +26,8 @@ class BloodPump:
         self.pres_ext = self.pres_atm = 0.0
 
         # initialize dependent properties
-        self.vol = self.vol_max = self.vol_min = self.vol_sv = 0.0
+        self.vol = 0.0
         self.pres = self.pres_in = self.pres_out = self.pres_tm = 0.0
-        self.pres_max = self.pres_min = self.pres_mean = 0.0
         self.po2 = self.pco2 = self.ph = self.so2 = 0.0
 
         # initialize local properties
@@ -37,12 +36,6 @@ class BloodPump:
         self._is_initialized: bool = False
         self._inlet_res = None
         self._outlet_res = None
-        self._temp_pres_max = -1000.0
-        self._temp_pres_min = 1000.0
-        self._temp_vol_max = -1000.0
-        self._temp_vol_min = 1000.0
-        self._analytics_timer = 0.0
-        self._analytics_window = 2.0
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the properties as passed in the arguments
@@ -96,9 +89,6 @@ class BloodPump:
         self.pres_tm = self.pres_in - self.pres_out
         self.pres = self.pres_in + self.pres_out
 
-        # Analyze pressure and volume values
-        self.analyze()
-
         # Reset external pressures
         self.pres_ext = 0.0
 
@@ -151,28 +141,3 @@ class BloodPump:
 
         return vol_not_removed
 
-    def analyze(self):
-        self._temp_pres_max = max(self.pres, self._temp_pres_max)
-        self._temp_pres_min = min(self.pres, self._temp_pres_min)
-        self._temp_vol_max = max(self.vol, self._temp_vol_max)
-        self._temp_vol_min = min(self.vol, self._temp_vol_min)
-
-        if (
-            self._analytics_timer >= self._analytics_window
-            or self._model_engine.ncc_ventricular == 1
-        ):
-            self.pres_max = self._temp_pres_max
-            self.pres_min = self._temp_pres_min
-            self.pres_mean = (2.0 * self.pres_min + self.pres_max) / 3.0
-            self.vol_max = self._temp_vol_max
-            self.vol_min = self._temp_vol_min
-            self.vol_sv = self.vol_max - self.vol_min
-
-            self._temp_pres_max = -1000.0
-            self._temp_pres_min = 1000.0
-            self._temp_vol_max = -1000.0
-            self._temp_vol_min = 1000.0
-            self._analytics_timer = 0.0
-
-        # increase the analytics timer with the modeling stepsize
-        self._analytics_timer += self._t

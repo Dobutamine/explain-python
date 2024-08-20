@@ -26,8 +26,7 @@ class GasResistor:
         self.p1_ext_factor = self.p2_ext_factor = 0.0
 
         # initialize dependent properties
-        self.flow = self.flow_lmin = self.flow_lmin_avg = 0.0
-        self.flow_forward_lmin = self.flow_backward_lmin = 0.0
+        self.flow = 0.0
 
         # local properties
         self._model_engine: object = model_ref
@@ -35,13 +34,6 @@ class GasResistor:
         self._is_initialized: bool = False
         self._model_comp_from = None
         self._model_comp_to = None
-        self._cum_forward_flow = 0.0
-        self._cum_backward_flow = 0.0
-        self._flow_counter = 0.0
-        self._flow_mov_avg_counter = 0.0
-        self._alpha = 0.05
-        self._analytics_timer = 0.0
-        self._analytics_window = 2.0
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the properties as passed in the arguments
@@ -120,14 +112,9 @@ class GasResistor:
         elif _p1 > _p2:
             # forward flow
             self.flow = (_p1 - _p2) / _r_for
-            self._cum_forward_flow += self.flow * self._t
         else:
             # back flow
             self.flow = (_p1 - _p2) / _r_back
-            self._cum_backward_flow += self.flow * self._t
-
-        # analyze current state
-        self.analyze()
 
         # Update the volumes of the model components connected by this resistor
         vol_not_removed = 0.0
@@ -163,29 +150,3 @@ class GasResistor:
             self._model_comp_to = self._model_engine.models[self.comp_to]
         else:
             self._model_comp_to = self.comp_to
-
-    def analyze(self):
-        self._flow_counter += self._t
-        self._analytics_timer += self._t
-
-        if self._analytics_timer > self._analytics_window:
-            self._analytics_timer = 0.0
-            self.flow_forward_lmin = (
-                self._cum_forward_flow / self._flow_counter
-            ) * 60.0
-            self.flow_backward_lmin = (
-                self._cum_backward_flow / self._flow_counter
-            ) * 60.0
-            self.flow_lmin = self.flow_forward_lmin + self.flow_backward_lmin
-            self._cum_forward_flow = 0.0
-            self._cum_backward_flow = 0.0
-            self._flow_counter = 0.0
-
-            # Prevent startup averaging problems
-            self._flow_mov_avg_counter += 1
-            if self._flow_mov_avg_counter > 5:
-                self._flow_mov_avg_counter = 5
-                self.flow_lmin_avg = (
-                    self._alpha * self.flow_lmin
-                    + (1 - self._alpha) * self.flow_lmin_avg
-                )

@@ -55,18 +55,14 @@ class Shunts:
         self.da_out_res = 10000000
 
         self.da_flow = 0.0
-        self.da_flow_lmin = 0.0
         self.da_velocity = 0.0
 
         self.ips_flow = 0.0
-        self.ips_flow_lmin = 0.0
         self.ips_velocity = 0.0
         self.fo_flow = 0.0
-        self.fo_flow_lmin = 0.0
         self.fo_velocity = 0.0
         self.fo_res = 10000000
         self.vsd_flow = 0.0
-        self.vsd_flow_lmin = 0.0
         self.vsd_velocity = 0.0
         self.vsd_res = 10000000
 
@@ -138,7 +134,6 @@ class Shunts:
             self._da.r_k = self.da_out_r_k
         else:
             self._da.flow = 0.0
-            self._da.flow_lmin = 0.0
             self.da_velocity = 0.0
 
         if self.fo_enabled:
@@ -152,7 +147,6 @@ class Shunts:
             self._fo.r_k = self.fo_r_k
         else:
             self._fo.flow = 0.0
-            self._fo.flow_lmin = 0.0
             self.fo_velocity = 0.0
 
         if self.vsd_enabled:
@@ -164,7 +158,6 @@ class Shunts:
             self._vsd.r_k = self.vsd_r_k
         else:
             self._vsd.flow = 0.0
-            self._vsd.flow_lmin = 0.0
             self.vsd_velocity = 0.0
 
         if self.ips_enabled:
@@ -175,10 +168,8 @@ class Shunts:
             self._ips.r_k = self.ips_r_k
         else:
             self._ips.flow = 0.0
-            self._ips.flow_lmin = 0.0
 
         self.da_flow = self._da_out.flow
-        self.da_flow_lmin = self._da_out.flow_lmin
         # calculate the velocity = flow_rate (in m^3/s) / (pi * radius^2) in m/s
         da_area = math.pow((self.da_diameter * 0.001) / 2.0, 2.0) * math.pi
         # in m^2
@@ -187,10 +178,8 @@ class Shunts:
             self.da_velocity = ((self.da_flow * 0.001) / da_area) * 1.4
 
         self.ips_flow = self._ips.flow
-        self.ips_flow_lmin = self._ips.flow_lmin
 
         self.fo_flow = self._fo.flow
-        self.fo_flow_lmin = self._fo.flow_lmin
         # calculate the velocity = flow_rate (in m^3/s) / (pi * radius^2) in m/s
         fo_area = math.pow((self.fo_diameter * 0.001) / 2.0, 2.0) * math.pi
         # in m^2
@@ -199,7 +188,6 @@ class Shunts:
             self.fo_velocity = (self.fo_flow * 0.001) / fo_area
 
         self.vsd_flow = self._vsd.flow
-        self.vsd_flow_lmin = self._vsd.flow_lmin
         # calculate the velocity = flow_rate (in m^3/s) / (pi * radius^2) in m/s
         vsd_area = math.pow((self.vsd_diameter * 0.001) / 2.0, 2.0) * math.pi
         # in m^2
