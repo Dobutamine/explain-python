@@ -5612,41 +5612,6 @@
           "total_blood_volume": 0.9331239959543716,
           "current_blood_volume": 0.9331239959543716
         },
-        "Drugs": {
-          "name": "Drugs",
-          "model_type": "Drugs",
-          "description": "drug model",
-          "is_enabled": true,
-          "dependencies": []
-        },
-        "Kidneys": {
-          "name": "Kidneys",
-          "model_type": "Kidneys",
-          "description": "kidney model",
-          "is_enabled": true,
-          "dependencies": []
-        },
-        "Liver": {
-          "name": "Liver",
-          "model_type": "Liver",
-          "description": "liver model",
-          "is_enabled": true,
-          "dependencies": []
-        },
-        "Brain": {
-          "name": "Brain",
-          "model_type": "Brain",
-          "description": "brain model",
-          "is_enabled": true,
-          "dependencies": []
-        },
-        "Lymph": {
-          "name": "Lymph",
-          "model_type": "Lymph",
-          "description": "lymphatics model",
-          "is_enabled": false,
-          "dependencies": []
-        },
         "Resuscitation": {
           "name": "Resuscitation",
           "model_type": "Resuscitation",
