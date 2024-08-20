@@ -5,4 +5,3 @@ __pycache__
 *.ipynb
 *.xpl
 !template.ipynb
-!normal_neonate.ipynb
