@@ -142,9 +142,6 @@ class Scaler:
         self._model_engine: object = model_ref
         self._is_initialized: bool = False
         self._t: float = model_ref.modeling_stepsize
-        self._debug = False
-        self._update_counter = 0.0
-        self._update_window = 1.0
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the independent properties
@@ -167,6 +164,71 @@ class Scaler:
     # actual model calculations are done here
     def calc_model(self):
         pass
+
+    def scale_patient(self):
+        # scale total blood volume
+        self.scale_total_blood_volume(self.blood_volume_kg)
+
+        # scale total lung volume
+        self.scale_total_lung_volume(self.lung_volume_kg)
+
+        # scale pericardium
+        self.scale_pericardium()
+
+        # scale the thorax
+        self.scale_thorax()
+
+        # scale the baroreflex of the autonomous nervous system
+        self.scale_ans(self.hr_ref, self.map_ref)
+
+        # scale the control of breathing model
+        self.scale_cob()
+
+        # scale the metabolism
+        self.scale_metabolism()
+
+        # scale mob
+        self.scale_mob()
+
+        # scale the heart
+        self.scale_heart()
+
+        # scale the systemic arteries
+        self.scale_systemic_arteries()
+
+        # scale the pulmonary arteries
+        self.scale_pulmonary_arteries()
+
+        # scale the capillaries
+        self.scale_capillaries()
+
+        # scale the systemic veins
+        self.scale_systemic_veins()
+
+        # scale the pulmonary veins
+        self.scale_pulmonary_veins()
+
+        # scale the systemic blood connectors
+        self.scale_syst_blood_connectors()
+
+        # scale the pulmonary blood connectors
+        self.scale_pulm_blood_connectors()
+
+        # scale the shunts
+        self.scale_shunts()
+
+        # scale the valves
+        self.scale_heart_valves()
+
+        # scale the lung
+        self.scale_lungs()
+
+        # scale the airways
+        self.scale_airways()
+
+        # get the current total blood and lung volume in l/kg
+        self.blood_volume_kg = self.get_total_blood_volume() / self._model_engine.weight
+        self.lung_volume_kg = self.get_total_lung_volume() / self._model_engine.weight
 
     def scale_weight(self, new_weight):
         # calculate the global scaling factor. This factor is relative to the reference baseline patient
