@@ -12,6 +12,8 @@ class Resuscitation:
         self.description: str = ""
         self.is_enabled: bool = False
         self.dependencies: list = []
+        self.ventilator = []
+        self.breathing = []
         self.compressions = 15.0
         self.chest_comp_enabled = True
         self.chest_comp_freq = 100.0
@@ -59,7 +61,57 @@ class Resuscitation:
 
     # actual model calculations are done here
     def calc_model(self):
-        pass
+        # // y(t) = A sin(2PIft+o)
+        # A = amplitude, f = frequency in Hz, t is time, o = phase shift
+        self._model_engine.models["Heart"].heart_rate_override = self.forced_hr
+        if (self.forced_hr):
+            self._model_engine.models["Heart"].heart_rate_forced = float(self.overriden_hr)
+
+        if (self.cpr_enabled):
+            f = self.chest_comp_freq / 60.0
+            a = self.chest_comp_pres / 2.0
+            if (self.chest_comp_cont):
+                self._comp_pause = False
+                self._vent_timer += self._t
+                if (self._vent_timer > self.vent_insp_time * 2.1):
+                    self._vent_timer = 0.0
+                    self._model_engine.models["Ventilator"].trigger_breath()
+
+
+            if not self._comp_pause:
+                self.chest_comp_force = a * math.sin(2 * math.pi * f * self._comp_timer - 0.5 * math.pi) + a
+                self._comp_timer += self._t
+                self._model_engine.models["Heart"].ncc_resus += 1.0
+
+
+            if (self._comp_timer > 60.0 / self.chest_comp_freq):
+                self._comp_timer = 0.0
+                self._comp_counter += 1
+                self._model_engine.models["Heart"].ncc_resus = 0.0
+
+
+            if (self._comp_counter == self.compressions and not self.chest_comp_cont):
+                self._model_engine.models["Ventilator"].trigger_breath()
+                self._vent_timer = 0.0
+                self._comp_counter = 0
+                self._comp_pause_timer = 0.0
+                self._comp_pause = True
+
+
+            if (self._comp_pause and not self.chest_comp_cont):
+                self._comp_pause_timer += self._t
+                self._vent_timer += self._t
+                if (self._vent_timer > self.vent_insp_time * 2.1):
+                    self._vent_timer = 0.0
+                    self._model_engine.models["Ventilator"].trigger_breath()
+
+            if (self._comp_pause_timer > self.ventilations * self.vent_insp_time * 2.0):
+                self._comp_pause = False
+                self._vent_timer = 0.0
+
+
+            for key, value in self.chest_comp_targets.items():
+                self._model_engine.models[key].pres_cc = float(self.chest_comp_force * value)
 
     def switch_cpr(self, state):
         if state:
@@ -76,12 +128,7 @@ class Resuscitation:
             self.cpr_enabled = True
         else:
             self.cpr_enabled = False
-            self._model_engine.models["Ventilator"].set_ventilator_pc(
-                16.0, 5.0, 50, 0.4, 10.0
-            )
+            self._model_engine.models["Ventilator"].set_ventilator_pc(16.0, 5.0, 50, 0.4, 10.0)
+
         self._model_engine.models["Ventilator"].vent_sync = True
-        # for (let [comp_target, force] of Object.entries(
-        #   self.chest_comp_targets
-        # )) {
-        #   self._model_engine.models[comp_target].pres_cc = 0.0;
-        # }
+

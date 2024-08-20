@@ -5652,7 +5652,7 @@
           "model_type": "Resuscitation",
           "description": "resuscitation model",
           "is_enabled": true,
-          "dependencies": [],
+          "dependencies": ["Heart", "Ventilator", "Breathing", "CHEST_L", "CHEST_R", "LA", "LV", "RA", "RV", "AA", "AAR", "SVC", "IVCI", "COR"],
           "compressions": 3,
           "chest_comp_enabled": false,
           "chest_comp_freq": 100,
