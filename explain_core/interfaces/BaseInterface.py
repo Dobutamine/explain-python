@@ -83,7 +83,40 @@ class BaseInterface:
                 state = response.json()
                 print(state)
     
-            
+    def get_all_user_states(self):
+        if not self.user_name:
+            self.user_name = input("Enter your username:")
+        if not self.user_token:
+            self.user_token = self._log_in(self.user_name)
+        if self.user_token:
+            response = requests.post("https://explain-user.com/api/states/get_all_user_states?token=" + self.user_token, json={ "user": self.user_name, "name": "all" })
+            if response.status_code == 200:
+                state = response.json()
+                print(state)
+
+    def get_all_shared_states(self):
+        if not self.user_name:
+            self.user_name = input("Enter your username:")
+        if not self.user_token:
+            self.user_token = self._log_in(self.user_name)
+        if self.user_token:
+            response = requests.post("https://explain-user.com/api/states/get_all_shared_states?token=" + self.user_token, json={ "user": self.user_name})
+            if response.status_code == 200:
+                state = response.json()
+                print(state)
+
+    def get_default_state(self):
+        if not self.user_name:
+            self.user_name = input("Enter your username:")
+        if not self.user_token:
+            self.user_token = self._log_in(self.user_name)
+        if self.user_token:
+            response = requests.post("https://explain-user.com/api/states/get_user_state?token=" + self.user_token, json={ "user": self.user_name, "name": "baseline neonate" })
+            if response.status_code == 200:
+                state = response.json()
+                print(state)
+
+
 
         
     def scale_to_gestational_age(self, gestational_age: float):
