@@ -1,4 +1,4 @@
-import os
+import os, requests, getpass
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -60,7 +60,32 @@ class BaseInterface:
         self.fast_analyzer_data = {}
         self.fast_analyzer_sample_interval = 0.005
         self.analysis_object = {}
+        self.user_name = ""
+        self.user_token = ""
 
+    def _log_in(self, user_name):
+        # get the password
+        password = getpass.getpass("Enter your password:")
+        response_auth = requests.post("https://explain-user.com/api/auth", json={ "name": user_name, "password": password})
+        if response_auth.status_code == 200:
+            return response_auth.json()["token"]
+        else:
+            return False
+
+    def get_user_state(self, state_name):
+        if not self.user_name:
+            self.user_name = input("Enter your username:")
+        if not self.user_token:
+            self.user_token = self._log_in(self.user_name)
+        if self.user_token:
+            response = requests.post("https://explain-user.com/api/states/get_user_state?token=" + self.user_token, json={ "user": self.user_name, "name": state_name })
+            if response.status_code == 200:
+                state = response.json()
+                print(state)
+    
+            
+
+        
     def scale_to_gestational_age(self, gestational_age: float):
         self.model.scale_to_gestational_age(gestational_age)
 
