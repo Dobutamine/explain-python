@@ -1,6 +1,3 @@
-import math
-
-
 class SensoryInput:
     # static properties
     model_type: str = "SensoryInput"

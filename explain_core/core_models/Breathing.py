@@ -220,13 +220,13 @@ class Breathing:
 
         return mp
 
-    def switch_breathing(state):
+    def switch_breathing(self, state):
         self.breathing_enabled = state
 
-    def set_resp_rate(resp_rate):
+    def set_resp_rate(self, resp_rate):
         self.resp_rate = resp_rate
 
-    def set_mv_ref(mv_ref):
+    def set_mv_ref(self, mv_ref):
         self.minute_volume_ref = mv_ref
 
     def set_vt_rr_ratio(self, vt_rr_ratio):
