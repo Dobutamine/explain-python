@@ -37,6 +37,8 @@ class Breathing:
         self.exp_tidal_volume = 0.0
         self.insp_tidal_volume = 0.0
         self.resp_muscle_pressure = 0.0
+        self.ncc_insp = 0
+        self.ncc_exp = 0
 
         # local properties
         self._model_engine: object = model_ref
@@ -49,11 +51,9 @@ class Breathing:
         self._breath_interval = 60.0
         self._insp_running = False
         self._insp_timer = 0.0
-        self.ncc_insp = 0
         self._temp_insp_volume = 0.0
         self._exp_running = False
         self._exp_timer = 0.0
-        self.ncc_exp = 0
         self._temp_exp_volume = 0.0
 
     def init_model(self, **args: dict[str, any]):

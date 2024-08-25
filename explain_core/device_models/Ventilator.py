@@ -96,6 +96,8 @@ class Ventilator:
         self._hfo_map = 0.0
         self._hfo_amplitude = 0.0
         self._tv_tolerance = 0.0005
+        self.ncc_insp = 0
+        self.ncc_exp = 0
 
         # tidal volume tolerance for volume control in l
         self._triggered_breath = False
@@ -113,8 +115,6 @@ class Ventilator:
         self._hfo_exp_tv_counter = 0
         self._hfo_state = 0
         self._prev_hfo_state = 0
-        self.ncc_insp = 0
-        self.ncc_exp = 0
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the independent properties
