@@ -23,6 +23,15 @@ class DataCollector:
                                     'model': self.model.models['Heart'], 'prop1': 'ncc_ventricular', 'prop2': None}
             self.ncc_atrial = {'label': 'Heart.ncc_atrial',
                                'model': self.model.models['Heart'], 'prop1': 'ncc_atrial', 'prop2': None}
+            self.ncc_breathing_insp = {'label': 'Breathing.ncc_insp',
+                               'model': self.model.models['Breathing'], 'prop1': 'ncc_insp', 'prop2': None}
+            self.ncc_breathing_exp = {'label': 'Breathing.ncc_exp',
+                               'model': self.model.models['Breathing'], 'prop1': 'ncc_exp', 'prop2': None}
+            self.ncc_ventilator_insp = {'label': 'Ventilator.ncc_insp',
+                               'model': self.model.models['Ventilator'], 'prop1': 'ncc_insp', 'prop2': None}
+            self.ncc_ventilator_exp = {'label': 'Ventilator.ncc_exp',
+                               'model': self.model.models['Ventilator'], 'prop1': 'ncc_exp', 'prop2': None}
+            
         except:
             self.ncc_ventricular = {'label': '',
                                     'model': None, 'prop1': '', 'prop2': None}
@@ -32,6 +41,10 @@ class DataCollector:
         # add the two always there
         self.watch_list.append(self.ncc_atrial)
         self.watch_list.append(self.ncc_ventricular)
+        self.watch_list.append(self.ncc_breathing_insp)
+        self.watch_list.append(self.ncc_breathing_exp)
+        self.watch_list.append(self.ncc_ventilator_insp)
+        self.watch_list.append(self.ncc_ventilator_exp)
 
         # define the data list
         self.collected_data = []
@@ -49,6 +62,10 @@ class DataCollector:
         # add the two always there
         self.watch_list.append(self.ncc_atrial)
         self.watch_list.append(self.ncc_ventricular)
+        self.watch_list.append(self.ncc_breathing_insp)
+        self.watch_list.append(self.ncc_breathing_exp)
+        self.watch_list.append(self.ncc_ventilator_insp)
+        self.watch_list.append(self.ncc_ventilator_exp)
 
     def set_sample_interval(self, new_interval=0.005):
         self.sample_interval = new_interval
