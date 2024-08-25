@@ -49,11 +49,11 @@ class Breathing:
         self._breath_interval = 60.0
         self._insp_running = False
         self._insp_timer = 0.0
-        self._ncc_insp = 0
+        self.ncc_insp = 0
         self._temp_insp_volume = 0.0
         self._exp_running = False
         self._exp_timer = 0.0
-        self._ncc_exp = 0
+        self.ncc_exp = 0
         self._temp_exp_volume = 0.0
 
     def init_model(self, **args: dict[str, any]):
@@ -112,14 +112,14 @@ class Breathing:
             self._breath_timer = 0.0
             self._insp_running = True
             self._insp_timer = 0.0
-            self._ncc_insp = 0.0
+            self.ncc_insp = 0.0
 
         # has the inspiration time elapsed?
         if self._insp_timer > self._ti:
             self._insp_timer = 0.0
             self._insp_running = False
             self._exp_running = True
-            self._ncc_exp = 0.0
+            self.ncc_exp = 0.0
             self._temp_exp_volume = 0.0
             self.insp_tidal_volume = -self._temp_insp_volume
 
@@ -152,7 +152,7 @@ class Breathing:
 
         if self._insp_running:
             self._insp_timer += self._t
-            self._ncc_insp += 1
+            self.ncc_insp += 1
             if self._model_engine.models["MOUTH_DS"].flow > 0:
                 self._temp_insp_volume += (
                     self._model_engine.models["MOUTH_DS"].flow * self._t
@@ -160,7 +160,7 @@ class Breathing:
 
         if self._exp_running:
             self._exp_timer += self._t
-            self._ncc_exp += 1
+            self.ncc_exp += 1
             if self._model_engine.models["MOUTH_DS"].flow < 0:
                 self._temp_exp_volume += (
                     self._model_engine.models["MOUTH_DS"].flow * self._t
@@ -206,13 +206,13 @@ class Breathing:
         mp = 0.0
         # inspiration
         if self._insp_running:
-            mp = (self._ncc_insp / (self._ti / self._t)) * self.rmp_gain
+            mp = (self.ncc_insp / (self._ti / self._t)) * self.rmp_gain
 
         # expiration
         if self._exp_running:
             mp = (
                 (
-                    math.pow(math.e, -4.0 * (self._ncc_exp / (self._te / self._t)))
+                    math.pow(math.e, -4.0 * (self.ncc_exp / (self._te / self._t)))
                     - self._eMin4
                 )
                 / (1.0 - self._eMin4)

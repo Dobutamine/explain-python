@@ -113,8 +113,8 @@ class Ventilator:
         self._hfo_exp_tv_counter = 0
         self._hfo_state = 0
         self._prev_hfo_state = 0
-        self._ncc_insp = 0
-        self._ncc_exp = 0
+        self.ncc_insp = 0
+        self.ncc_exp = 0
 
     def init_model(self, **args: dict[str, any]):
         # set the values of the independent properties
@@ -473,7 +473,7 @@ class Ventilator:
             self._inspiration = False
             self._expiration = True
             # reset the ncc counter
-            self._ncc_exp = 0
+            self.ncc_exp = 0
             # reset the triggered breath flag
             self._triggered_breath = False
             # reset the block trigger counter
@@ -496,7 +496,7 @@ class Ventilator:
             self._inspiration = True
             self._expiration = False
             # reset the ncc counter
-            self._ncc_insp = 0
+            self.ncc_insp = 0
             # reset the triggered breath flag
             self._triggered_breath = False
             # reset the volume counter
@@ -542,7 +542,7 @@ class Ventilator:
                 self._inspiration = True
                 self._expiration = False
                 # reset the ncc counter
-                self._ncc_insp = 0
+                self.ncc_insp = 0
                 # determine the peak flow
                 if self._et_tube.flow > self._peak_flow:
                     self._peak_flow = self._et_tube.flow
@@ -556,7 +556,7 @@ class Ventilator:
                     self._inspiration = False
                     self._expiration = True
                     # reset the ncc counter
-                    self._ncc_exp = 0
+                    self.ncc_exp = 0
                     # reset the tidal volume counter
                     self._exp_tidal_volume_counter = 0.0
                     # reset the triggered breath flag
@@ -569,7 +569,7 @@ class Ventilator:
             self._inspiration = False
             self._expiration = True
             # reset the ncc counter
-            self._ncc_exp = 0
+            self.ncc_exp = 0
             # calculate the expiratory tidal volume
             self._exp_tidal_volume_counter += self._et_tube.flow * self._t
 
@@ -624,7 +624,7 @@ class Ventilator:
     def pressure_control(self):
         if self._inspiration:
             # increase the ncc counter
-            self._ncc_insp += 1
+            self.ncc_insp += 1
 
             # close the expiration valve and open the inspiration valve
             self._exp_valve.no_flow = True
@@ -650,7 +650,7 @@ class Ventilator:
 
         if self._expiration:
             # increase the ncc counter
-            self._ncc_exp += 1
+            self.ncc_exp += 1
 
             self._pres_reached = False
             # close the inspiration valve and open the expiration valve
@@ -672,7 +672,7 @@ class Ventilator:
     def pressure_support(self):
         if self._inspiration:
             # increase the ncc counter
-            self._ncc_insp += 1
+            self.ncc_insp += 1
             # close the expiration valve and open the inspiration valve
             self._exp_valve.no_flow = True
             self._insp_valve.no_flow = False
@@ -697,7 +697,7 @@ class Ventilator:
 
         if self._expiration:
             # increase the ncc counter
-            self._ncc_exp += 1
+            self.ncc_exp += 1
 
             self._pres_reached = False
             # close the inspiration valve and open the expiration valve
