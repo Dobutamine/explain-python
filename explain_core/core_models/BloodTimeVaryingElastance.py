@@ -10,6 +10,7 @@ class BloodTimeVaryingElastance:
         self.is_enabled: bool = False
         self.dependencies: list = []
         self.fixed_composition = False
+        self.analysis_enabled = False
         self.aboxy = {}
         self.solutes = {}
         self.drugs = {}
@@ -100,7 +101,7 @@ class BloodTimeVaryingElastance:
         self.pres_ed = _el_min * vol_diff
 
         # calculate the elastance depending on the activation factor
-        self.el = ((_el_max - _el_min) * self.act_factor) / 1000.0
+        self.el = _el_min + (_el_max - _el_min) * self.act_factor
 
         # calculate the maximal systolic pressure
         self.pres_ms = _el_max * vol_diff

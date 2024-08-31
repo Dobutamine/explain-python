@@ -9,6 +9,7 @@ class BloodValve:
         self.description: str = ""
         self.is_enabled: bool = False
         self.dependencies: list = []
+        self.analysis_enabled = False
         self.no_flow: bool = True
         self.no_back_flow: bool = True
         self.comp_from: str = ""

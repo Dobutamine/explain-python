@@ -12,6 +12,7 @@ class Container:
         self.description: str = ""
         self.is_enabled: bool = False
         self.dependencies: list = []
+        self.analysis_enabled = False
         self.contained_components = []
 
         # initialize independent properties

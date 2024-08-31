@@ -13,6 +13,7 @@ class GasCapacitance:
         self.is_enabled: bool = False
         self.dependencies: list = []
         self.fixed_composition = False
+        self.analysis_enabled = False
 
         # initialize independent properties
         self.u_vol = self.u_vol_factor = self.u_vol_ans_factor = 1.0

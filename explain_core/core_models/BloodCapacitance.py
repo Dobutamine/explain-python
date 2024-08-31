@@ -11,6 +11,7 @@ class BloodCapacitance:
         self.is_enabled: bool = False
         self.dependencies: list = []
         self.fixed_composition = False
+        self.analysis_enabled = False
         self.aboxy = {}
         self.solutes = {}
         self.drugs = {}
