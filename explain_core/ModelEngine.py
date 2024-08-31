@@ -90,13 +90,56 @@ class ModelEngine:
         self._task_scheduler: dict = {}
         self.initialized = False
 
+        # initialize a dictionary holding the model definition
+        model_definition = {}
+
         # try to open the json file
         try:
             # open the json file
             json_file = open(model_definition_filename)
 
+            # signal that the json file loaded succesfully
+            print(f" Model definition file: {model_definition_filename} loaded.")
+            self._update_log(f" Model definition file: {model_definition_filename} loaded.")
+
             # convert the json file to a python dictionary
-            self.model_definition = json.load(json_file)
+            model_definition = json.load(json_file)
+
+        except:
+            # signal that the json file failed to load
+            print(
+                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!"
+            )
+            self._update_log(
+                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!",
+                "error",
+            )
+            self.initialized = False
+
+            # terminate function
+            return
+        
+        # process the model definition
+        self.process_model_definition(model_definition)
+
+    def process_model_definition(self, model_definition: dict):
+        # set the error counter = 0
+        error_counter = 0
+
+        # reset the status log
+        self.status = {"log": [], "error_log": [], "initialized": False}
+
+        # make sure the objects are empty
+        self.models: dict = {}
+        self.model_data: list = []
+        self._datacollector: dict = {}
+        self._task_scheduler: dict = {}
+        self.initialized = False
+
+        try:
+
+            # convert the json file to a python dictionary
+            self.model_definition = model_definition
 
             # get the model attributes
             self.name = self.model_definition["name"]
@@ -110,10 +153,10 @@ class ModelEngine:
         except:
             # signal that the json file failed to load
             print(
-                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!"
+                f"The JSON model definition filec could not be processed correctly!"
             )
             self._update_log(
-                f"The JSON model definition file: {model_definition_filename} failed to load or can not be found!",
+                f"The JSON model definition filec could not be processed correctly!",
                 "error",
             )
             self.initialized = False
@@ -201,9 +244,9 @@ class ModelEngine:
             if init_errors > 0 or dep_errors > 0:
                 self.initialized = False
             else:
-                print(f" Model '{self.name}' loaded and initialized correctly.")
+                print(f" Model '{self.name}' initialized and ready for use. Have fun!")
                 self._update_log(
-                    f" Model '{self.name}' loaded and initialized correctly."
+                    f" Model '{self.name}' initialized and ready for use. Have fun!"
                 )
                 self.initialized = True
 

@@ -9,6 +9,9 @@ from pathlib import Path
 
 class BaseInterface:
     def __init__(self, model):
+        # store an object holding a complete explain object 
+        self.explain_model = None
+
         # store a reference to the model instance
         self.model = model
 
@@ -80,8 +83,12 @@ class BaseInterface:
         if self.user_token:
             response = requests.post("https://explain-user.com/api/states/get_user_state?token=" + self.user_token, json={ "user": self.user_name, "name": state_name })
             if response.status_code == 200:
-                state = response.json()
-                print(state)
+                # store a dictionary
+                self.explain_model = response.json()
+                # initialize this model
+                self.model.process_model_definition(self.explain_model["model_definition"])
+            else:
+                return False
     
     def get_all_user_states(self):
         if not self.user_name:
@@ -116,9 +123,6 @@ class BaseInterface:
                 state = response.json()
                 print(state)
 
-
-
-        
     def scale_to_gestational_age(self, gestational_age: float):
         self.model.scale_to_gestational_age(gestational_age)
 
