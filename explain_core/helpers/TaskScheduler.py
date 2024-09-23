@@ -53,9 +53,7 @@ class TaskScheduler:
         if new_task["type"] < 1:
             # calculate the stepsize
             if new_task["in_time"] > 0:
-                new_task["stepsize"] = (new_task["new_value"] - current_value) / (
-                    new_task["in_time"] / self._task_interval
-                )
+                new_task["stepsize"] = (new_task["new_value"] - current_value) / (new_task["in_time"] / self._task_interval)
             else:
                 new_task["type"] = 1
                 new_task["stepsize"] = 0.0
@@ -110,9 +108,7 @@ class TaskScheduler:
 
                 # check whether the new value is already at the target value
                 if task["type"] < 1 and task["running"]:
-                    if abs(task["current_value"] - task["new_value"]) < abs(
-                        task["stepsize"]
-                    ):
+                    if (abs(task["current_value"] - task["new_value"]) < abs(task["stepsize"])) or (task["current_value"] - task["new_value"] == 0.0):
                         task["current_value"] = task["new_value"]
                         self._set_value(task)
                         task["stepsize"] = 0

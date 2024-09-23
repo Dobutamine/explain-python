@@ -30,6 +30,7 @@ class BloodCapacitance:
         self.vol = self.vol_max = self.vol_min = self.vol_sv = 0.0
         self.pres = self.pres_in = self.pres_out = self.pres_tm = 0.0
         self.po2 = self.pco2 = self.ph = self.so2 = 0.0
+        self.el = 0.0
 
         # initialize local properties
         self._model_engine: object = model_ref
@@ -81,6 +82,8 @@ class BloodCapacitance:
 
         # make the elastances volume dependent
         _el += _el_k * vol_diff * vol_diff
+
+        self.el = _el
 
         # Calculate pressures
         self.pres_in = _el * vol_diff

@@ -499,7 +499,7 @@ class ModelEngine:
     ) -> str:
         # define some placeholders
         task_id: int = random.randint(0, 1000)
-        m: BaseModel = None
+        m: object = None
         p1: str = None
         p2: str = None
 

@@ -28,6 +28,7 @@ class BloodResistor:
 
         # initialize dependent properties
         self.flow = 0.0
+        self.res = 0.0
 
 
         # local properties
@@ -109,6 +110,7 @@ class BloodResistor:
         _r_for = max(_r_for, 20.0)
         _r_back = max(_r_back, 20.0)
 
+        self.res = _r_for
         # calculate flow
         if self.no_flow or (_p1 <= _p2 and self.no_back_flow):
             self.flow = 0.0
