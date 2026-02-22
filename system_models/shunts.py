@@ -4,9 +4,12 @@ from base_models.base_model import BaseModel
 
 
 class Shunts(BaseModel):
+	"""Septal shunt model (FO/VSD) with diameter-based resistance updates."""
+
 	model_type = "shunts"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize shunt geometry, viscosity, and hemodynamic outputs."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.diameter_fo = 2.0
@@ -31,6 +34,7 @@ class Shunts(BaseModel):
 		self._lv = None
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -46,6 +50,7 @@ class Shunts(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Update shunt resistances/velocities from current diameters and flows."""
 		self._fo = self._resolve_model("FO")
 		self._vsd = self._resolve_model("VSD")
 		self._lv = self._resolve_model("LV")
@@ -80,6 +85,7 @@ class Shunts(BaseModel):
 		self.velocity_vsd = ((self.flow_vsd * 0.001) / area_vsd) if area_vsd > 0.0 else 0.0
 
 	def calc_resistance(self, diameter, length=2.0, viscosity=6.0):
+		"""Return Poiseuille-based resistance estimate for shunt pathway."""
 		diameter = float(diameter)
 		length = float(length)
 		viscosity = float(viscosity)

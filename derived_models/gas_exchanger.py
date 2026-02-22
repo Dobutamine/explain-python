@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 from functions.blood_composition import calc_blood_composition
 
 class GasExchanger(BaseModel):
+    """Bidirectional gas exchange model between blood and gas compartments."""
+
     model_type = "gas_exchanger"
 
     def __init__(self, model_ref = {}, name=None):
+        """Initialize exchanger connectivity, diffusion constants, and flux state."""
         # initialize the base model properties
         super().__init__(model_ref=model_ref, name=name)
 
@@ -31,6 +34,7 @@ class GasExchanger(BaseModel):
         self._gas = None  # reference to the gas component
 
     def calc_model(self):
+        """Run one exchange step and update blood/gas concentrations."""
         # find the blood and gas components
         self._blood = self._model_engine.models[self.comp_blood]
         self._gas = self._model_engine.models[self.comp_gas]

@@ -1,8 +1,20 @@
+"""Long-run stability smoke test for `baseline_mongo.json`.
+
+This script loads the model, advances a fixed number of simulation steps,
+and prints simple min/max/last statistics for selected monitor and heart
+signals to detect numerical instability.
+"""
+
 import math
 from model_engine import ModelEngine
 
 
 def main():
+    """Run a 10k-step soak test and print tracked signal statistics.
+
+    Raises:
+        RuntimeError: If any tracked numeric value becomes non-finite.
+    """
     steps = 10000
     engine = ModelEngine()
     engine.load_json_file("definitions/baseline_mongo.json")

@@ -9,13 +9,39 @@ from base_models.base_model import BaseModel
 
 
 class ModelEngine:
+	"""Runtime engine that builds and steps model graphs from JSON definitions.
+
+	The engine loads model configuration from a Python mapping or JSON file,
+	resolves each model class by `model_type`, initializes model instances, and
+	advances all models one simulation step at a time.
+	"""
+
 	def __init__(self, modeling_stepsize=0.0005):
+		"""Initialize an empty engine.
+
+		Args:
+			modeling_stepsize: Default simulation time step in seconds. This value
+				can be overridden by the loaded model definition.
+		"""
 		self.models = {}
 		self.model_definition = {}
 		self.modeling_stepsize = float(modeling_stepsize)
 		self.is_initialized = False
 
 	def load_json_file(self, file_path):
+		"""Load a JSON model definition file and build the engine.
+
+		Args:
+			file_path: Path to a JSON definition file.
+
+		Returns:
+			ModelEngine: The current engine instance for chaining.
+
+		Raises:
+			FileNotFoundError: If the file does not exist.
+			json.JSONDecodeError: If the file is not valid JSON.
+			TypeError/ValueError: If the definition content is invalid.
+		"""
 		path = Path(file_path)
 		if not path.exists():
 			raise FileNotFoundError(f"Model definition file not found: {path}")
@@ -27,6 +53,23 @@ class ModelEngine:
 		return self
 
 	def build(self, model_definition):
+		"""Build model instances from an in-memory definition mapping.
+
+		The definition may contain model entries in `models`, `components`, and
+		`helpers`. These sections are merged, model classes are resolved from their
+		`model_type`, and each model receives its configuration via `init_model`.
+
+		Args:
+			model_definition: Mapping containing model and general settings.
+
+		Returns:
+			ModelEngine: The current engine instance for chaining.
+
+		Raises:
+			TypeError: If `model_definition` is not a mapping.
+			ValueError: If model definitions are missing required fields or contain
+				unknown `model_type` values.
+		"""
 		if not isinstance(model_definition, Mapping):
 			raise TypeError("Model definition must be a dictionary")
 
@@ -55,10 +98,17 @@ class ModelEngine:
 		return self
 
 	def step_model(self):
+		"""Advance all initialized models by one simulation step."""
 		for model in self.models.values():
 			model.step_model()
 
 	def _apply_general_settings(self, model_definition):
+		"""Apply global settings from the definition onto the engine instance.
+
+		Values from `general` and top-level keys (excluding model sections) are
+		copied to engine attributes. The final modeling step size is normalized to
+		`float`.
+		"""
 		general_config = model_definition.get("general")
 		if isinstance(general_config, Mapping):
 			for key, value in general_config.items():
@@ -73,6 +123,11 @@ class ModelEngine:
 		self.modeling_stepsize = float(getattr(self, "modeling_stepsize", self.modeling_stepsize))
 
 	def _extract_model_configs(self, model_definition):
+		"""Collect and merge model configs from supported definition sections.
+
+		Sections are processed in order: `models`, `components`, then `helpers`.
+		If a name appears more than once, later sections overwrite earlier entries.
+		"""
 		merged_configs = {}
 
 		for section_key in ["models", "components", "helpers"]:
@@ -87,6 +142,19 @@ class ModelEngine:
 		return merged_configs
 
 	def _normalize_model_section(self, section_data, section_name):
+		"""Normalize one model section into a name -> config dictionary.
+
+		Args:
+			section_data: Section content as dict or list.
+			section_name: Section label used in error messages.
+
+		Returns:
+			dict[str, dict]: Normalized model configs keyed by model name.
+
+		Raises:
+			TypeError: If the section is not a dict or list.
+			ValueError: If a list entry is missing a required `name`.
+		"""
 		configs = {}
 
 		if isinstance(section_data, Mapping):
@@ -119,6 +187,18 @@ class ModelEngine:
 		raise TypeError(f"'{section_name}' must be a dictionary or a list")
 
 	def _resolve_model_class(self, model_type):
+		"""Resolve a `model_type` string to a `BaseModel` subclass.
+
+		Resolution tries module names derived from the model type across model
+		packages (`base_models`, `composite_models`, `derived_models`,
+		`system_models`, `device_models`). Legacy aliases are mapped first.
+
+		Args:
+			model_type: Model type identifier from a definition file.
+
+		Returns:
+			type[BaseModel] | None: Matching class if found, otherwise `None`.
+		"""
 		model_type_str = str(model_type)
 		normalized_target = re.sub(r"_", "", model_type_str).lower()
 		legacy_aliases = {

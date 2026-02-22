@@ -5,9 +5,12 @@ from functions.gas_composition import calc_gas_composition
 
 
 class MechanicalVentilator(BaseModel):
+	"""Mechanical ventilator controller supporting PC, PRVC, and PS modes."""
+
 	model_type = "mechanical_ventilator"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize ventilator settings, measured outputs, and runtime state."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.pres_atm = 760.0
@@ -76,6 +79,7 @@ class MechanicalVentilator(BaseModel):
 		self._et_tube_resistance = 40.0
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 		if isinstance(self.model_ref, dict):
@@ -88,6 +92,7 @@ class MechanicalVentilator(BaseModel):
 		return None
 
 	def init_model(self, args=None):
+		"""Initialize linked ventilator components and baseline gas composition."""
 		linked_components = None
 		if args is not None:
 			normalized = dict(args) if isinstance(args, Mapping) else self._normalize_init_args(args)
@@ -126,6 +131,7 @@ class MechanicalVentilator(BaseModel):
 		self._et_tube_resistance = self.calc_ettube_resistance(self.flow)
 
 	def calc_model(self):
+		"""Run one ventilator control/update step for current operating mode."""
 		if not self.is_enabled:
 			return
 		if self._vent_gascircuit is None or self._vent_ettube is None:
@@ -162,6 +168,7 @@ class MechanicalVentilator(BaseModel):
 		self._et_tube_resistance = self.calc_ettube_resistance(self.flow)
 
 	def triggering(self):
+		"""Evaluate patient-trigger logic for synchronized ventilation."""
 		self.trigger_volume = (self.tidal_volume / 100.0) * self.trigger_volume_perc
 		if self._breathing_model is not None:
 			if float(getattr(self._breathing_model, "ncc_insp", 0.0) or 0.0) == 1.0 and not self._trigger_blocked:
@@ -177,6 +184,7 @@ class MechanicalVentilator(BaseModel):
 			self.triggered_breath = True
 
 	def flow_cycling(self):
+		"""Apply flow-cycled inspiration/expiration transitions (PS mode)."""
 		flow = float(getattr(self._vent_ettube, "flow", 0.0) or 0.0)
 
 		if flow > 0.0 and self.triggered_breath:
@@ -213,6 +221,7 @@ class MechanicalVentilator(BaseModel):
 			self._trigger_blocked = False
 
 	def time_cycling(self):
+		"""Apply time-cycled inspiration/expiration transitions (PC/PRVC)."""
 		if self.vent_rate <= 0.0:
 			return
 		self.exp_time = 60.0 / self.vent_rate - self.insp_time
@@ -262,6 +271,7 @@ class MechanicalVentilator(BaseModel):
 			self._trigger_blocked = False
 
 	def pressure_control(self):
+		"""Update inspiratory/expiratory valve states for pressure-targeted support."""
 		if self._vent_exp_valve is None or self._vent_insp_valve is None or self._vent_gasin is None or self._vent_gascircuit is None:
 			return
 
@@ -301,6 +311,7 @@ class MechanicalVentilator(BaseModel):
 				self._exp_tidal_volume_counter += et_flow * self._t
 
 	def pressure_regulated_volume_control(self):
+		"""Adjust pressure target to track desired tidal volume in PRVC mode."""
 		if self.exp_tidal_volume < self.tidal_volume - self._tv_tolerance:
 			self.pip_cmh2o += 1.0
 			if self.pip_cmh2o > self.pip_cmh2o_max:
@@ -312,6 +323,7 @@ class MechanicalVentilator(BaseModel):
 				self.pip_cmh2o = self.peep_cmh2o + 2.0
 
 	def reset_dependent_properties(self):
+		"""Reset measured/output properties when ventilator is turned off."""
 		self.pres = 0.0
 		self.flow = 0.0
 		self.vol = 0.0
@@ -329,6 +341,7 @@ class MechanicalVentilator(BaseModel):
 		self.triggered_breath = False
 
 	def switch_ventilator(self, state):
+		"""Enable or disable ventilator circuit components."""
 		state = bool(state)
 		self.is_enabled = state
 		if not state:
@@ -346,6 +359,7 @@ class MechanicalVentilator(BaseModel):
 			mouth_ds.no_flow = state
 
 	def calc_ettube_resistance(self, flow):
+		"""Compute and apply ET tube resistance from calibrated flow relation."""
 		flow = float(flow)
 		res = (self._a * flow + self._b) * (self.ettube_length / self._ettube_length_ref)
 		if res < 15.0:
@@ -438,4 +452,6 @@ class MechanicalVentilator(BaseModel):
 
 
 class Ventilator(MechanicalVentilator):
+	"""Backward-compatible alias for the mechanical ventilator model."""
+
 	model_type = "ventilator"

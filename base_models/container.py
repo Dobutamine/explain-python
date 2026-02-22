@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class Container(BaseModel):
+    """Container model that applies pressure coupling to enclosed components."""
+
     model_type = "container"
 
     def __init__(self, model_ref = {}, name=None):
+        """Initialize a container with elastance and enclosed component settings."""
         # initialize the base model properties
         super().__init__(model_ref=model_ref, name=name)
 
@@ -38,6 +41,7 @@ class Container(BaseModel):
         self._el_k = 0.0  # calculated elastance non-linear k (unitless)
 
     def calc_model(self):
+        """Run one container update step (elastance, volume aggregation, pressure)."""
         # calculate the current elastance and volumes
         self.calc_elastance()
         self.calc_volume()
@@ -51,6 +55,7 @@ class Container(BaseModel):
         self.calc_pressure()
 
     def calc_elastance(self):
+        """Update effective container elastance terms from factor settings."""
         # calculate the elastance and non-linear elastance incorporating the factors
         self._el = self.el_base  + (self.el_base_factor - 1) * self.el_base + (self.el_base_factor_ps - 1) * self.el_base
         self._el_k = self.el_k  + (self.el_k_factor - 1) * self.el_k + (self.el_k_factor_ps - 1) * self.el_k
@@ -60,6 +65,7 @@ class Container(BaseModel):
         self.el_k_factor = 1.0  
 
     def calc_volume(self):
+        """Compute container volume from `vol_extra` plus enclosed model volumes."""
         # reset the starting volume to the additional volume of the container
         self.vol = self.vol_extra
 
@@ -74,6 +80,7 @@ class Container(BaseModel):
         self.u_vol_factor = 1.0
 
     def calc_pressure(self):
+        """Compute pressure and propagate external pressure to enclosed components."""
         # calculate the recoil pressure
         self.pres_in = self._el_k * (self.vol - self._u_vol) ** 2 + self._el * (self.vol - self._u_vol)
 

@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class Mob(BaseModel):
+	"""Myocardial oxygen balance model with hypoxia-driven cardiac adjustments."""
+
 	model_type = "mob"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize myocardial oxygen-balance parameters and state variables."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.mob_active = True
@@ -72,6 +75,7 @@ class Mob(BaseModel):
 		self._pv_area_rv_dec = 0.0
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -87,6 +91,7 @@ class Mob(BaseModel):
 		return None
 
 	def _resolve_first(self, *names):
+		"""Resolve and return the first existing model from a list of names."""
 		for name in names:
 			model = self._resolve_model(name)
 			if model is not None:
@@ -94,6 +99,7 @@ class Mob(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Run one myocardial oxygen-balance update and apply hypoxia effects."""
 		if not self.mob_active:
 			return
 
@@ -172,6 +178,7 @@ class Mob(BaseModel):
 				self._cor.tco2 = new_tco2_cor
 
 	def calc_bm(self):
+		"""Return basal myocardial O2 consumption in mmol/s equivalent."""
 		bm_vo2 = self.bm_vo2_ref * self.hw + self._d_bm_vo2 * self.bm_g
 		min_bm = self.bm_vo2_min * self.hw
 		if bm_vo2 < min_bm:
@@ -179,16 +186,19 @@ class Mob(BaseModel):
 		return bm_vo2 / self._ml_to_mmol
 
 	def calc_ecc(self):
+		"""Estimate excitation-contraction coupling oxygen consumption."""
 		self.ecc_lv = float(getattr(self._lv, "el_max", 0.0) or 0.0)
 		self.ecc_rv = float(getattr(self._rv, "el_max", 0.0) or 0.0)
 		self.ecc = (self.ecc_lv + self.ecc_rv) / 1000.0
 		return (self.ecc * self.ecc_ref * self.hw) / self._ml_to_mmol
 
 	def calc_pe(self):
+		"""Estimate potential-energy oxygen consumption component."""
 		self.pe = 0.0
 		return (self.pe * self.pe_ref * self.hw) / self._ml_to_mmol
 
 	def calc_pva(self):
+		"""Estimate pressure-volume area oxygen consumption component."""
 		if bool(getattr(self._heart, "cardiac_cycle_running", 0)) and not bool(
 			getattr(self._heart, "_prev_cardiac_cycle_running", 0)
 		):
@@ -222,6 +232,7 @@ class Mob(BaseModel):
 		return (self.pva * self.pva_ref * self.hw) / self._ml_to_mmol
 
 	def calc_hypoxia_effects(self):
+		"""Apply hypoxia-derived factor changes to heart/chamber properties."""
 		self.ans_activity_factor = 1.0 + self.ans_g * self._d_ans
 		setattr(self._heart, "ans_activity_factor", self.ans_activity_factor)
 
@@ -238,6 +249,7 @@ class Mob(BaseModel):
 				chamber.el_max_factor = self.cont_factor
 
 	def activation_function(self, value, max_value, setpoint, min_value):
+		"""Map a measured value to signed activation around a setpoint."""
 		activation = 0.0
 
 		if value >= max_value:

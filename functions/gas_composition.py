@@ -1,13 +1,17 @@
 import math
 
+"""Gas-mixture helper utilities for capacitance compartments."""
+
 
 def _gc_get(container, key, default=None):
+    """Read key/attribute from dict-like or object container."""
     if isinstance(container, dict):
         return container.get(key, default)
     return getattr(container, key, default)
 
 
 def _gc_set(container, key, value):
+    """Write key/attribute on dict-like or object container."""
     if isinstance(container, dict):
         container[key] = value
     else:
@@ -15,6 +19,7 @@ def _gc_set(container, key, value):
 
 
 def _gc_call_calc_model(gc):
+    """Call `calc_model` if available (for object-style containers)."""
     if isinstance(gc, dict):
         return
 
@@ -24,6 +29,7 @@ def _gc_call_calc_model(gc):
 
 
 def calc_gas_composition(gc, fio2=0.205, temp=37.0, humidity=1.0, fico2=0.000392):
+    """Compute gas concentrations, partial pressures, and fractions for a compartment."""
     fo2_dry = 0.205
     fco2_dry = 0.000392
     fn2_dry = 0.794608

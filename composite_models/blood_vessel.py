@@ -3,9 +3,12 @@ from base_models.resistor import Resistor
 
 
 class BloodVessel(BloodCapacitance):
+    """Composite blood vessel model with embedded input resistors."""
+
     model_type = "blood_vessel"
 
     def __init__(self, model_ref={}, name=None):
+        """Initialize vessel state, resistance parameters, and connector config."""
         super().__init__(model_ref=model_ref, name=name)
 
         self.inputs = []
@@ -44,6 +47,7 @@ class BloodVessel(BloodCapacitance):
         self._l = 0.0
 
     def init_model(self, args=None):
+        """Initialize vessel and create input connector resistors from `inputs`."""
         super().init_model(args)
 
         model_registry = self.model_ref if isinstance(self.model_ref, dict) else {}
@@ -79,6 +83,7 @@ class BloodVessel(BloodCapacitance):
             self._resistors[resistor_name] = resistor
 
     def calc_model(self):
+        """Run one vessel step and propagate parameters to connector resistors."""
         self.calc_resistances()
         self.calc_elastances()
         self.calc_inertances()
@@ -112,6 +117,7 @@ class BloodVessel(BloodCapacitance):
         self.get_flows()
 
     def get_flows(self):
+        """Aggregate net, forward, and backward flow from all input resistors."""
         self.flow = 0.0
         self.flow_forward = 0.0
         self.flow_backward = 0.0
@@ -128,10 +134,12 @@ class BloodVessel(BloodCapacitance):
         self.flow = self.flow_forward - self.flow_backward
 
     def calc_inertances(self):
+        """Update effective inertance using transient and persistent factors."""
         self._l = self.l + (self.l_factor - 1.0) * self.l + (self.l_factor_ps - 1.0) * self.l
         self.l_factor = 1.0
 
     def calc_resistances(self):
+        """Update effective forward/backward resistance including ANS modulation."""
         self._r_for = (
             self.r_for
             + (self.r_factor - 1.0) * self.r_for
@@ -156,6 +164,7 @@ class BloodVessel(BloodCapacitance):
         self.r_k_factor = 1.0
 
     def calc_elastances(self):
+        """Update effective elastance terms from factor and ANS contributions."""
         ans_elas_factor = self.ans_activity ** self.alpha
         r_elas_factor = self.r_factor ** self.alpha
         r_ps_elas_factor = self.r_factor_ps ** self.alpha

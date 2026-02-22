@@ -3,9 +3,12 @@ from functions.blood_composition import calc_blood_composition
 
 
 class Blood(BaseModel):
+	"""Global blood composition manager and blood-gas snapshot provider."""
+
 	model_type = "blood"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize global blood settings and monitored blood-gas outputs."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.viscosity = 6.0
@@ -41,6 +44,7 @@ class Blood(BaseModel):
 		self._right_atrium = None
 
 	def _get_models_registry(self):
+		"""Return active model registry dictionary if available."""
 		if isinstance(self.model_ref, dict):
 			return self.model_ref
 
@@ -53,12 +57,14 @@ class Blood(BaseModel):
 		return None
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model name from the active registry."""
 		models = self._get_models_registry()
 		if models is None:
 			return None
 		return models.get(model_name)
 
 	def init_model(self, args=None):
+		"""Initialize blood-capable models with baseline blood properties."""
 		super().init_model(args)
 
 		models = self._get_models_registry()
@@ -85,6 +91,7 @@ class Blood(BaseModel):
 		self.art_solutes = dict(self.solutes)
 
 	def calc_model(self):
+		"""Periodically compute and publish arterial/venous blood-gas snapshots."""
 		time_step = getattr(self, "_t", 0.0)
 		if time_step <= 0.0:
 			return
@@ -138,6 +145,7 @@ class Blood(BaseModel):
 			calc_blood_composition(svc)
 
 	def set_temperature(self, new_temp, bc_site=""):
+		"""Set blood temperature globally or for a specific blood compartment."""
 		self.temp = float(new_temp)
 
 		models = self._get_models_registry()
@@ -155,6 +163,7 @@ class Blood(BaseModel):
 				model.temp = self.temp
 
 	def set_viscosity(self, new_viscosity):
+		"""Set blood viscosity for all blood-containing models."""
 		self.viscosity = float(new_viscosity)
 
 		models = self._get_models_registry()
@@ -166,6 +175,7 @@ class Blood(BaseModel):
 				model.viscosity = self.viscosity
 
 	def set_to2(self, new_to2, bc_site=""):
+		"""Set total oxygen content globally or for one blood compartment."""
 		models = self._get_models_registry()
 		if models is None:
 			return
@@ -182,6 +192,7 @@ class Blood(BaseModel):
 				model.to2 = value
 
 	def set_tco2(self, new_tco2, bc_site=""):
+		"""Set total carbon dioxide content globally or for one compartment."""
 		models = self._get_models_registry()
 		if models is None:
 			return
@@ -198,6 +209,7 @@ class Blood(BaseModel):
 				model.tco2 = value
 
 	def set_solute(self, solute, solute_value, bc_site=""):
+		"""Set a solute concentration globally or for one blood compartment."""
 		models = self._get_models_registry()
 		if models is None:
 			return

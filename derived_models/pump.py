@@ -2,9 +2,12 @@ from derived_models.blood_capacitance import BloodCapacitance
 
 
 class Pump(BloodCapacitance):
+    """Active blood pump model that applies pressure to inlet or outlet side."""
+
     model_type = "pump"
 
     def __init__(self, model_ref={}, name=None):
+        """Initialize pump connectivity, operating mode, and pressure state."""
         super().__init__(model_ref=model_ref, name=name)
 
         self.inlet = ""  # name of inlet resistor/valve component
@@ -20,6 +23,7 @@ class Pump(BloodCapacitance):
         self._outlet = None  # reference to outlet flow component
 
     def _resolve_component(self, component_name):
+        """Resolve a connected component by name from registry or engine."""
         if not component_name:
             return None
 
@@ -35,6 +39,7 @@ class Pump(BloodCapacitance):
         return None
 
     def calc_pressure(self):
+        """Compute compartment pressure and apply pump-generated pressure offsets."""
         self._inlet = self._resolve_component(self.inlet)
         self._outlet = self._resolve_component(self.outlet)
 

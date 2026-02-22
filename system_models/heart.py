@@ -4,9 +4,12 @@ from base_models.base_model import BaseModel
 
 
 class Heart(BaseModel):
+	"""Cardiac cycle controller coordinating chamber activation and timing."""
+
 	model_type = "heart"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize heart timing, modulation factors, and cycle state."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.heart_rate_ref = 110.0
@@ -124,6 +127,7 @@ class Heart(BaseModel):
 		self.cqt_time = self.qt_time
 
 	def _resolve_model(self, component_name):
+		"""Resolve a connected model by name from registry or engine."""
 		if isinstance(self.model_ref, dict) and component_name in self.model_ref:
 			return self.model_ref[component_name]
 
@@ -136,6 +140,7 @@ class Heart(BaseModel):
 		return None
 
 	def analyze(self):
+		"""Update derived chamber pressure/volume metrics over cycle transitions."""
 		if self._prev_cardiac_cycle_state == 0 and self.cardiac_cycle_state == 1:
 			self.lv_edv = self._lv.vol
 			self.lv_edp = self._lv.pres_in
@@ -168,6 +173,7 @@ class Heart(BaseModel):
 			self.rv_ef = self.rv_sv / self.rv_edv if self.rv_edv > 0 else 0.0
 
 	def calc_model(self):
+		"""Run one cardiac timing step and drive chamber activation factors."""
 		self._la = self._resolve_model("LA")
 		self._lv = self._resolve_model("LV")
 		self._ra = self._resolve_model("RA")
@@ -311,6 +317,7 @@ class Heart(BaseModel):
 		self.calc_varying_elastance()
 
 	def calc_varying_elastance(self):
+		"""Compute atrial/ventricular activation waveforms and apply to chambers."""
 		time_step = getattr(self, "_t", 0.0)
 		if time_step <= 0.0:
 			return
@@ -342,17 +349,20 @@ class Heart(BaseModel):
 		self.analyze()
 
 	def calc_qtc(self, hr):
+		"""Return corrected QT duration using Bazett-style scaling."""
 		if hr > 10.0:
 			return self.qt_time * math.sqrt(60.0 / hr)
 		return self.qt_time * 2.449
 
 	def set_pericardium(self, new_el_factor, new_volume):
+		"""Adjust persistent pericardial elastance factor."""
 		f_pc_el = self._pc.el_base_factor_ps
 		delta = new_el_factor - self._prev_pc_el_factor
 		f_pc_el = max(f_pc_el + delta, 0.0)
 		self._pc.el_base_factor_ps = f_pc_el
 
 	def set_contractillity(self, new_cont_factor_left, new_cont_factor_right):
+		"""Adjust persistent chamber contractility factors (left/right)."""
 		f_ps_la = self._la.el_max_factor_ps
 		f_ps_lv = self._lv.el_max_factor_ps
 		f_ps_ra = self._ra.el_max_factor_ps
@@ -375,6 +385,7 @@ class Heart(BaseModel):
 		self.cont_factor_right = new_cont_factor_right
 
 	def set_relaxation(self, new_relax_factor_left, new_relax_factor_right):
+		"""Adjust persistent chamber relaxation factors (left/right)."""
 		f_ps_la = self._la.el_min_factor_ps
 		f_ps_lv = self._lv.el_min_factor_ps
 		f_ps_ra = self._ra.el_min_factor_ps
@@ -397,4 +408,5 @@ class Heart(BaseModel):
 		self.relax_factor_right = new_relax_factor_right
 
 	def gaussian(self, t, amp, center, width):
+		"""Return Gaussian pulse value for ECG waveform synthesis."""
 		return amp * math.exp(-((t - center) ** 2) / (2.0 * width * width))

@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class Metabolism(BaseModel):
+	"""Whole-body metabolism model consuming O2 and producing CO2 per compartment."""
+
 	model_type = "metabolism"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize metabolism settings and active compartment distribution."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.met_active = True
@@ -14,6 +17,7 @@ class Metabolism(BaseModel):
 		self.metabolic_active_models = {}
 
 	def set_metabolic_active_model(self, site, fvo2=None, new_fvo2=None):
+		"""Set fractional oxygen consumption contribution for one site."""
 		if not site:
 			return
 
@@ -24,6 +28,7 @@ class Metabolism(BaseModel):
 		self.metabolic_active_models[str(site)] = float(value)
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -39,6 +44,7 @@ class Metabolism(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Run one metabolic step and update to2/tco2 in active compartments."""
 		if not self.met_active:
 			return
 

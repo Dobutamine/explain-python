@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class AnsAfferent(BaseModel):
+	"""Afferent ANS sensor that converts input signals into firing rate."""
+
 	model_type = "ans_afferent"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize afferent sensor configuration and firing-rate state."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.input_model = ""
@@ -27,6 +30,7 @@ class AnsAfferent(BaseModel):
 		self._gain = 0.0
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -42,6 +46,7 @@ class AnsAfferent(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Compute afferent firing rate and push updates to configured effectors."""
 		self._update_counter += getattr(self, "_t", 0.0)
 		if self._update_counter < self._update_interval:
 			return

@@ -2,9 +2,12 @@ from base_models.capacitance import Capacitance
 
 
 class BloodCapacitance(Capacitance):
+    """Capacitance compartment extended with blood composition state."""
+
     model_type = "blood_capacitance"
 
     def __init__(self, model_ref={}, name=None):
+        """Initialize blood-specific properties on top of generic capacitance."""
         super().__init__(model_ref=model_ref, name=name)
 
         self.temp = 37.0
@@ -24,6 +27,7 @@ class BloodCapacitance(Capacitance):
         self.prev_po2 = 18.7
 
     def volume_in(self, dvol, comp_from=None):
+        """Add volume and mix blood composition from the source compartment."""
         super().volume_in(dvol)
 
         if comp_from is None or self.vol <= 0.0:

@@ -4,9 +4,12 @@ from base_models.base_model import BaseModel
 
 
 class Breathing(BaseModel):
+	"""Spontaneous breathing controller producing respiratory muscle pressure."""
+
 	model_type = "breathing"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize breathing control parameters and cycle state."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.breathing_enabled = True
@@ -50,6 +53,7 @@ class Breathing(BaseModel):
 		self.debug_factor1 = 0.0
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -65,6 +69,7 @@ class Breathing(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Run one respiratory control/update step and drive thorax elastance."""
 		model_engine = getattr(self, "_model_engine", None)
 		weight = float(getattr(model_engine, "weight", 1.0) or 1.0)
 		time_step = getattr(self, "_t", 0.0)
@@ -161,6 +166,7 @@ class Breathing(BaseModel):
 			thorax.el_base_factor += self.resp_muscle_pressure
 
 	def vt_rr_controller(self, weight):
+		"""Compute respiratory rate and target tidal volume from minute-volume goal."""
 		if not self.breathing_enabled:
 			self.resp_rate = 0.0
 			return
@@ -184,6 +190,7 @@ class Breathing(BaseModel):
 			self.target_tidal_volume = 0.0
 
 	def calc_resp_muscle_pressure(self):
+		"""Calculate inspiratory/expiratory respiratory muscle pressure waveform."""
 		mp = 0.0
 		time_step = getattr(self, "_t", 0.0)
 		if time_step <= 0.0:
@@ -201,4 +208,5 @@ class Breathing(BaseModel):
 		return mp
 
 	def switch_breathing(self, state):
+		"""Enable or disable spontaneous breathing."""
 		self.breathing_enabled = bool(state)

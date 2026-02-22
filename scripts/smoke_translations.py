@@ -1,3 +1,9 @@
+"""Translation-aware smoke checks for multiple JSON model definitions.
+
+Each check loads one definition and validates a small set of expected runtime
+properties. The script exits non-zero when any check fails.
+"""
+
 from pathlib import Path
 import sys
 
@@ -9,11 +15,13 @@ from model_engine import ModelEngine
 
 
 def _load_engine(definition_name: str) -> ModelEngine:
+    """Load a definition file into a new model engine instance."""
     definition_path = REPO_ROOT / "definitions" / definition_name
     return ModelEngine().load_json_file(str(definition_path))
 
 
 def check_baseline() -> tuple[bool, str]:
+    """Validate baseline model initialization and core model presence."""
     engine = _load_engine("baseline.json")
     engine.step_model()
     required = ["PDA", "MOB", "SHUNTS", "MVU", "MVU_ART"]
@@ -22,6 +30,7 @@ def check_baseline() -> tuple[bool, str]:
 
 
 def check_pda() -> tuple[bool, str]:
+    """Validate PDA model availability and basic resistance parameters."""
     engine = _load_engine("pda.json")
     engine.step_model()
     pda = engine.models.get("PDA")
@@ -32,6 +41,7 @@ def check_pda() -> tuple[bool, str]:
 
 
 def check_shunts() -> tuple[bool, str]:
+    """Validate shunts model availability and key shunt resistances."""
     engine = _load_engine("shunts.json")
     engine.step_model()
     shunts = engine.models.get("SHUNTS")
@@ -42,6 +52,7 @@ def check_shunts() -> tuple[bool, str]:
 
 
 def check_placenta() -> tuple[bool, str]:
+    """Validate placenta subsystem activation and required components."""
     engine = _load_engine("placenta.json")
     engine.step_model()
     placenta = engine.models.get("PLACENTA")
@@ -58,6 +69,7 @@ def check_placenta() -> tuple[bool, str]:
 
 
 def check_fluids() -> tuple[bool, str]:
+    """Validate fluid infusion path by asserting target volume increases."""
     engine = _load_engine("fluids.json")
     fluids = engine.models.get("FL")
     target = engine.models.get("VLB")
@@ -74,6 +86,7 @@ def check_fluids() -> tuple[bool, str]:
 
 
 def check_ans() -> tuple[bool, str]:
+    """Validate ANS activity by checking an expected resistance factor change."""
     engine = _load_engine("ans.json")
     ans = engine.models.get("ANS")
     eff = engine.models.get("ANS_EFF")
@@ -91,6 +104,7 @@ def check_ans() -> tuple[bool, str]:
 
 
 def check_ecls() -> tuple[bool, str]:
+    """Validate ECLS circuit creation and short-run operating outputs."""
     engine = _load_engine("ecls.json")
     ecls = engine.models.get("ECLS")
     required = [
@@ -118,6 +132,7 @@ def check_ecls() -> tuple[bool, str]:
 
 
 def check_ventilator() -> tuple[bool, str]:
+    """Validate ventilator circuit wiring and short-run signals."""
     engine = _load_engine("ventilator.json")
     vent = engine.models.get("VENT")
     required = [
@@ -144,6 +159,7 @@ def check_ventilator() -> tuple[bool, str]:
 
 
 def check_resuscitation() -> tuple[bool, str]:
+    """Validate CPR mode orchestration across resuscitation subsystems."""
     engine = _load_engine("resuscitation.json")
     resus = engine.models.get("RESUS")
     vent = engine.models.get("VENT")
@@ -174,6 +190,7 @@ def check_resuscitation() -> tuple[bool, str]:
 
 
 def check_monitor() -> tuple[bool, str]:
+    """Validate monitor output channels after a short stabilization run."""
     engine = _load_engine("monitor.json")
     monitor = engine.models.get("MON")
     required = ["AA", "AD", "PA", "RA", "VENT", "DS"]
@@ -197,6 +214,11 @@ def check_monitor() -> tuple[bool, str]:
 
 
 def main() -> int:
+    """Run all smoke checks and return process exit code semantics.
+
+    Returns:
+        0 when all checks pass, otherwise 1.
+    """
     checks = [
         check_baseline,
         check_pda,

@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class Respiration(BaseModel):
+	"""Respiratory system coordinator for airway resistance and elastance factors."""
+
 	model_type = "respiration"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize respiratory model groups and control factors."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.upper_airways = ["MOUTH_DS"]
@@ -38,6 +41,7 @@ class Respiration(BaseModel):
 		self._prev_res_lower_airways_factor = 1.0
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -53,6 +57,7 @@ class Respiration(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Apply pending respiratory factor changes at configured update interval."""
 		time_step = getattr(self, "_t", 0.0)
 		if time_step <= 0.0:
 			return
@@ -82,6 +87,7 @@ class Respiration(BaseModel):
 				self._prev_gex_factor = self.gex_factor
 
 	def set_el_lung_factor(self, new_factor):
+		"""Set lung elastance scaling factor across configured lung compartments."""
 		updated_factor = float(new_factor)
 
 		for lung_name in self.lungs:
@@ -102,6 +108,7 @@ class Respiration(BaseModel):
 		self.el_lungs_factor = updated_factor
 
 	def set_el_thorax_factor(self, new_factor):
+		"""Set thorax elastance scaling factor across configured thorax models."""
 		updated_factor = float(new_factor)
 
 		for thorax_name in self.thorax:
@@ -122,6 +129,7 @@ class Respiration(BaseModel):
 		self.el_thorax_factor = updated_factor
 
 	def set_upper_airway_resistance(self, new_factor):
+		"""Set resistance factor for upper airway resistive elements."""
 		updated_factor = float(new_factor)
 
 		for airway_name in self.upper_airways:
@@ -142,6 +150,7 @@ class Respiration(BaseModel):
 		self.res_upper_airways_factor = updated_factor
 
 	def set_lower_airway_resistance(self, new_factor):
+		"""Set resistance factor for lower airway resistive elements."""
 		updated_factor = float(new_factor)
 
 		for airway_name in self.lower_airways:
@@ -162,6 +171,7 @@ class Respiration(BaseModel):
 		self.res_lower_airways_factor = updated_factor
 
 	def set_gasexchange(self, new_factor):
+		"""Set gas-exchange diffusion factor for configured exchanger models."""
 		updated_factor = float(new_factor)
 
 		for exchanger_name in self.gas_echangers:

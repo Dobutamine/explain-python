@@ -2,9 +2,12 @@ from base_models.time_varying_elastance import TimeVaryingElastance
 
 
 class HeartChamber(TimeVaryingElastance):
+    """Heart chamber model with ANS-modulated elastance and blood mixing."""
+
     model_type = "heart_chamber"
 
     def __init__(self, model_ref={}, name=None):
+        """Initialize chamber mechanics and blood-related state."""
         super().__init__(model_ref=model_ref, name=name)
 
         self.fixed_composition = False
@@ -30,6 +33,7 @@ class HeartChamber(TimeVaryingElastance):
         self.elmax_calc = 0.9
 
     def calc_elastance(self):
+        """Compute ANS-adjusted elastance bounds and current chamber elastance."""
         self._el_min = (
             self.el_min
             + (self.el_min_factor - 1.0) * self.el_min
@@ -60,6 +64,7 @@ class HeartChamber(TimeVaryingElastance):
         self.el_k_factor = 1.0
 
     def volume_in(self, dvol, comp_from=None):
+        """Add incoming volume and mix chemistry from source compartment."""
         super().volume_in(dvol)
 
         if comp_from is None or self.vol <= 0.0:

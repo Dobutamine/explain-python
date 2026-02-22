@@ -2,9 +2,12 @@ from base_models.time_varying_elastance import TimeVaryingElastance
 
 
 class BloodTimeVaryingElastance(TimeVaryingElastance):
+    """Time-varying elastance chamber with blood composition mixing behavior."""
+
     model_type = "blood_time_varying_elastance"
 
     def __init__(self, model_ref={}, name=None):
+        """Initialize chamber mechanics plus blood-related state variables."""
         super().__init__(model_ref=model_ref, name=name)
 
         self.fixed_composition = False
@@ -26,6 +29,7 @@ class BloodTimeVaryingElastance(TimeVaryingElastance):
         self.prev_po2 = 18.7
 
     def volume_in(self, dvol, comp_from=None):
+        """Add volume and mix blood composition from incoming compartment."""
         super().volume_in(dvol)
 
         if comp_from is None or self.vol <= 0.0:

@@ -4,9 +4,12 @@ from base_models.base_model import BaseModel
 
 
 class Monitor(BaseModel):
+	"""Patient monitor aggregator computing bedside-style vital signals."""
+
 	model_type = "monitor"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize monitor channel mappings, outputs, and rolling state."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.hr_avg_beats = 5.0
@@ -182,6 +185,7 @@ class Monitor(BaseModel):
 		self._resp_rate_max_valid = 300.0
 
 	def _resolve_model(self, model_name):
+		"""Resolve a connected model by name (supports single-item list values)."""
 		if isinstance(model_name, (list, tuple)):
 			if not model_name:
 				return None
@@ -200,6 +204,7 @@ class Monitor(BaseModel):
 		return None
 
 	def _safe_float(self, obj, attr_name, default=0.0):
+		"""Safely read a numeric attribute as float with fallback default."""
 		if obj is None:
 			return float(default)
 		value = getattr(obj, attr_name, default)
@@ -208,6 +213,7 @@ class Monitor(BaseModel):
 		return float(value)
 
 	def init_model(self, args=None):
+		"""Initialize monitor configuration and resolve component references."""
 		if args is not None:
 			normalized = dict(args) if isinstance(args, Mapping) else self._normalize_init_args(args)
 			super().init_model(normalized)
@@ -241,6 +247,7 @@ class Monitor(BaseModel):
 		self._rr_update_counter = 0.0
 
 	def calc_avg_heartrate(self, hr):
+		"""Update rolling average heart rate using adaptive beat window."""
 		self._hr_list.append(float(hr))
 
 		if hr < 80.0:
@@ -255,6 +262,7 @@ class Monitor(BaseModel):
 			self._hr_list.pop(0)
 
 	def calc_model(self):
+		"""Collect pressures/flows/signals and update derived monitor channels."""
 		self.collect_pressures()
 		self.collect_blood_flows()
 		self.collect_signals()
@@ -398,6 +406,7 @@ class Monitor(BaseModel):
 		self.spo2_ven = self._safe_float(self._ra, "so2", self.spo2_ven)
 
 	def collect_signals(self):
+		"""Collect raw waveform-like monitor channels from connected models."""
 		self.ecg_signal = self._safe_float(self._heart, "ecg_signal", 0.0)
 		self.resp_signal = self._safe_float(self._thorax, "vol", 0.0)
 		self.spo2_pre_signal = self._safe_float(self._aa, "pres_in", 0.0)
@@ -408,6 +417,7 @@ class Monitor(BaseModel):
 		self.co2_signal = self._safe_float(self._ventilator, "co2", 0.0)
 
 	def collect_pressures(self):
+		"""Track running min/max pressure and volume envelopes for cycle metrics."""
 		self._temp_aa_pres_max = max(self._temp_aa_pres_max, self._safe_float(self._aa, "pres_in", -1000.0)) if self._aa else -1000.0
 		self._temp_aa_pres_min = min(self._temp_aa_pres_min, self._safe_float(self._aa, "pres_in", 1000.0)) if self._aa else 1000.0
 		self._temp_lv_pres_max = max(self._temp_lv_pres_max, self._safe_float(self._lv, "pres_in", -1000.0)) if self._lv else -1000.0
@@ -426,6 +436,7 @@ class Monitor(BaseModel):
 		self._temp_pa_pres_min = min(self._temp_pa_pres_min, self._safe_float(self._pa, "pres_in", 1000.0)) if self._pa else 1000.0
 
 	def collect_blood_flows(self):
+		"""Accumulate per-step flow integrals for derived flow/cardiac output metrics."""
 		self._lvo_counter += self._safe_float(self._lv_aa, "flow", 0.0) * self._t
 		self._rvo_counter += self._safe_float(self._rv_pa, "flow", 0.0) * self._t
 		self._cor_flow_counter += self._safe_float(self._cor_ra, "flow", 0.0) * self._t

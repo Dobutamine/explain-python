@@ -3,9 +3,12 @@ from composite_models.blood_vessel import BloodVessel
 
 
 class MicroVascularUnit(BaseModel):
+    """Three-segment microvascular bed (arterial, capillary, venous)."""
+
     model_type = "micro_vascular_unit"
 
     def __init__(self, model_ref={}, name=None):
+        """Initialize distribution settings and state for a microvascular unit."""
         super().__init__(model_ref=model_ref, name=name)
 
         self.inputs = []
@@ -96,6 +99,7 @@ class MicroVascularUnit(BaseModel):
         self._ven = None
 
     def init_model(self, args=None):
+        """Initialize unit and create/configure ART, CAP, and VEN sub-vessels."""
         super().init_model(args)
 
         self.calc_elastance_dist(self.el_base, self.el_dist)
@@ -177,6 +181,7 @@ class MicroVascularUnit(BaseModel):
         )
 
     def _get_or_create_vessel(self, model_registry, model_ref_for_vessel, vessel_name):
+        """Return an existing `BloodVessel` by name or create and register one."""
         if vessel_name in model_registry:
             vessel = model_registry[vessel_name]
             if isinstance(vessel, BloodVessel):
@@ -187,6 +192,7 @@ class MicroVascularUnit(BaseModel):
         return vessel
 
     def calc_model(self):
+        """Run one unit step and synchronize state with underlying vessel segments."""
         if self._art is None or self._cap is None or self._ven is None:
             return
 
@@ -260,6 +266,7 @@ class MicroVascularUnit(BaseModel):
         self.viscosity = self._cap.viscosity
 
     def calc_resistance(self):
+        """Update global resistance terms and distribute them across segments."""
         self._r_for = (
             self.r_for
             + (self.r_factor - 1.0) * self.r_for
@@ -291,6 +298,7 @@ class MicroVascularUnit(BaseModel):
         self.r_k_factor = 1.0
 
     def calc_elastance(self):
+        """Update global elastance and distribute linear/nonlinear terms."""
         self._el = (
             self.el_base
             + (self.el_base_factor - 1.0) * self.el_base
@@ -313,6 +321,7 @@ class MicroVascularUnit(BaseModel):
         self.el_k_factor = 1.0
 
     def calc_elastance_dist(self, el_base, el_dist):
+        """Convert target total elastance into segment-specific elastances."""
         if el_base <= 0.0:
             self._el_art = 0.0
             self._el_cap = 0.0
@@ -330,10 +339,12 @@ class MicroVascularUnit(BaseModel):
         self._el_ven = 1.0 / (ven_dist * 100.0 * unit)
 
     def calc_inertance(self):
+        """Update effective inertance from transient and persistent factors."""
         self._l = self.l + (self.l_factor - 1.0) * self.l + (self.l_factor_ps - 1.0) * self.l
         self.l_factor = 1.0
 
     def calc_volume(self):
+        """Update effective unstressed volume and distribute it across segments."""
         self._u_vol = (
             self.u_vol
             + (self.u_vol_factor - 1.0) * self.u_vol

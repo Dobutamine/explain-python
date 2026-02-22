@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 from functions.gas_composition import calc_gas_composition
 
 class GasDiffusor(BaseModel):
+    """Diffusive exchange model between two gas-containing compartments."""
+
     model_type = "gas_diffusor"
 
     def __init__(self, model_ref = {}, name=None):
+        """Initialize gas diffusion settings and component references."""
         # initialize the base model properties
         super().__init__(model_ref=model_ref, name=name)
 
@@ -33,6 +36,7 @@ class GasDiffusor(BaseModel):
         self._comp_gas2 = None  # reference to the second gas-containing model
 
     def _resolve_component(self, component_name):
+        """Resolve a component name from local registry or attached model engine."""
         if not component_name:
             return None
 
@@ -48,6 +52,7 @@ class GasDiffusor(BaseModel):
         return None
 
     def calc_model(self):
+        """Run one diffusion step for configured gas species."""
         # find the two gas-containing models and store references
         self._comp_gas1 = self._resolve_component(self.comp_gas1)
         self._comp_gas2 = self._resolve_component(self.comp_gas2)

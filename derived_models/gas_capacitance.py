@@ -4,9 +4,12 @@ from base_models.capacitance import Capacitance
 
 
 class GasCapacitance(Capacitance):
+    """Gas compartment with pressure, temperature, and gas-fraction dynamics."""
+
     model_type = "gas_capacitance"
 
     def __init__(self, model_ref={}, name=None):
+        """Initialize gas capacitance thermodynamic and composition properties."""
         super().__init__(model_ref=model_ref, name=name)
 
         self.pres_atm = 760.0
@@ -41,6 +44,7 @@ class GasCapacitance(Capacitance):
         self._gas_constant = 62.36367
 
     def calc_model(self):
+        """Run one gas compartment step (heat, vapor, pressure, composition)."""
         self.add_heat()
         self.add_watervapour()
 
@@ -54,6 +58,7 @@ class GasCapacitance(Capacitance):
         self.calc_gas_composition()
 
     def calc_pressure(self):
+        """Compute pressure including atmospheric and external contributors."""
         super().calc_pressure()
 
         self.pres = self.pres + self.pres_cc + self.pres_mus + self.pres_atm
@@ -63,6 +68,7 @@ class GasCapacitance(Capacitance):
         self.pres_mus = 0.0
 
     def volume_in(self, dvol, comp_from=None):
+        """Add incoming volume and mix gas composition from source compartment."""
         super().volume_in(dvol)
 
         if comp_from is None or self.vol <= 0.0:
@@ -77,6 +83,7 @@ class GasCapacitance(Capacitance):
         self.temp = (self.temp * self.vol + (getattr(comp_from, "temp", self.temp) - self.temp) * dvol) / self.vol
 
     def add_heat(self):
+        """Move temperature toward target and adjust volume accordingly."""
         dtemp = (self.target_temp - self.temp) * 0.0005
         self.temp += dtemp
 
@@ -88,6 +95,7 @@ class GasCapacitance(Capacitance):
             self.vol = 0.0
 
     def add_watervapour(self):
+        """Add/remove water vapor toward temperature-dependent equilibrium."""
         ph2o_target = self.calc_watervapour_pressure()
         time_step = getattr(self, "_t", 0.0)
         dh2o = 0.00001 * (ph2o_target - self.ph2o) * time_step
@@ -99,9 +107,11 @@ class GasCapacitance(Capacitance):
             self.vol += ((self._gas_constant * (273.15 + self.temp)) / self.pres) * (dh2o / 1000.0)
 
     def calc_watervapour_pressure(self):
+        """Return saturated water vapor pressure (mmHg) for current temperature."""
         return math.exp(20.386 - 5132.0 / (self.temp + 273.0))
 
     def calc_gas_composition(self):
+        """Recompute partial pressures and fractions from gas concentrations."""
         self.ctotal = self.ch2o + self.co2 + self.cco2 + self.cn2 + self.cother
 
         if self.ctotal == 0.0:

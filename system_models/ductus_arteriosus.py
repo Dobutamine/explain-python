@@ -4,9 +4,12 @@ from base_models.base_model import BaseModel
 
 
 class DuctusArteriosus(BaseModel):
+	"""Ductus arteriosus geometry/hemodynamics model with adjustable resistance."""
+
 	model_type = "pda"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize duct dimensions, resistance parameters, and flow outputs."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.diameter_ao = 4.0
@@ -34,6 +37,7 @@ class DuctusArteriosus(BaseModel):
 		self._da_pa = None
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -49,6 +53,7 @@ class DuctusArteriosus(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Update duct resistance/velocity metrics and connected resistor settings."""
 		self._aar_da = self._resolve_model("AAR_DA")
 		self._da = self._resolve_model("DA")
 		self._da_pa = self._resolve_model("DA_PA")
@@ -91,6 +96,7 @@ class DuctusArteriosus(BaseModel):
 		self.vol = float(getattr(self._da, "vol", 0.0) or 0.0)
 
 	def set_diameter(self, new_diameter):
+		"""Set both aortic and pulmonary duct diameters to the same value."""
 		new_value = float(new_diameter)
 		self.diameter_ao = new_value
 		self.diameter_pa = new_value
@@ -99,6 +105,7 @@ class DuctusArteriosus(BaseModel):
 		pass
 
 	def calc_resistance(self, diameter, length=20.0, viscosity=6.0):
+		"""Return Poiseuille-based resistance estimate for a vessel segment."""
 		diameter = float(diameter)
 		length = float(length)
 		viscosity = float(viscosity)

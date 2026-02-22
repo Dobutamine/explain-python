@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class Valve(BaseModel):
+    """Valve flow element with optional no-backflow behavior."""
+
     model_type = "valve"
 
     def __init__(self, model_ref = {}, name=None):
+        """Initialize valve parameters, state, and connected endpoints."""
         # initialize the base model properties
         super().__init__(model_ref=model_ref, name=name)
 
@@ -42,6 +45,7 @@ class Valve(BaseModel):
         self._r_k = 0  # calculated non-linear resistance factor (unitless)
 
     def calc_model(self):
+        """Run one valve update step (resolve components, resistance, flow)."""
         # find the up- and downstream components and store the references
         self._comp_from = self.model_ref[self.comp_from]
         self._comp_to = self.model_ref[self.comp_to]
@@ -53,6 +57,7 @@ class Valve(BaseModel):
         self.calc_flow()
 
     def calc_resistance(self):
+        """Update effective valve resistance terms from configured factors."""
         # incorporate all factors influencing this valve
         self._r_for = self.r_for  + (self.r_factor - 1) * self.r_for + (self.r_factor_ps - 1) * self.r_for
         self._r_back = self.r_back + (self.r_factor - 1) * self.r_back + (self.r_factor_ps - 1) * self.r_back
@@ -63,6 +68,7 @@ class Valve(BaseModel):
         self.r_k_factor = 1.0
 
     def calc_flow(self):
+        """Compute directional valve flow and transfer volume between models."""
         # get the pressure of the volume containing compartments and incorporate the external pressures
         _p1_t = self._comp_from.pres + self.p1_ext
         _p2_t = self._comp_to.pres + self.p2_ext

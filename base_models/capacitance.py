@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class Capacitance(BaseModel):
+    """Generic capacitance compartment with elastance-based pressure dynamics."""
+
     model_type = "capacitance"
 
     def __init__(self, model_ref = {}, name=None):
+        """Initialize a capacitance component and its tunable parameters."""
         # initialize the base model properties
         super().__init__(model_ref=model_ref, name=name)
 
@@ -37,6 +40,7 @@ class Capacitance(BaseModel):
         self._el_k = 0.0  # calculated elastance non-linear k (unitless)
 
     def calc_model(self):
+        """Run one capacitance update step (elastance, volume, pressure)."""
         # calculate the current elastance and volumes
         self.calc_elastance()
         self.calc_volume()
@@ -50,6 +54,7 @@ class Capacitance(BaseModel):
         self.calc_pressure()
 
     def calc_elastance(self):
+        """Update effective elastance terms using persistent/non-persistent factors."""
         # calculate the elastance and non-linear elastance incorporating the factors
         self._el = self.el_base  + (self.el_base_factor - 1) * self.el_base + (self.el_base_factor_ps - 1) * self.el_base
         self._el_k = self.el_k  + (self.el_k_factor - 1) * self.el_k + (self.el_k_factor_ps - 1) * self.el_k
@@ -59,6 +64,7 @@ class Capacitance(BaseModel):
         self.el_k_factor = 1.0  
 
     def calc_volume(self):
+        """Update effective unstressed volume from configured factors."""
         # calculate the unstressed volume incorporating the factors
         self._u_vol = self.u_vol  + (self.u_vol_factor - 1) * self.u_vol + (self.u_vol_factor_ps - 1) * self.u_vol
 
@@ -66,6 +72,7 @@ class Capacitance(BaseModel):
         self.u_vol_factor = 1.0
 
     def calc_pressure(self):
+        """Compute recoil, transmural, and total pressure for the compartment."""
         # calculate the recoil pressure
         self.pres_in = self._el_k * (self.vol - self._u_vol) ** 2 + self._el * (self.vol - self._u_vol)
 
@@ -79,11 +86,13 @@ class Capacitance(BaseModel):
         self.pres_ext = 0.0
 
     def volume_in(self, dvol, comp_from=None):
+        """Add incoming volume when composition is not fixed."""
         if not self.fixed_composition:
             # add volume to the capacitance
             self.vol += dvol
 
     def volume_out(self, dvol):
+        """Remove outgoing volume when composition is not fixed."""
         if not self.fixed_composition:
             # remove volume from capacitance
             self.vol -= dvol

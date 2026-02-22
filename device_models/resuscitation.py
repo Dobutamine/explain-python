@@ -4,9 +4,12 @@ from base_models.base_model import BaseModel
 
 
 class Resuscitation(BaseModel):
+	"""CPR and ventilation choreography model for resuscitation scenarios."""
+
 	model_type = "resuscitation"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize CPR/ventilation settings and runtime sequencing state."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.cpr_enabled = False
@@ -36,6 +39,7 @@ class Resuscitation(BaseModel):
 		self._vent_counter = 0.0
 
 	def _resolve_model(self, *candidate_names):
+		"""Resolve first matching model name from candidates."""
 		for model_name in candidate_names:
 			if not model_name:
 				continue
@@ -50,6 +54,7 @@ class Resuscitation(BaseModel):
 		return None
 
 	def init_model(self, args=None):
+		"""Initialize linked ventilator/breathing references and FiO2 setting."""
 		super().init_model(args)
 
 		self._ventilator = self._resolve_model("Ventilator", "VENT", "MechanicalVentilator")
@@ -59,6 +64,7 @@ class Resuscitation(BaseModel):
 			self.set_fio2(self.vent_fio2)
 
 	def calc_model(self):
+		"""Run one CPR/ventilation sequencing step and apply chest compression forces."""
 		if not self.cpr_enabled:
 			return
 
@@ -115,6 +121,7 @@ class Resuscitation(BaseModel):
 			target_model.pres_cc = self.chest_comp_pres * float(force_factor)
 
 	def switch_cpr(self, state):
+		"""Enable/disable CPR mode and configure ventilator/breathing accordingly."""
 		state = bool(state)
 		if state:
 			if self._ventilator is not None:
@@ -135,6 +142,7 @@ class Resuscitation(BaseModel):
 			self.cpr_enabled = False
 
 	def set_fio2(self, new_fio2):
+		"""Set ventilation oxygen fraction used during resuscitation."""
 		self.vent_fio2 = float(new_fio2)
 		if self._ventilator is not None and hasattr(self._ventilator, "set_fio2"):
 			self._ventilator.set_fio2(self.vent_fio2)

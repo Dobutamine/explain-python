@@ -1,5 +1,8 @@
 class DataCollector:
+	"""Collects time-series snapshots from selected model properties."""
+
 	def __init__(self, model):
+		"""Initialize collector state, default watch items, and sample intervals."""
 		self.model = model
 
 		self.watch_list = []
@@ -34,36 +37,45 @@ class DataCollector:
 		self.collected_data_slow = []
 
 	def clear_data(self):
+		"""Clear fast-sampled buffered data."""
 		self.collected_data = []
 
 	def clear_data_slow(self):
+		"""Clear slow-sampled buffered data."""
 		self.collected_data_slow = []
 
 	def clear_watchlist(self):
+		"""Reset fast watchlist to core cardiac cycle counters."""
 		self.clear_data()
 		self.watch_list = [self.ncc_atrial, self.ncc_ventricular]
 
 	def clear_watchlist_slow(self):
+		"""Reset slow watchlist to an empty set."""
 		self.clear_data_slow()
 		self.watch_list_slow = []
 
 	def get_model_data(self):
+		"""Return and clear buffered fast-sampled data."""
 		data = list(self.collected_data)
 		self.collected_data = []
 		return data
 
 	def get_model_data_slow(self):
+		"""Return and clear buffered slow-sampled data."""
 		data = list(self.collected_data_slow)
 		self.collected_data_slow = []
 		return data
 
 	def set_sample_interval(self, new_interval=0.005):
+		"""Set fast sampling interval in seconds."""
 		self.sample_interval = float(new_interval)
 
 	def set_sample_interval_slow(self, new_interval=0.005):
+		"""Set slow sampling interval in seconds."""
 		self.sample_interval_slow = float(new_interval)
 
 	def add_to_watchlist(self, properties):
+		"""Add one or more property paths to the fast watchlist."""
 		success = True
 		self.clear_data()
 
@@ -84,6 +96,7 @@ class DataCollector:
 		return success
 
 	def add_to_watchlist_slow(self, properties):
+		"""Add one or more property paths to the slow watchlist."""
 		success = True
 		self.clear_data_slow()
 
@@ -104,6 +117,7 @@ class DataCollector:
 		return success
 
 	def clean_up(self):
+		"""Remove disabled or unresolved entries from the fast watchlist."""
 		self.watch_list = [
 			item
 			for item in self.watch_list
@@ -111,6 +125,7 @@ class DataCollector:
 		]
 
 	def clean_up_slow(self):
+		"""Remove disabled or unresolved entries from the slow watchlist."""
 		self.watch_list_slow = [
 			item
 			for item in self.watch_list_slow
@@ -118,6 +133,7 @@ class DataCollector:
 		]
 
 	def collect_data(self, model_clock):
+		"""Sample watched properties at configured intervals and buffer records."""
 		if self._interval_counter >= self.sample_interval:
 			self._interval_counter = 0.0
 			data_object = {"time": round(float(model_clock), 4)}
@@ -164,6 +180,7 @@ class DataCollector:
 		self._interval_counter_slow += self.modeling_stepsize
 
 	def _find_model_prop(self, prop):
+		"""Resolve a dotted property path into a watchlist descriptor."""
 		tokens = str(prop).split(".")
 		if len(tokens) not in (2, 3):
 			return None

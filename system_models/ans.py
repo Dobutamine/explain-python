@@ -4,9 +4,12 @@ from collections.abc import Mapping
 
 
 class Ans(BaseModel):
+	"""Autonomic nervous system coordinator for component enablement and blood-gas refresh."""
+
 	model_type = "ans"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize ANS state and update cadence settings."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.ans_active = True
@@ -17,6 +20,7 @@ class Ans(BaseModel):
 		self._update_counter = 0.0
 
 	def init_model(self, args=None):
+		"""Initialize model and preserve linked component configuration."""
 		if args is None:
 			super().init_model(args)
 			return
@@ -30,6 +34,7 @@ class Ans(BaseModel):
 			self.components = linked_components
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -45,6 +50,7 @@ class Ans(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Apply ANS enable/disable state and update blood composition targets."""
 		self._update_counter += getattr(self, "_t", 0.0)
 		if self._update_counter < self._update_interval:
 			return

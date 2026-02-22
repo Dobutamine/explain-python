@@ -2,7 +2,10 @@ import random
 
 
 class TaskScheduler:
+	"""Lightweight in-model scheduler for delayed ramps, sets, and function calls."""
+
 	def __init__(self, model_ref):
+		"""Initialize scheduler state and bind to model engine."""
 		self._model_engine = model_ref
 		self._t = float(getattr(model_ref, "modeling_stepsize", 0.0) or 0.0)
 		self._is_initialized = False
@@ -13,12 +16,14 @@ class TaskScheduler:
 		self._task_interval_counter = 0.0
 
 	def _new_task_id(self):
+		"""Generate a unique random task identifier."""
 		while True:
 			task_id = f"task_{random.randint(0, 9999)}"
 			if task_id not in self._tasks:
 				return task_id
 
 	def add_function_call(self, new_function_call):
+		"""Schedule a delayed function invocation on a model object."""
 		task = dict(new_function_call)
 		id_ = self._new_task_id()
 
@@ -42,6 +47,7 @@ class TaskScheduler:
 		self._tasks[id_] = task
 
 	def add_task(self, new_task):
+		"""Schedule a delayed/gradual property update task."""
 		task = dict(new_task)
 		id_ = self._new_task_id()
 
@@ -86,6 +92,7 @@ class TaskScheduler:
 			self._tasks[id_] = task
 
 	def remove_task(self, task_id):
+		"""Remove one task by numeric suffix identifier."""
 		id_ = f"task_{task_id}"
 		if id_ in self._tasks:
 			del self._tasks[id_]
@@ -93,9 +100,11 @@ class TaskScheduler:
 		return False
 
 	def remove_all_tasks(self):
+		"""Clear all scheduled tasks."""
 		self._tasks = {}
 
 	def run_tasks(self):
+		"""Advance scheduler and execute due tasks at scheduler interval."""
 		if self._task_interval_counter > self._task_interval:
 			finished_tasks = []
 			self._task_interval_counter = 0.0
@@ -136,6 +145,7 @@ class TaskScheduler:
 			self._task_interval_counter += self._t
 
 	def _set_value(self, task):
+		"""Apply task value to direct property or nested mapping/attribute."""
 		if task["prop2"] is None:
 			setattr(task["model"], task["prop1"], task["current_value"])
 			return

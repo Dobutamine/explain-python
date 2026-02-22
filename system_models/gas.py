@@ -3,9 +3,12 @@ from functions.gas_composition import calc_gas_composition
 
 
 class Gas(BaseModel):
+	"""Global gas environment manager for gas-capacitance compartments."""
+
 	model_type = "gas"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize atmospheric settings and per-site overrides."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.pres_atm = 760.0
@@ -18,6 +21,7 @@ class Gas(BaseModel):
 		self.gas_containing_modeltypes = ["GasCapacitance", "gas_capacitance"]
 
 	def init_model(self, args=None):
+		"""Initialize gas compartments with pressure, temperature, and humidity."""
 		super().init_model(args)
 
 		models = self._get_models_registry()
@@ -48,9 +52,11 @@ class Gas(BaseModel):
 				calc_gas_composition(model, self.fio2, model.temp, model.humidity)
 
 	def calc_model(self):
+		"""No per-step dynamics; gas model acts as a global configuration holder."""
 		return
 
 	def _get_models_registry(self):
+		"""Return active model registry dictionary if available."""
 		if isinstance(self.model_ref, dict):
 			return self.model_ref
 
@@ -63,6 +69,7 @@ class Gas(BaseModel):
 		return None
 
 	def set_atmospheric_pressure(self, new_pres_atm):
+		"""Set atmospheric pressure for all gas-capacitance models."""
 		self.pres_atm = float(new_pres_atm)
 
 		models = self._get_models_registry()
@@ -74,6 +81,7 @@ class Gas(BaseModel):
 				model.pres_atm = self.pres_atm
 
 	def set_temperature(self, new_temp, sites=None):
+		"""Set target temperature for selected gas sites."""
 		if sites is None:
 			sites = ["OUT", "MOUTH"]
 		if not isinstance(sites, (list, tuple)):
@@ -95,6 +103,7 @@ class Gas(BaseModel):
 			model.target_temp = temp
 
 	def set_humidity(self, new_humidity, sites=None):
+		"""Set humidity for selected gas sites."""
 		if sites is None:
 			sites = ["OUT", "MOUTH"]
 		if not isinstance(sites, (list, tuple)):
@@ -115,6 +124,7 @@ class Gas(BaseModel):
 			model.humidity = humidity
 
 	def set_fio2(self, new_fio2, sites=None):
+		"""Set inspired oxygen fraction and recompute composition at selected sites."""
 		self.fio2 = float(new_fio2)
 
 		if sites is None:

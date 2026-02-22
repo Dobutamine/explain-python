@@ -6,9 +6,12 @@ from functions.gas_composition import calc_gas_composition
 from helpers.realtime_moving_average import RealTimeMovingAverage
 
 class Ecls(BaseModel):
+	"""Extracorporeal life support (ECLS/ECMO) circuit controller."""
+
 	model_type = "ecls"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize ECLS configuration, runtime metrics, and component references."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.ecls_running = False
@@ -100,6 +103,7 @@ class Ecls(BaseModel):
 		self._part_average = RealTimeMovingAverage(300)
 
 	def _resolve_model(self, model_name):
+		"""Resolve a circuit component by name from registry or engine."""
 		if not model_name:
 			return None
 		if isinstance(self.model_ref, dict):
@@ -112,6 +116,7 @@ class Ecls(BaseModel):
 		return None
 
 	def init_model(self, args=None):
+		"""Resolve circuit components and apply initial ECLS configuration."""
 		super().init_model(args)
 
 		self._drainage = self._resolve_model("ECLS_DRAINAGE")
@@ -157,6 +162,7 @@ class Ecls(BaseModel):
 			self.switch_gas_components(self.ecls_running)
 
 	def calc_model(self):
+		"""Run one ECLS control/update step for flow, pressures, and gas settings."""
 		if self.ecls_running and self._return is not None:
 			self.blood_flow = self._flow_average.add_value(float(getattr(self._return, "flow", 0.0) or 0.0) * 60.0)
 
@@ -220,11 +226,13 @@ class Ecls(BaseModel):
 			self._return.no_flow = self.tubing_clamped
 
 	def switch_ecls(self, state):
+		"""Enable or disable ECLS blood and gas sub-circuits."""
 		self.ecls_running = bool(state)
 		self.switch_blood_components(self.ecls_running)
 		self.switch_gas_components(self.ecls_running)
 
 	def set_ecls_mode(self, new_mode):
+		"""Set ECLS operating mode and update circuit topology switches."""
 		self.ecls_mode = str(new_mode)
 		if self.ecls_mode in {"VA-ECMO", "VV-ECMO"}:
 			self._is_oxy_circuit = True
@@ -531,6 +539,7 @@ class Ecls(BaseModel):
 				self._gasout.calc_pressure()
 
 	def set_gas_compositions(self):
+		"""Recompute gas compositions for ECLS gas compartments."""
 		total_gas_flow = self.gas_flow + (self.co2_gas_flow / 1000.0)
 		added_fico2 = (self.co2_gas_flow * 0.001 / total_gas_flow) if total_gas_flow > 0 else 0.0
 		self._fico2_gas = 0.0004 + added_fico2
@@ -543,9 +552,11 @@ class Ecls(BaseModel):
 			calc_gas_composition(self._gasout, 0.205, 20.0, 0.1, 0.0004)
 
 	def _calc_tube_volume(self, diameter, length):
+		"""Return tube volume in mL for diameter (m) and length (m)."""
 		return math.pi * math.pow(0.5 * float(diameter), 2) * float(length) * 1000.0
 
 	def _calc_tube_resistance(self, diameter, length, viscosity=6.0):
+		"""Return Poiseuille-based tube resistance estimate."""
 		n_pas = float(viscosity) / 1000.0
 		radius_meters = float(diameter) / 2.0
 		if radius_meters <= 0.0 or float(length) <= 0.0:

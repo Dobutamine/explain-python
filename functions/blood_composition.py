@@ -1,5 +1,7 @@
 import math
 
+"""Blood-gas and acid-base equilibrium helper functions."""
+
 
 # -----------------------------------------------------------------------------
 # Constants
@@ -56,12 +58,14 @@ PREV_PO2 = 18.7
 
 
 def _bc_get(container, key, default=None):
+	"""Read key/attribute from dict-like or object container."""
 	if isinstance(container, dict):
 		return container.get(key, default)
 	return getattr(container, key, default)
 
 
 def _bc_set(container, key, value):
+	"""Write key/attribute on dict-like or object container."""
 	if isinstance(container, dict):
 		container[key] = value
 	else:
@@ -69,10 +73,12 @@ def _bc_set(container, key, value):
 
 
 def calc_blood_composition(bc):
+	"""Public wrapper to compute blood composition for a compartment container."""
 	_calc_blood_composition_py(bc)
 
 
 def _calc_blood_composition_py(bc):
+	"""Compute pH, gases, bicarbonate/base excess, and oxygen saturation."""
 	global TCO2, TO2, SID, ALBUMIN, PHOSPHATES, UMA, HEMOGLOBIN, TEMP
 	global PREV_PH, PREV_PO2, LEFT_HP, RIGHT_HP, PH, PCO2, HCO3, BE
 	global LOG10_P50, P50, P50_N, LEFT_O2, RIGHT_O2
@@ -151,6 +157,7 @@ def _calc_blood_composition_py(bc):
 
 
 def _net_charge_plasma(hp_estimate):
+	"""Plasma charge-balance residual used for root finding."""
 	global PH, HCO3, PCO2
 
 	PH = -math.log10(hp_estimate / 1000.0)
@@ -168,12 +175,14 @@ def _net_charge_plasma(hp_estimate):
 
 
 def _calc_so2(po2_estimate):
+	"""Calculate oxygen saturation via Hill equation."""
 	po2_n = math.pow(po2_estimate, N_HILL)
 	denominator = po2_n + P50_N
 	return po2_n / denominator
 
 
 def _do2_content(po2_estimate):
+	"""Oxygen-content residual used to solve for PO2."""
 	global SO2
 
 	SO2 = _calc_so2(po2_estimate)
@@ -187,6 +196,7 @@ def _do2_content(po2_estimate):
 
 
 def _brent_root_finding(function, left_bound, right_bound, max_iter, tolerance):
+	"""Brent-style root finder with guarded bisection fallback."""
 	f_left = function(left_bound)
 	f_right = function(right_bound)
 

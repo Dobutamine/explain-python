@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class Circulation(BaseModel):
+	"""High-level circulation controller for vascular factors and blood volumes."""
+
 	model_type = "circulation"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize circulation model groups and update cadence state."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.heart_chambers = []
@@ -39,6 +42,7 @@ class Circulation(BaseModel):
 		self._update_counter_slow = 0.0
 
 	def init_model(self, args=None):
+		"""Initialize grouped vessel lists for systemic and pulmonary updates."""
 		super().init_model(args)
 
 		self._combined_list = [
@@ -63,6 +67,7 @@ class Circulation(BaseModel):
 		]
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -78,6 +83,7 @@ class Circulation(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Apply ANS/SVR/PVR updates and periodically recompute blood volumes."""
 		time_step = getattr(self, "_t", 0.0)
 		if time_step <= 0.0:
 			return
@@ -108,6 +114,7 @@ class Circulation(BaseModel):
 			self.calc_blood_volumes()
 
 	def set_svr_factor(self, new_svr_factor):
+		"""Set systemic vascular resistance factor across systemic vessel groups."""
 		updated_svr_factor = float(new_svr_factor)
 
 		for model_name in self._syst_models:
@@ -128,6 +135,7 @@ class Circulation(BaseModel):
 		self.svr_factor = updated_svr_factor
 
 	def set_pvr_factor(self, new_pvr_factor):
+		"""Set pulmonary vascular resistance factor across pulmonary groups."""
 		updated_pvr_factor = float(new_pvr_factor)
 
 		for model_name in self._pulm_models:
@@ -148,6 +156,7 @@ class Circulation(BaseModel):
 		self.pvr_factor = updated_pvr_factor
 
 	def calc_blood_volumes(self):
+		"""Compute systemic/pulmonary/cardiac blood volume totals and percentages."""
 		self.total_blood_volume = 0.0
 		self.syst_blood_volume = 0.0
 		self.pulm_blood_volume = 0.0

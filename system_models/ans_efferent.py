@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class AnsEfferent(BaseModel):
+	"""ANS efferent pathway mapping firing-rate input to target effectors."""
+
 	model_type = "ans_efferent"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize efferent target mapping and response dynamics."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.target_model = ""
@@ -22,6 +25,7 @@ class AnsEfferent(BaseModel):
 		self._cum_firing_rate_counter = 1.0
 
 	def _resolve_model(self, model_name):
+		"""Resolve a model by name from local registry or attached engine."""
 		if not model_name:
 			return None
 
@@ -37,6 +41,7 @@ class AnsEfferent(BaseModel):
 		return None
 
 	def calc_model(self):
+		"""Update effector value and write it to target model property."""
 		self._update_counter += getattr(self, "_t", 0.0)
 		if self._update_counter < self._update_interval:
 			return
@@ -65,5 +70,6 @@ class AnsEfferent(BaseModel):
 		self._cum_firing_rate_counter = 0.0
 
 	def update_effector(self, new_firing_rate, weight):
+		"""Accumulate weighted firing-rate contribution from afferent pathways."""
 		self._cum_firing_rate += (float(new_firing_rate) - 0.5) * float(weight)
 		self._cum_firing_rate_counter += 1.0

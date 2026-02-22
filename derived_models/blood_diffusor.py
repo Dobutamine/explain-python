@@ -3,9 +3,12 @@ from functions.blood_composition import calc_blood_composition
 
 
 class BloodDiffusor(BaseModel):
+    """Diffusive exchange model between two blood-containing compartments."""
+
     model_type = "blood_diffusor"
 
     def __init__(self, model_ref={}, name=None):
+        """Initialize blood diffusion settings and component references."""
         super().__init__(model_ref=model_ref, name=name)
 
         self.comp_blood1 = ""
@@ -26,6 +29,7 @@ class BloodDiffusor(BaseModel):
         self._comp_blood2 = None
 
     def _resolve_component(self, component_name):
+        """Resolve a component name from local registry or attached model engine."""
         if not component_name:
             return None
 
@@ -41,6 +45,7 @@ class BloodDiffusor(BaseModel):
         return None
 
     def calc_model(self):
+        """Run one diffusion step for gases and configured blood solutes."""
         self._comp_blood1 = self._resolve_component(self.comp_blood1)
         self._comp_blood2 = self._resolve_component(self.comp_blood2)
 

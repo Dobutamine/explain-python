@@ -4,9 +4,12 @@ from base_models.base_model import BaseModel
 
 
 class Placenta(BaseModel):
+	"""Placental circulation/gas-exchange controller for fetal-maternal interface."""
+
 	model_type = "placenta"
 
 	def __init__(self, model_ref={}, name=None):
+		"""Initialize placenta geometry, diffusion settings, and runtime state."""
 		super().__init__(model_ref=model_ref, name=name)
 
 		self.placenta_running = False
@@ -43,6 +46,7 @@ class Placenta(BaseModel):
 		self._update_counter = 0.0
 
 	def _models(self):
+		"""Return active model registry dictionary."""
 		if isinstance(self.model_ref, dict):
 			return self.model_ref
 
@@ -55,9 +59,11 @@ class Placenta(BaseModel):
 		return {}
 
 	def _model(self, name):
+		"""Resolve a model from the active registry by name."""
 		return self._models().get(name)
 
 	def init_model(self, args=None):
+		"""Initialize placenta structures and apply enabled/disabled state."""
 		super().init_model(args)
 
 		engine = getattr(self, "_model_engine", None)
@@ -68,6 +74,7 @@ class Placenta(BaseModel):
 		self.switch_placenta(self.placenta_running)
 
 	def calc_model(self):
+		"""Run one placenta update step (flows, resistances, and composition links)."""
 		ad_umb_art = self._model("AD_UMB_ART")
 		if ad_umb_art is not None:
 			self.umb_art_flow = float(getattr(ad_umb_art, "flow", 0.0) or 0.0) * 60.0
@@ -132,6 +139,7 @@ class Placenta(BaseModel):
 			plm.tco2 = self.mat_tco2
 
 	def switch_placenta(self, state):
+		"""Enable or disable placenta-related components in the model graph."""
 		state = bool(state)
 		self.is_enabled = state
 		self.placenta_running = state
@@ -177,6 +185,7 @@ class Placenta(BaseModel):
 			umb_ven_ivci.no_flow = self.umb_clamped
 
 	def build_placenta(self):
+		"""Initialize placenta circuit defaults for first-time model setup."""
 		ad_umb_art = self._model("AD_UMB_ART")
 		if ad_umb_art is not None:
 			ad_umb_art.no_flow = self.umb_clamped
@@ -235,25 +244,33 @@ class Placenta(BaseModel):
 			umb_ven_ivci.r_back = 50.0
 
 	def clamp_umbilical_cord(self, state):
+		"""Set umbilical cord clamping state."""
 		self.umb_clamped = bool(state)
 
 	def set_umbilical_arteries_resistance(self, new_res):
+		"""Set umbilical arterial resistance."""
 		self.umb_art_res = float(new_res)
 
 	def set_umbilical_vein_resistance(self, new_res):
+		"""Set umbilical venous resistance."""
 		self.umb_ven_res = float(new_res)
 
 	def set_fetal_placenta_resistance(self, new_res):
+		"""Set fetal-placental exchange resistance."""
 		self.plf_res = float(new_res)
 
 	def set_dif_o2(self, new_dif_o2):
+		"""Set O2 diffusion coefficient for placental exchanger."""
 		self.dif_o2 = float(new_dif_o2)
 
 	def set_dif_co2(self, new_dif_co2):
+		"""Set CO2 diffusion coefficient for placental exchanger."""
 		self.dif_co2 = float(new_dif_co2)
 
 	def set_mat_to2(self, new_to2):
+		"""Set maternal total oxygen content input to placenta."""
 		self.mat_to2 = float(new_to2)
 
 	def set_mat_tco2(self, new_tco2):
+		"""Set maternal total carbon dioxide content input to placenta."""
 		self.mat_tco2 = float(new_tco2)

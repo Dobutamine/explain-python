@@ -2,9 +2,12 @@ from base_models.base_model import BaseModel
 
 
 class TimeVaryingElastance(BaseModel):
+    """Capacitance-like chamber with activation-dependent elastance."""
+
     model_type = "time_varying_elastance"
 
     def __init__(self, model_ref = {}, name=None):
+        """Initialize chamber parameters and time-varying elastance state."""
         # initialize the base model properties
         super().__init__(model_ref=model_ref, name=name)
 
@@ -42,6 +45,7 @@ class TimeVaryingElastance(BaseModel):
         self._el_k = 0.0  # calculated elastance non-linear k (unitless)
 
     def calc_model(self):
+        """Run one chamber update step (elastance, volume, pressure)."""
         # calculate the current elastance and volumes
         self.calc_elastance()
         self.calc_volume()
@@ -55,6 +59,7 @@ class TimeVaryingElastance(BaseModel):
         self.calc_pressure()
 
     def calc_elastance(self):
+        """Update minimum/maximum elastance and non-linear term from factors."""
         # calculate the elastances and non-linear elastance incorporating the factors
         self._el_min = self.el_min + (self.el_min_factor - 1) * self.el_min + (self.el_min_factor_ps - 1) * self.el_min
         self._el_max = self.el_max + (self.el_max_factor - 1) * self.el_max + (self.el_max_factor_ps - 1) * self.el_max
@@ -70,6 +75,7 @@ class TimeVaryingElastance(BaseModel):
         self.el_k_factor = 1.0
 
     def calc_volume(self):
+        """Update effective unstressed volume using current scaling factors."""
         # calculate the unstressed volume incorporating the factors
         self._u_vol = self.u_vol  + (self.u_vol_factor - 1) * self.u_vol + (self.u_vol_factor_ps - 1) * self.u_vol
 
@@ -77,6 +83,7 @@ class TimeVaryingElastance(BaseModel):
         self.u_vol_factor = 1.0
 
     def calc_pressure(self):
+        """Compute pressure from diastolic/systolic blend using activation factor."""
         # calculate the recoil pressure
         p_ms = (self.vol - self._u_vol) * self._el_max
         p_ed = self._el_k * (self.vol - self._u_vol) ** 2 + self._el_min * (self.vol - self._u_vol)
@@ -94,11 +101,13 @@ class TimeVaryingElastance(BaseModel):
         self.pres_ext = 0.0
 
     def volume_in(self, dvol, comp_from=None):
+        """Add incoming volume when composition is not fixed."""
         if not self.fixed_composition:
             # add volume to the capacitance
             self.vol += dvol
 
     def volume_out(self, dvol):
+        """Remove outgoing volume when composition is not fixed."""
         if not self.fixed_composition:
             # remove volume from capacitance
             self.vol -= dvol

@@ -6,10 +6,25 @@ import re
 
 
 class BaseModel(ABC):
+    """Abstract base class for all model components.
+
+    It provides common lifecycle behavior:
+    - initialize configurable attributes from a definition,
+    - create nested component models when declared in `components`,
+    - and execute one simulation step through `step_model`.
+    """
+
     # define class-level properties that are common to all models
     model_type = "base"
 
     def __init__(self, model_ref=None, name=None):
+        """Initialize shared model state.
+
+        Args:
+            model_ref: Either a model registry dict or a `ModelEngine`-like
+                object exposing a `models` attribute.
+            name: Optional unique model/component name.
+        """
         # initialization of the base model properties
         if model_ref is None:
             model_ref = {}
@@ -30,6 +45,14 @@ class BaseModel(ABC):
         self._is_initialized = False
 
     def init_model(self, args=None):
+        """Initialize model properties from configuration and nested components.
+
+        Unknown properties are ignored for backward compatibility with legacy
+        definitions.
+
+        Args:
+            args: Configuration as a mapping or list of `{key, value}` items.
+        """
         # model property initialization from args (dict or [{"key":..., "value":...}])
         for key, value in self._normalize_init_args(args).items():
             if not hasattr(self, key):
@@ -40,6 +63,17 @@ class BaseModel(ABC):
         self._is_initialized = True
 
     def _normalize_init_args(self, args):
+        """Normalize initialization input into a plain dictionary.
+
+        Args:
+            args: `None`, mapping, or list/tuple of dict-like `{key, value}`.
+
+        Returns:
+            dict: Normalized key/value config.
+
+        Raises:
+            TypeError: If input format is unsupported.
+        """
         if args is None:
             return {}
 
@@ -57,6 +91,7 @@ class BaseModel(ABC):
         raise TypeError("args must be a dict or a list/tuple of {'key', 'value'} items")
 
     def _init_components(self):
+        """Instantiate and initialize nested models declared in `components`."""
         if not isinstance(self.components, Mapping) or not self.components:
             return
 
@@ -86,6 +121,7 @@ class BaseModel(ABC):
             model_registry[component_name].init_model(component_args)
 
     def _get_model_registry(self):
+        """Return the active model registry dictionary if available."""
         if isinstance(self.model_ref, dict):
             return self.model_ref
 
@@ -97,6 +133,10 @@ class BaseModel(ABC):
         return None
 
     def _resolve_model_class(self, model_type):
+        """Resolve a component `model_type` to a concrete `BaseModel` subclass.
+
+        Supports legacy aliases and searches known model packages.
+        """
         model_type_str = str(model_type)
         normalized_target = re.sub(r"_", "", model_type_str).lower()
         legacy_aliases = {
@@ -132,6 +172,7 @@ class BaseModel(ABC):
         return None
 
     def step_model(self):
+        """Execute one model step if enabled and initialized."""
         # default step_model implementation that can be overridden by subclasses
         if not self.is_enabled or not self._is_initialized:
             return
@@ -140,4 +181,5 @@ class BaseModel(ABC):
 
     @abstractmethod
     def calc_model(self):
+        """Compute one simulation step for the concrete model implementation."""
         raise NotImplementedError("calc_model must be implemented by subclasses")
