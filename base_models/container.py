@@ -13,6 +13,7 @@ class Container(BaseModel):
         self.el_base = 0.0  # baseline elastance E (mmHg/L)
         self.el_k = 0.0  # non-linear elastance factor K2 (unitless)
         self.pres_ext = 0.0  # non persistent external pressure p2(t) (mmHg)
+        self.vol_extra = 0.0  # additional container volume offset (L)
         self.contained_components = [] # list of names of models this Container contains
 
         # non-persistent property factors. These factors reset to 1.0 after each model step

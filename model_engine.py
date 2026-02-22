@@ -121,7 +121,13 @@ class ModelEngine:
 	def _resolve_model_class(self, model_type):
 		model_type_str = str(model_type)
 		normalized_target = re.sub(r"_", "", model_type_str).lower()
-		snake_name = re.sub(r"(?<!^)(?=[A-Z])", "_", model_type_str).lower()
+		legacy_aliases = {
+			"bloodpump": ("pump", "pump"),
+		}
+		if normalized_target in legacy_aliases:
+			normalized_target, snake_name = legacy_aliases[normalized_target]
+		else:
+			snake_name = re.sub(r"(?<!^)(?=[A-Z])", "_", model_type_str).lower()
 
 		candidate_modules = [
 			f"base_models.{snake_name}",

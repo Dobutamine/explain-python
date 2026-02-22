@@ -179,8 +179,13 @@ class Monitor(BaseModel):
 		self._qrs_interval_counter = 0.0
 		self._qrs_interval_counter_factor = 1.0
 		self._rr_update_counter = 0.0
+		self._resp_rate_max_valid = 300.0
 
 	def _resolve_model(self, model_name):
+		if isinstance(model_name, (list, tuple)):
+			if not model_name:
+				return None
+			model_name = model_name[0]
 		if not model_name:
 			return None
 		if isinstance(self.model_ref, dict):
@@ -271,7 +276,9 @@ class Monitor(BaseModel):
 
 		if self._rr_update_counter > 0.015:
 			self._rr_update_counter = 0.0
-			self.resp_rate = self._safe_float(self._breathing, "resp_rate_measured", self.resp_rate)
+			resp_rate_candidate = self._safe_float(self._breathing, "resp_rate_measured", self.resp_rate)
+			if 0.0 <= resp_rate_candidate <= self._resp_rate_max_valid:
+				self.resp_rate = resp_rate_candidate
 		self._rr_update_counter += self._t
 
 		if ncc_ventricular == 1.0:
