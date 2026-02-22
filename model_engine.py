@@ -126,7 +126,7 @@ class ModelEngine:
 		candidate_modules = [
 			f"base_models.{snake_name}",
 			f"composite_models.{snake_name}",
-			f"component_models.{snake_name}",
+			f"derived_models.{snake_name}",
 			f"system_models.{snake_name}",
 			f"device_models.{snake_name}",
 		]

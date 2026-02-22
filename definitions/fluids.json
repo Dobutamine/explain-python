@@ -1,0 +1,62 @@
+{
+	"general": {
+		"name": "fluids",
+		"description": "Isolated fluids model definition",
+		"modeling_stepsize": 0.015
+	},
+	"components": {
+		"VLB": {
+			"model_type": "blood_capacitance",
+			"is_enabled": true,
+			"fixed_composition": false,
+			"vol": 0.2,
+			"u_vol": 0.1,
+			"el_base": 5.0,
+			"el_k": 0.0,
+			"to2": 8.0,
+			"tco2": 24.0,
+			"temp": 37.0,
+			"solutes": {
+				"na": 140.0,
+				"k": 4.0,
+				"ca": 1.2,
+				"mg": 0.8,
+				"cl": 104.0,
+				"lact": 1.0,
+				"albumin": 42.0,
+				"phosphates": 1.2,
+				"uma": 0.0,
+				"hemoglobin": 9.0
+			},
+			"drugs": {}
+		},
+		"FL": {
+			"model_type": "fluids",
+			"is_enabled": true,
+			"fluids": {
+				"normal_saline": {
+					"na": 154.0,
+					"cl": 154.0
+				},
+				"ringers_lactate": {
+					"na": 130.0,
+					"k": 4.0,
+					"ca": 1.5,
+					"cl": 109.0,
+					"lact": 28.0
+				},
+				"packed_cells": {
+					"na": 154.0,
+					"cl": 154.0,
+					"hemoglobin": 18.0
+				},
+				"albumin_20%": {
+					"na": 145.0,
+					"cl": 125.0,
+					"albumin": 200.0
+				}
+			}
+		}
+	},
+	"helpers": {}
+}

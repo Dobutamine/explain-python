@@ -1,4 +1,4 @@
-from component_models.blood_capacitance import BloodCapacitance
+from derived_models.blood_capacitance import BloodCapacitance
 
 
 class Pump(BloodCapacitance):
