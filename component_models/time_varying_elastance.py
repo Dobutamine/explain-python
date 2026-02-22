@@ -15,6 +15,7 @@ class TimeVaryingElastance(BaseModel):
         self.el_k = 0.0  # non-linear elastance coefficient K2 (unitless)
         self.pres_ext = 0.0  # non persistent external pressure p2(t) (mmHg)
         self.act_factor = 0.0  # activation factor from the heart model (unitless)
+        self.fixed_composition = False  # whether volume composition is fixed
 
         # non-persistent property factors. These factors reset to 1.0 after each model step
         self.u_vol_factor = 1.0  # non-persistent unstressed volume factor step (unitless)
@@ -92,7 +93,7 @@ class TimeVaryingElastance(BaseModel):
         # reset the external pressure
         self.pres_ext = 0.0
 
-    def volume_in(self, dvol):
+    def volume_in(self, dvol, comp_from=None):
         if not self.fixed_composition:
             # add volume to the capacitance
             self.vol += dvol

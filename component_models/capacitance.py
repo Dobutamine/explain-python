@@ -78,7 +78,7 @@ class Capacitance(BaseModel):
         # reset the external pressures
         self.pres_ext = 0.0
 
-    def volume_in(self, dvol):
+    def volume_in(self, dvol, comp_from=None):
         if not self.fixed_composition:
             # add volume to the capacitance
             self.vol += dvol
