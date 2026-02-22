@@ -1,13 +1,11 @@
 {
     "general": {
-    "name": "baseline",
-    "description": "Starter baseline model definition",
-    "weight": 3.545,
-    "height": 0.519,
-    "gestational_age": 40,
-    "age": 0,
-    "modeling_stepsize": 0.0005,
-    "model_time_total": 1949.355000167761
+        "name": "baseline_neonate",
+        "description": "Starter baseline model definition",
+        "weight": 3.545,
+        "height": 0.519,
+        "modeling_stepsize": 0.0005,
+        "model_time_total": 0.0
     },
     "components": {
         "Heart": {
