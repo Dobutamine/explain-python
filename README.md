@@ -19,6 +19,26 @@ python -m pip install -r requirements.txt
 python model_engine.py
 ```
 
+## Validation
+
+Run smoke tests for all definitions:
+
+```bash
+PYTHONPATH=. python validation/smoke_test.py
+```
+
+Run smoke test for one definition:
+
+```bash
+PYTHONPATH=. python validation/smoke_test.py --definition baseline_neonate.json --steps 25
+```
+
+Run long soak test:
+
+```bash
+PYTHONPATH=. python validation/soak_test.py --definition baseline_neonate.json --steps 10000 --report-every 2000
+```
+
 ## ModelEngine Usage
 
 Load a model definition from JSON:
