@@ -1,0 +1,70 @@
+{
+	"general": {
+		"name": "pda",
+		"description": "Starter PDA model definition",
+		"modeling_stepsize": 0.0005
+	},
+	"components": {
+		"AA": {
+			"model_type": "blood_capacitance",
+			"is_enabled": true,
+			"fixed_composition": false,
+			"vol": 0.25,
+			"u_vol": 0.2,
+			"el_base": 8.0,
+			"el_k": 0.0,
+			"to2": 8.0,
+			"tco2": 24.0,
+			"temp": 37.0,
+			"solutes": {
+				"na": 140.0,
+				"k": 4.0,
+				"ca": 1.2,
+				"mg": 0.8,
+				"cl": 104.0,
+				"lact": 1.0,
+				"albumin": 42.0,
+				"phosphates": 1.2,
+				"uma": 0.0,
+				"hemoglobin": 9.0
+			},
+			"drugs": {}
+		},
+		"VEN": {
+			"model_type": "blood_capacitance",
+			"is_enabled": true,
+			"fixed_composition": false,
+			"vol": 0.35,
+			"u_vol": 0.3,
+			"el_base": 4.0,
+			"el_k": 0.0,
+			"to2": 6.0,
+			"tco2": 26.0,
+			"temp": 37.0,
+			"solutes": {
+				"na": 140.0,
+				"k": 4.0,
+				"ca": 1.2,
+				"mg": 0.8,
+				"cl": 104.0,
+				"lact": 1.0,
+				"albumin": 42.0,
+				"phosphates": 1.2,
+				"uma": 0.0,
+				"hemoglobin": 9.0
+			},
+			"drugs": {}
+		},
+		"SYS_RES": {
+			"model_type": "resistor",
+			"is_enabled": true,
+			"comp_from": "AA",
+			"comp_to": "VEN",
+			"r_for": 120.0,
+			"r_back": 140.0,
+			"r_k": 0.0,
+			"no_back_flow": false
+		}
+	},
+	"helpers": {}
+}

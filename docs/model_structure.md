@@ -11,8 +11,9 @@ This project is organized around an object-oriented model hierarchy.
 - Base class: [base_models/base_model.py](base_models/base_model.py)
 - Required behavior:
   - `calc_model(self)` must be implemented by subclasses.
-  - `step_model(self)` calls `calc_model(self)` when `is_enabled` is `True`.
-  - `init_model(self, args)` safely maps dictionary config into existing instance attributes.
+  - `step_model(self)` calls `calc_model(self)` only when `is_enabled` is `True` and model initialization is complete.
+  - `init_model(self, args)` supports both dictionary args and JS-style lists of `{key, value}` pairs.
+  - `init_model(self, args)` can auto-create and initialize nested components defined in `self.components`.
 
 ## Component Models
 Folder: [component_models](component_models)
@@ -27,6 +28,7 @@ Folder: [component_models](component_models)
 ### Blood-specialized models
 - [component_models/blood_capacitance.py](component_models/blood_capacitance.py): `Capacitance` + blood composition state (solutes, gases, drugs)
 - [component_models/blood_time_varying_elastance.py](component_models/blood_time_varying_elastance.py): `TimeVaryingElastance` + blood composition state
+- [component_models/heart_chamber.py](component_models/heart_chamber.py): `TimeVaryingElastance` chamber with blood composition and ANS-modulated elastance
 - [component_models/blood_diffusor.py](component_models/blood_diffusor.py): diffusion between two blood components (O2, CO2, solutes)
 - [component_models/pump.py](component_models/pump.py): blood pump extending blood capacitance with pump pressure coupling
 
@@ -49,6 +51,7 @@ Folder: [functions](functions)
     - `GasCapacitance`
   - `TimeVaryingElastance`
     - `BloodTimeVaryingElastance`
+    - `HeartChamber`
   - `Resistor`
   - `Valve`
   - `Container`
@@ -72,6 +75,7 @@ classDiagram
     Capacitance <|-- GasCapacitance
 
     TimeVaryingElastance <|-- BloodTimeVaryingElastance
+    TimeVaryingElastance <|-- HeartChamber
 ```
 
 ## Runtime Interaction Pattern

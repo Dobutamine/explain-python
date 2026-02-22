@@ -3,6 +3,7 @@
 ## Documentation
 
 - [Model Structure](docs/model_structure.md)
+- Heart system components include [HeartChamber](component_models/heart_chamber.py).
 
 ## Setup (PyPy)
 
@@ -16,6 +17,35 @@ python -m pip install -r requirements.txt
 
 ```bash
 python model_engine.py
+```
+
+## ModelEngine Usage
+
+Load a model definition from JSON:
+
+```python
+from model_engine import ModelEngine
+
+engine = ModelEngine().load_json_file("definitions/example_minimal.json")
+print(engine.is_initialized)
+print(sorted(engine.models.keys()))
+```
+
+Build directly from a Python dictionary:
+
+```python
+from model_engine import ModelEngine
+
+definition = {
+	"general": {"modeling_stepsize": 0.01},
+	"components": {
+		"C1": {"model_type": "capacitance", "is_enabled": True, "vol": 0.2, "u_vol": 0.1, "el_base": 5.0},
+		"R1": {"model_type": "resistor", "is_enabled": True, "comp_from": "C1", "comp_to": "C1", "r_for": 100.0, "r_back": 100.0}
+	}
+}
+
+engine = ModelEngine().build(definition)
+engine.step_model()
 ```
 
 ## Blood Composition Example

@@ -1,4 +1,4 @@
-from component_models.time_varying_elastance import TimeVaryingElastance
+from base_models.time_varying_elastance import TimeVaryingElastance
 
 
 class BloodTimeVaryingElastance(TimeVaryingElastance):

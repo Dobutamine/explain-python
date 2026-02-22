@@ -1,4 +1,4 @@
-from component_models.capacitance import Capacitance
+from base_models.capacitance import Capacitance
 
 
 class BloodCapacitance(Capacitance):
